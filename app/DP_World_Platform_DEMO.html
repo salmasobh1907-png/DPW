@@ -2292,7 +2292,7 @@ function renderReq(){
 // Reads the demo pricing mailbox (pricing.test@example.com, all dummy) through the Gmail connector,
 // the same way the real tool reads Outlook. Carrier offers go to the Carrier offers reader; sales and
 // network requests open Rates & quote with the lane, customer and containers filled in.
-const IBX={items:[],state:"idle",msg:"",src:"",open:null,q:"in:inbox newer_than:60d -from:google.com -from:microsoft.com -from:accountprotection.microsoft.com"};
+const IBX={items:[],state:"idle",msg:"",src:"",open:null,q:(function(){ try{ const v=JSON.parse(localStorage.getItem("ibxQ_v1")||"null"); if(v) return String(v); }catch(e){} return "in:inbox newer_than:30d (rate OR rates OR quote OR quotation OR RFQ OR booking OR freight OR spot OR shipment) -from:google.com -from:microsoft.com -from:accountprotection.microsoft.com"; })()};
 const IBX_PRICING="pricing.test@example.com", IBX_SALES="sales.test@example.com";
 IBX.sentRe=new Set(); try{ IBX.done=new Set(JSON.parse(localStorage.getItem("ibxDone")||"[]")); }catch(e){ IBX.done=new Set(); }
 function ibxMarkDone(id){ IBX.done.add(id); try{ localStorage.setItem("ibxDone",JSON.stringify([...IBX.done])); }catch(e){} }
@@ -2323,7 +2323,7 @@ function ibxH2T(h){ try{ let t=String(h||"").replace(/<(style|script|head)[\s\S]
     const d=document.createElement("textarea"); d.innerHTML=t; t=d.value;
     return t.split("\n").map(l=>l.replace(/[ \t ]+/g," ").replace(/\s*\|\s*$/,"").trim()).filter((l,i,a)=>l||(a[i-1]||"")).join("\n").trim(); }catch(e){ return String(h||""); } }
 function ibxBest(plain,html){ const p=String(plain||""); if(html&&(/<table/i.test(html)||(p.split("\n").length<4&&p.length>300))) return ibxH2T(html); return p; }
-function ibxUse(list,src){ IBX.items=list.map((e,i)=>({id:e.id||("x"+i),subject:e.subject||"",from:e.from||"",date:e.date||"",body:ibxClean(e.body),html:e.html||"",kind:ibxKind(e.subject||"",e.from||"",e.body||""),replied:!!e.replied,msgs:e.msgs||[]})); IBX.src=src; IBX.state="ok"; renderIbx(); updateBadges&&updateBadges(); }
+function ibxUse(list,src){ IBX.items=list.map((e,i)=>({id:e.id||("x"+i),lastMsgId:e.lastMsgId||"",subject:e.subject||"",from:e.from||"",date:e.date||"",body:ibxClean(e.body),html:e.html||"",kind:ibxKind(e.subject||"",e.from||"",e.body||""),replied:!!e.replied,msgs:e.msgs||[]})); IBX.src=src; IBX.state="ok"; renderIbx(); updateBadges&&updateBadges(); }
 function ibxTO(pr,ms){ return Promise.race([pr,new Promise((_,no)=>setTimeout(()=>no(Object.assign(new Error("timeout"),{code:"timeout"})),ms))]); }
 async function ibxLoad(quiet){
   if(IBX.busy) return; IBX.busy=true; try{ await ibxLoad2(quiet); }finally{ IBX.busy=false; } }
@@ -2338,7 +2338,7 @@ async function ibxLoad2(quiet){
     const GT=await Promise.all(th.slice(0,20).map(t=>ibxTO(mcp.callTool("Gmail","get_thread",{threadId:t.id,messageFormat:"FULL_CONTENT"},{cache:false}),15000).then(g=>({t,g})).catch(()=>null)));
     for(const it of GT){ if(!it) continue; const t=it.t; try{ const g=it.g; const ms=(g.payload&&g.payload.messages)||[]; const m=ms[0]||{};
       const rep=ms.slice(1).some(x=>String(x.sender||"").toLowerCase().includes("pricing.team"))&&!String(m.sender||"").toLowerCase().includes("pricing.team");
-      out.push({id:t.id,subject:m.subject||"",from:m.sender||"",date:m.date||"",body:ibxBest(m.plaintextBody,m.htmlBody),html:m.htmlBody||"",replied:rep,msgs:ms.slice(1).map(x=>({from:x.sender||"",date:x.date||"",body:String(ibxBest(x.plaintextBody,x.htmlBody)).split(/\nOn .{5,80} wrote:/)[0].slice(0,1500)}))}); }catch(e){} }
+      out.push({id:t.id,lastMsgId:(ms[ms.length-1]||{}).id||"",subject:m.subject||"",from:m.sender||"",date:m.date||"",body:ibxBest(m.plaintextBody,m.htmlBody),html:m.htmlBody||"",replied:rep,msgs:ms.slice(1).map(x=>({from:x.sender||"",date:x.date||"",body:String(ibxBest(x.plaintextBody,x.htmlBody)).split(/\nOn .{5,80} wrote:/)[0].slice(0,1500)}))}); }catch(e){} }
     try{ const s2=await ibxTO(mcp.callTool("Gmail","search_threads",{query:"in:sent to:"+IBX_SALES+" newer_than:60d",pageSize:30,view:"THREAD_VIEW_MINIMAL"},{cache:false}),10000);
       ((s2&&s2.payload&&s2.payload.threads)||[]).forEach(t=>(t.messages||[]).forEach(x=>{ if(x.subject) IBX.sentRe.add(ibxBare(x.subject)); })); }catch(e){}
     out.forEach(x=>{ if(IBX.sentRe.has(ibxBare(x.subject))) x.replied=true; });
@@ -2428,12 +2428,12 @@ async function ibxSendSales(){ const e=IBX.req, b=$("of-gm"), msg=$("of-msg"); i
   let M=offerModel(); if(!M.list.length){ try{ suggestOffer(); }catch(x){} M=offerModel(); }
   if(!M.list.length){ msg.textContent="No valid rate on this lane for this equipment."; return; } M=ofView(M);
   renderOffer(); const {html,text,who}=ibxSalesHtml(e,M); const subj="Re: "+String(e.subject||"").replace(/^DEMO\s*\|\s*/i,"");
-  b.disabled=true; b.textContent="Sending…"; let sent=false, code="";
+  b.disabled=true; b.textContent="Saving draft…"; let sent=false, code="";
   if(IBX.src==="gmail"){ let mcp=null; try{ mcp=window.claude&&await claude.use("mcp"); }catch(x){}
-    if(mcp){ try{ await mcp.callTool("Gmail","send_message",{to:[IBX_SALES],subject:subj,htmlBody:html,body:text,replyThreadId:e.id}); sent=true; }catch(x){ code=(x&&x.code)||"error"; } } else code="no_gmail"; }
+        if(mcp){ try{ const to=(String(e.from||"").match(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/)||[IBX_SALES])[0]; const r=await mcp.callTool("Gmail","create_draft",{to:[to],subject:subj,htmlBody:html,body:text,...(e.lastMsgId?{replyToMessageId:e.lastMsgId}:{})}); sent=true; IBX.draftUrl=(r&&r.payload&&r.payload.viewUrl)||""; IBX.draftTo=to; }catch(x){ code=(x&&x.code)||"error"; } } else code="no_gmail"; }
   else code="offline";
   await ibxLogFromReq(e,who,M); ibxMarkDone(e.id);
-  if(sent){ msg.textContent=`Sent to ${who} at ${IBX_SALES}, as a reply in the same email thread. Logged as an offer to ${who}: it counts as a quote when ${who.split(" ")[0]} sends it to the customer.`; b.textContent="Sent ✓"; setTimeout(()=>{ try{ IBX.ck=true; ibxLoad(true); }catch(x){} },4000); }
+  if(sent){ msg.textContent=`Draft saved in your Gmail as a reply to ${IBX.draftTo||IBX_SALES}. Open Gmail Drafts, check it and press Send yourself: the tool never sends. Logged as an offer to ${who}: it counts as a quote when ${who.split(" ")[0]} sends it to the customer.`; b.textContent="Draft saved ✓"; if(IBX.draftUrl&&/^https:\/\//.test(IBX.draftUrl)){ const a=document.createElement("a"); a.href=IBX.draftUrl; a.target="_blank"; a.rel="noopener"; a.textContent=" Open the draft"; msg.appendChild(a); } }
   else { let ok=false; try{ await navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([html],{type:"text/html"}),"text/plain":new Blob([text],{type:"text/plain"})})]); ok=true; }catch(x){}
     window.open("https://mail.google.com/mail/?authuser="+encodeURIComponent(IBX_PRICING)+"&view=cm&fs=1&to="+encodeURIComponent(IBX_SALES)+"&su="+encodeURIComponent(subj),"_blank","noopener");
     msg.textContent=(code==="offline"?"Offline copy: ":"Gmail could not send from the page ("+code+"). ")+(ok?"The quote table is copied: in the Gmail window press Ctrl+V, then Send.":"Use Copy for Outlook, then paste in Gmail.")+` Logged as an offer to ${who}: it counts as a quote when ${who.split(" ")[0]} sends it to the customer.`; b.disabled=false; b.textContent="Send offer to "+who.split(" ")[0]+" (sales)"; }

@@ -248,6 +248,10 @@ Managers, Directors and the CEO open here. Headline = the biggest pain. **How ar
 Pricing only, never in the email. **Rate move on the lane**: lowest *standard* rate (40', else 20') valid now vs the latest expired month on the same lane; alert at 5 % or more (`rateMoves`). The same list is a card on **Today** with what to do (up: re-check open offers; down: tell sales). **Free time and D&D**: free time per option (warns when a rate has none) and a cost line: days over free time × boxes × USD per day (default 150, market level for Egypt ports, set by Pricing in `rx_v1`). **ACI / Nafeza**: imports to Egypt need the ACID (19 digits) before loading at origin; exports show "not needed" (`aciCheck`). **Currency and FX**: flags any option not in USD; Pricing saves the bank rate (EGP per USD) with its date and name; warns when older than 7 days. The tool never fetches an FX rate.
 Terms added to the quote (email, PDF, Excel): D&D after free time as per tariff; "free time as per carrier tariff" when a rate has none; currency; EGP payment at the bank rate on the invoice date with the saved reference rate and date; ACID line on imports (`rxTerms`).
 
+### 5.24 Live Gmail (owner's private page only)
+
+On the published page, **Inbox → Check inbox** reads the owner's Gmail through the claude.ai Gmail connector (`search_threads`, `get_thread`), last 30 days, rate / quote / booking / freight words only (query saved per browser in `ibxQ_v1`). The reply button saves a **Gmail draft** (`create_draft`) as a reply to the sender; the person opens Gmail and sends it. The tool never sends. Nothing read from Gmail is written to the repo. Without the connector the page uses the offline dummy copy. For DP World, IT replaces this with M365 shared mailboxes via Microsoft Graph (read only).
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).

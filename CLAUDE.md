@@ -18,12 +18,13 @@ The next step with IT is in `docs/IT_Needs_Map.html`.
 
 ## 2. Data and security rules (hard rules, never break)
 
-- **Dummy data only in this folder.** Never add real rates, real customer names, real emails, real carrier contracts or real Rate Bank rows. If Salma pastes real data, warn her and ask to use dummy data instead.
+- **Dummy data only in this folder** (the live Gmail view below is the only exception, and nothing from it is saved here). Never add real rates, real customer names, real emails, real carrier contracts or real Rate Bank rows. If Salma pastes real data, warn her and ask to use dummy data instead.
 - **Never read, write or touch Youssef Sakr's Rate Bank files** (Rate Bank Export.xlsx, Rate Bank Import.xlsx, Reference Sheet) or any copy of them. They are view-only for everyone and this tool must not write to them, not even "a small fix".
 - **Never open the "Carrier Credentials" sheet.** Never read, copy, store or type passwords, keys or tokens. Salma logs in herself. The app already skips any sheet named like credential/password; keep that.
 - Pages that show **buy rates** are shared **inside DP World only**, never "Anyone with the link".
 - No AI / LLM inside the app. IT confirmed the tool must be **plain rules (keywords, formulas)**, no model calls.
 - Do not send emails. "Send" buttons only open a draft (Outlook/Gmail compose) for a human to send.
+- **Gmail connection (allowed by Salma, 27 Nov 2026):** the published tool page may read Salma's own Gmail through the claude.ai Gmail connector: `search_threads` and `get_thread` (read) and `create_draft` (draft only). **Never `send_message`.** Real emails are shown only in her browser at view time: never copy them, their rates, names or addresses into this folder, the repo, test data or docs. The page that has this connection stays **private** (not shared, never "Anyone with the link"). At work, the target is still M365 shared mailboxes via Graph (read only) once IT connects it.
 
 ## 3. Rate rules (the tool must apply these)
 
