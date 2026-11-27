@@ -215,6 +215,13 @@ A chat-style panel with a fixed help list (`GUIDE`, about 20 questions) matched 
 
 The words the tool understands, used by Quick price, the Guide and message reading: ports (names, codes, Arabic spellings), equipment (40HQ = 40 high cube = 40' HC, 40 قدم), work words in English, Egyptian Arabic and Franco (rate = سعر = se3r = as3ar …), filler words to skip (3ayz, عايز, mn, l …). Arabic digits are read as numbers. One letter off or two letters swapped is accepted for port names (Jedah, Valencai). Quick price reads the line as typed first, then through the dictionary. The Guide ranks answers with **BM25** (a fixed ranking formula from classic search engines). "Words the tool did not understand" (from Quick price and the Guide) are listed with a count; the tool owner adds them in one click (`kb_v1`, `kbMiss_v1`; changes go to the change log). "Try it" shows how a line is read. Not AI: nothing is added without the owner.
 
+### 5.18 Quotation PDF: watermark, lock and check code
+
+- **Watermark**: the official logo (uploaded once by the tool owner in Settings & sources → Logo for quotation PDFs; PNG/JPG up to 300 KB, from the Brand team) is printed see-through (8 %) behind the table on every page; until then the words "DP WORLD". The tool never draws the logo itself.
+- **Lock**: the PDF is encrypted with a random owner password that is kept nowhere: print allowed, editing and copying not. Honest limit: jsPDF 2.5.1 uses RC4, which most readers respect but a skilled person can remove, so the check code below is the real protection.
+- **Quotation number and check code** (`OF-YYMMDD-001`, `7F3A-91C2`) on top and at the bottom of every page. The code is calculated from the number, time, title, table and remarks; the tool keeps what it sent (`ofVerify_v1`). **Support → Verify a quotation**: number + code (+ optionally a rate from the document) → Matches, or "does not match / the number is not in the quotation the tool sent". Production: the record lives in the database (and can be signed on the server).
+- Mail drafts cannot attach files by link: the PDF is downloaded and attached by hand; with Microsoft Graph (IT) the draft can carry the PDF.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).

@@ -578,3 +578,12 @@ test('dictionary: the owner adds a word; unknown words are listed for review', a
     localStorage.removeItem('kb_v1'); return { before: !!before.err, miss, after: after.dest, missAfter }; });
   assert.equal(r.before, true); assert.deepEqual(r.miss, ['jdh']); assert.equal(r.after, 'Jeddah'); assert.deepEqual(r.missAfter, []);
 });
+
+test('quotation check: the code matches only the document the tool sent; a changed rate or code is caught', async () => {
+  const r = await run(() => { const R = window.__rules; localStorage.removeItem('ofVerify_v1');
+    const Q = { no: 'OF-261127-009', at: '2026-11-27T10:00:00Z', title: 'Ocean freight offer', head: ['Carrier', '40\\''], rows: [['Sahara Feeder', '955']], terms: ['Per container'] }; Q.code = R.ofCheck(Q); R.ofRecord(Q);
+    const changed = R.ofCheck({ ...Q, rows: [['Sahara Feeder', '855']] });
+    return { fmt: /^[0-9A-F]{4}-[0-9A-F]{4}$/.test(Q.code), diff: changed !== Q.code, ok: R.ofVerify('of-261127-009', Q.code, '955').ok, rate: R.ofVerify('OF-261127-009', Q.code, '855').why, code: R.ofVerify('OF-261127-009', '0000-0000').why, none: R.ofVerify('OF-1', 'x').why }; });
+  assert.ok(r.fmt && r.diff && r.ok);
+  assert.match(r.rate, /855 is not in the quotation/); assert.match(r.code, /does not match/); assert.match(r.none, /No quotation/);
+});
