@@ -625,3 +625,16 @@ test('CEO view sees buy rates (not treated as Sales)', async () => {
   const r = await pg.evaluate(() => ({ sales: document.body.classList.contains('sales'), pressed: [...document.querySelectorAll('#roleSw button[aria-pressed="true"]')].map(b => b.id) }));
   await pg.close(); assert.deepEqual(r, { sales: false, pressed: ['r-ceo'] });
 });
+
+test('dictionary feeds: unknown ports from emails / WhatsApp / sources are listed; a word list and a UN/LOCODE list import', async () => {
+  const r = await run(() => { const R = window.__rules; ['kb_v1', 'kbMiss_v1'].forEach(k => localStorage.removeItem(k));
+    R.kbCheckRows([{ pol: 'Sokhna', pod: 'Atlantisport' }, { pol: 'Sokhna', pod: 'Jedah' }], 'WhatsApp');
+    const miss = JSON.parse(localStorage.getItem('kbMiss_v1') || '[]').map(x => [x.w, x.where]);
+    const a = R.kbImportRows([['Section', 'Means', 'Also written as'], ['port', 'Jeddah', 'jdh, jd2'], ['word', 'rate', 'taman'], ['port', 'Atlantis', 'atl'], ['ignore', '', 'yalla'], ['colour', 'x', 'y']]);
+    const b = R.kbImportRows([['LOCODE', 'Name'], ['AEJEA', 'Jebel Ali'], ['XXABC', 'Nowhere']]);
+    const p = R.tdParse('Sokhna jdh 1x40').dest, q = R.tdParse('Sokhna aejea 1x40').dest;
+    ['kb_v1', 'kbMiss_v1'].forEach(k => localStorage.removeItem(k)); return { miss, a: [a.added, a.skipped], b: [b.added, b.skipped], p, q }; });
+  assert.deepEqual(r.miss, [['atlantisport', 'WhatsApp']]);   // "Jedah" is understood (typo), Atlantisport is not
+  assert.deepEqual(r.a, [4, 2]); assert.deepEqual(r.b, [1, 1]);
+  assert.equal(r.p, 'Jeddah'); assert.equal(r.q, 'Jebel Ali');
+});
