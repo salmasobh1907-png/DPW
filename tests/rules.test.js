@@ -461,8 +461,47 @@ test('sign-in: the app starts on a sign-in screen; picking a user sets the view 
 test('sign-in: a signed-in person sees only their own view (no Pricing / Sales / Director switch)', async () => {
   const pg = await browser.newPage(); await pg.route(/^https?:\/\//, x => x.abort());
   await pg.goto(PAGE.replace('?skipLogin=1', '')); await pg.waitForSelector('#loginDlg[open]');
-  await pg.click('[data-lg="me"]'); await pg.waitForSelector('#launchDlg[open]'); await pg.click('#launchDlg [data-lgo=""]');
+  await pg.click('[data-lg="nour"]'); await pg.waitForSelector('#launchDlg[open]'); await pg.click('#launchDlg [data-lgo=""]');
   const r = await pg.evaluate(() => ({ sw: document.getElementById('roleSw').hidden, pricing: window.__rules.navItems().flatMap(g => g[1]).some(x => x[0] === 'today') }));
   await pg.close();
   assert.deepEqual(r, { sw: true, pricing: true });
+});
+
+test('admin: only the tool owner changes settings; others see them read-only, the owner keeps every view', async () => {
+  const pg = await browser.newPage(); await pg.route(/^https?:\/\//, x => x.abort());
+  await pg.goto(PAGE.replace('?skipLogin=1', '')); await pg.waitForSelector('#loginDlg[open]');
+  await pg.click('[data-lg="nour"]'); await pg.waitForSelector('#launchDlg[open]'); await pg.click('#launchDlg [data-lgo="apps"]').catch(() => {});
+  await pg.evaluate(() => { const d = document.getElementById('launchDlg'); if (d) { d.close(); d.remove(); } document.querySelector('#nav button[data-k="apps"]').click(); }); await pg.waitForTimeout(300);
+  const nour = await pg.evaluate(() => ({ admin: window.__rules.isAdmin(), note: !!document.querySelector('#p-apps .ro-note'), locked: [...document.querySelectorAll('#p-apps [data-ape]')].every(b => b.disabled) }));
+  await pg.click('#whoBtn'); await pg.waitForSelector('#loginDlg[open]'); await pg.click('[data-lg="me"]'); await pg.waitForSelector('#launchDlg[open]');
+  await pg.evaluate(() => { const d = document.getElementById('launchDlg'); d.close(); d.remove(); document.querySelector('#nav button[data-k="apps"]').click(); }); await pg.waitForTimeout(300);
+  const me = await pg.evaluate(() => ({ admin: window.__rules.isAdmin(), note: !!document.querySelector('#p-apps .ro-note'), open: [...document.querySelectorAll('#p-apps [data-ape]')].some(b => !b.disabled), sw: document.getElementById('roleSw').hidden }));
+  await pg.close();
+  assert.deepEqual(nour, { admin: false, note: true, locked: true });
+  assert.deepEqual(me, { admin: true, note: false, open: true, sw: false });
+});
+
+test('tickets: anyone can open one; it records who, when, screen and the last errors; the owner answers and changes status', async () => {
+  const r = await run(() => { const R = window.__rules; ['tickets_v1', 'errLog_v1'].forEach(k => localStorage.removeItem(k));
+    R.errAdd('TypeError: x is undefined', 'page:1');
+    const t = R.tktNew({ type: 'bug', title: 'Quick price shows no rate', text: 'Jeddah 2x40', prio: 'urgent', to: 'both' });
+    R.tktUpd(t.id, { status: 'prog' }, 'Looking at it'); const u = R.tktAll()[0], A = R.adminAlerts();
+    return { id: u.id, by: u.byName, screen: typeof u.tech.screen, err: u.tech.errors[0].msg, status: u.status, comments: u.comments.map(c => c.text), urgent: A.urgent }; });
+  assert.equal(r.id, 'T-0001'); assert.ok(r.by); assert.equal(r.screen, 'string');
+  assert.match(r.err, /x is undefined/); assert.equal(r.status, 'prog');
+  assert.deepEqual(r.comments, ['Status: New → In progress', 'Looking at it']); assert.equal(r.urgent, 1);
+});
+
+test('change log: a settings change is recorded with who and what', async () => {
+  const log = await run(() => new Promise(z => { localStorage.removeItem('audit_v1'); document.querySelector('#nav button[data-k="apps"]').click();
+    setTimeout(() => { document.querySelector('[data-apm="outlook"]').click(); z(JSON.parse(localStorage.getItem('audit_v1') || '[]')); }, 300); }));
+  assert.ok(log.some(x => /Apps hub/.test(x.what) && x.who && x.at));
+});
+
+test('tickets (screen): the Report button opens the form and Send saves the ticket', async () => {
+  const pg = await browser.newPage(); await pg.route(/^https?:\/\//, x => x.abort()); await pg.goto(PAGE); await pg.waitForFunction(() => !!window.__rules);
+  await pg.evaluate(() => localStorage.removeItem('tickets_v1'));
+  await pg.click('#fabTkt'); await pg.waitForSelector('#tktDlg[open]'); await pg.fill('#tkTi', 'Screen test'); await pg.click('#tktDlg button[type="submit"]'); await pg.waitForTimeout(300);
+  const r = await pg.evaluate(() => ({ n: JSON.parse(localStorage.getItem('tickets_v1') || '[]').length, pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id }));
+  await pg.close(); assert.deepEqual(r, { n: 1, pane: 'p-support' });
 });

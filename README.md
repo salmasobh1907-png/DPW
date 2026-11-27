@@ -183,6 +183,15 @@ One page with the apps the team uses: Outlook, calendar, Teams, the Gmail test b
 - **Responsibilities: who does what** (Team dashboard, managers only): load per person in hours a week (shared tasks split), tasks supporting others, done today; task-by-task matrix; "one person" tasks (no back-up) and work **nobody owns** (in the demo: tenders).
 - Demo content: the split of work is a dummy example; customer names are replaced by account types and colleagues by the demo people.
 
+### 5.12 Tool owner (admin), tickets and feedback, change log, error log
+
+- **Admin**: only the tool owner's sign-in (demo: "You") changes tool settings: Settings & sources, Data sources, Apps hub, Mailboxes & SLA, the Responsibilities list. Everyone else sees these screens read-only with "Ask for it" (opens a ticket); people still tick their own responsibilities. The admin keeps the Pricing / Sales / Director switch to see every view and counts as a manager. Production: an Entra ID group, enforced by the server.
+- **Report / feedback** button on every screen, for everyone: Problem / bug, Request / change, Idea / feedback; title, details, urgency, send to the tool owner, IT support or both. Technical details are added (screen, time, version, data source, last 5 errors), never rates or customer data. Ticket numbers `T-0001`.
+- **Support** screen: each person sees their tickets, status and answers and can add details. The admin sees all tickets, changes status (New, In progress, Fixed, Closed) and replies; the status changes are written in the ticket.
+- **Alerts for the admin**: the bell and the launch summary count new tickets, urgent ones, setting changes made by others and errors since the admin last looked.
+- **Change log**: who changed which setting and when. **Error log**: every script error with time, screen, person and view, kept even when nobody reports it (200 entries).
+- Storage in the demo: `tickets_v1`, `audit_v1`, `errLog_v1`, `admSeen_v1` (this browser). Production: database, and a mail or Teams alert to the owner and IT.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).
