@@ -223,6 +223,14 @@ The words the tool understands, used by Quick price, the Guide and message readi
 - **Quotation number and check code** (`OF-YYMMDD-001`, `7F3A-91C2`) on top and at the bottom of every page. The code is calculated from the number, time, title, table and remarks; the tool keeps what it sent (`ofVerify_v1`). **Support → Verify a quotation**: number + code (+ optionally a rate from the document) → Matches, or "does not match / the number is not in the quotation the tool sent". Production: the record lives in the database (and can be signed on the server).
 - Mail drafts cannot attach files by link: the PDF is downloaded and attached by hand; with Microsoft Graph (IT) the draft can carry the PDF.
 
+### 5.19 Department health (scope: DP World Egypt, freight forwarding core)
+
+Departments: Pricing, Sales / Commercial, Operations, Customs clearance & trucking, Documentation. Each KPI has a target, the value now and before, a status, and — only where a written formula exists — a loss in USD; off-target KPIs show **Where exactly** (top 3 lanes or causes) and **What to do** (fixed list of actions).
+- **Real data from the tool**: win rate; margin lost on price (lost quotes "price too high" / "booked elsewhere" × average won margin, by lane); replies within the SLA; asked lanes with a valid rate; Sales: margin lost after quoting ("no reply", "validity too short"); Operations: margin lost for "no space" / "transit time". The lost-quote reason decides the department.
+- **SAMPLE data** (marked) until BTI connects the source: Operations loading and demurrage & detention, Customs clearance time and storage fees, Documentation B/L corrections and amendment fees.
+- **Status**: Controlled = all KPIs on target; Watch = off target but within 10 % or improving; Out of control = off target and getting worse.
+- **Who sees what**: a department head sees only their department (demo heads: Pricing Manager, Hala Mostafa for Operations, Tamer Saleh for Customs & trucking); the Director and the **CEO** (new view, opens here) see the company view: every department, its status, loss in the last 3 months, the main issue and the data source, headed by the biggest pain.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).

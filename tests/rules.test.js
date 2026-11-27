@@ -596,3 +596,32 @@ test('brand: the platform name and an uploaded logo show in the side menu and th
     ['appName_v1', 'brandLogo_v1'].forEach((k, i) => keep[i] == null ? localStorage.removeItem(k) : localStorage.setItem(k, keep[i])); R.applyBrand(); return out; });
   assert.deepEqual(r, { name: 'DP World Egypt Platform', title: 'DP World Egypt Platform', img: true });
 });
+
+test('department health: lost quotes go to the department that caused them; status rules; sample data is marked', async () => {
+  const r = await run(() => { const R = window.__rules, H = R.deptHealth(), g = id => H.find(d => d.id === id);
+    const st = [R.kpiStatus({ actual: 50, target: 45, max: true }), R.kpiStatus({ actual: 42, target: 45, max: true }), R.kpiStatus({ actual: 30, target: 45, max: true, prev: 35 }), R.kpiStatus({ actual: 30, target: 45, max: true, prev: 20 })];
+    return { st, pricingLoss: g('pricing').loss > 0, salesLoss: g('sales').loss > 0, opsReal: g('ops').kpis[0].sample, docsSample: g('docs').sample, pricingSample: g('pricing').sample,
+             statuses: H.map(d => d.status).every(s => ['Controlled', 'Watch', 'Out of control'].includes(s)), drill: g('pricing').kpis.find(k => k.id === 'lostp').drill.length }; });
+  assert.deepEqual(r.st, ['ok', 'watch', 'bad', 'watch']);
+  assert.ok(r.pricingLoss && r.salesLoss); assert.equal(r.opsReal, false); assert.equal(r.docsSample, true); assert.equal(r.pricingSample, false);
+  assert.ok(r.statuses); assert.ok(r.drill > 0);
+});
+
+test('department health: a department head sees only their department; the CEO sees all and opens here', async () => {
+  const pg = await browser.newPage(); await pg.route(/^https?:\/\//, x => x.abort());
+  await pg.goto(PAGE.replace('?skipLogin=1', '')); await pg.waitForSelector('#loginDlg[open]');
+  await pg.click('[data-lg="hala"]'); await pg.waitForSelector('#launchDlg[open]'); await pg.evaluate(() => { const d = document.getElementById('launchDlg'); d.close(); d.remove(); document.querySelector('#nav button[data-k="health"]').click(); }); await pg.waitForTimeout(300);
+  const hala = await pg.evaluate(() => [...document.querySelectorAll('#p-health .card h3')].map(h => h.textContent.split(' ')[0]));
+  await pg.click('#whoBtn'); await pg.waitForSelector('#loginDlg[open]'); await pg.click('[data-lg="ceo"]'); await pg.waitForSelector('#launchDlg[open]'); await pg.click('#launchDlg [data-lgo="health"]'); await pg.waitForTimeout(300);
+  const ceo = await pg.evaluate(() => ({ pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id, head: document.querySelector('#p-health h2').textContent, rows: document.querySelectorAll('#p-health table tbody tr').length }));
+  await pg.close();
+  assert.deepEqual(hala, ['Operations']);
+  assert.equal(ceo.pane, 'p-health'); assert.match(ceo.head, /Biggest pain: .*USD/); assert.equal(ceo.rows, 5);
+});
+
+test('CEO view sees buy rates (not treated as Sales)', async () => {
+  const pg = await browser.newPage(); await pg.route(/^https?:\/\//, x => x.abort()); await pg.goto(PAGE); await pg.waitForFunction(() => !!window.__rules);
+  await pg.click('#r-ceo'); await pg.waitForTimeout(300);
+  const r = await pg.evaluate(() => ({ sales: document.body.classList.contains('sales'), pressed: [...document.querySelectorAll('#roleSw button[aria-pressed="true"]')].map(b => b.id) }));
+  await pg.close(); assert.deepEqual(r, { sales: false, pressed: ['r-ceo'] });
+});
