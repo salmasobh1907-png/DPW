@@ -104,3 +104,18 @@ test('data file: lane "lowest 40\'" uses valid standard rates only', () => {
     assert.ok(L.min40 <= min || std.some(r => r.r40 === L.min40), `${pod}: min40 ${L.min40} vs standard min ${min}`);
   }
 });
+
+test('rule: a line suspended to Jebel Ali is never shown as an option there', async () => {
+  const r = await run(() => { const R = window.__rules; R.setCargo('dry');
+    const rows = [{ pol: 'Sokhna', pod: 'Jebel Ali', car: 'Demo Suspended Line', r40: 500, valid: '2099-01-01' },
+                  { pol: 'Sokhna', pod: 'Jebel Ali', car: 'OK Line', r40: 900, valid: '2099-01-01' },
+                  { pol: 'Sokhna', pod: 'Jeddah', car: 'Demo Suspended Line', r40: 700, valid: '2099-01-01' }];
+    DATA.rates.push(...rows);
+    const jea = R.expRows('Jebel Ali', 'Jebel Ali').map(x => x.car);
+    const jed = R.expRows('Jeddah', 'Jeddah').map(x => x.car);
+    DATA.rates.splice(DATA.rates.length - 3, 3);
+    return { jea, jed }; });
+  assert.ok(!r.jea.includes('Demo Suspended Line'));
+  assert.ok(r.jea.includes('OK Line'));
+  assert.ok(r.jed.includes('Demo Suspended Line')); // other lanes are not affected
+});

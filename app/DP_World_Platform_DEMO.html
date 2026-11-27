@@ -1376,7 +1376,8 @@ function impRows(o,egy){
 function endOfMonth(){ const d=new Date(); return localISO(new Date(d.getFullYear(),d.getMonth()+1,0)); }
 function expRows(dest,sea){
   const today=todayISO(); const R=CARGO==="rf"?(DATA.reefers||[]).concat((DATA.rates||[]).filter(r=>r.rf20||r.rf40)):DATA.rates; if(!R) return null;
-  return R.filter(r=>r.pod===dest||r.pod===sea).map(r=>{
+  const jea=/jebel ali/i.test(String(dest||""));
+  return R.filter(r=>(r.pod===dest||r.pod===sea)&&!(jea&&/demo suspended line/i.test(String(r.car||"")))).map(r=>{ /* suspended to Jebel Ali: never shown as an option */
     const valid=r.valid||endOfMonth(); let tt=r.tt||null, est=false;
     if(!tt){ const sd=seaDaysPair(r.pol,sea); if(sd!=null){ tt=Math.ceil(sd+PORT_TIME_EST); est=true; } }
     return {...r,valid,ok:valid>=today,tt,ttEst:est};
