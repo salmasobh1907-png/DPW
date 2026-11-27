@@ -20,6 +20,7 @@ Contents: 1 Pack contents · 2 What the tool does · 3 Architecture · 4 Screens
 | `app/DP_World_Platform_DEMO.html` | The whole prototype: one HTML page (HTML + CSS + plain JavaScript). No server code. Open in Chrome or Edge. |
 | `data/Demo Rate Bank Export (dummy data).xlsx` | Dummy Rate Bank in the team layout. Sheets: Rate Data Base, Reference Sheet, Bookings, Contacts. |
 | `data/Demo Rate Bank Import (dummy data).xlsx` | Dummy import rates. Sheet: Import Rate Dashboard. |
+| `data/DPW Pricing Rate Bank (dummy).xlsx` | **The tool's own rate source** (recommended). One table for all rates with drop-downs, live status, Rate IDs, suspensions and margin rules. Sheets: Start here, Rates, Lists, Suspensions, Margin Rules, Lane Summary, Contacts. See 5.4. |
 | `data/demo_data.json` | The starting data of the page (the `const DATA = ...` line), as a readable file. |
 | `scripts/` | Python 3 scripts (need `openpyxl`): Excel → data file → page, and back. |
 | `TAB_MAP.csv` | One row per screen: data source → what it shows → what it feeds → where it is saved → production source. Opens in Excel. |
@@ -83,6 +84,10 @@ Full table, one row per sub-screen: `TAB_MAP.csv`. Summary:
 | `lanes` | Summary per destination: rate count, valid count, lowest 40', cheapest carrier, carriers, months, requests, won, TEU, transit days | Calculated by `ratebank_to_data.py` |
 | `egypt, ports, nodes, edges, attach, choke, alts, services` | Map: ports with lat/lon, sea network, chokepoints (Suez, Bab el-Mandeb …), alternative ports, liner services | Reference data (kept as is) |
 | `health` | Row checks on the Rate Data Base | Calculated |
+| `susp` | Suspended carriers: `car, pod` (empty = all lanes), `since, until, why, by` | Pricing Rate Bank → Suspensions |
+| `mrules` | Fixed margin rules: `name, dir, cargo, pods[], m20, m40` | Pricing Rate Bank → Margin Rules |
+
+With the Pricing Rate Bank, each rate row also carries `id` (Rate ID, `EX-00001` / `IM-00001`), `term` (Sokhna terminal), `src`, `ref` (email subject or file), and for special rows `type`, `cust`, `sailing`. A logged quote keeps `rateId`, so every quote points to the rate row it used.
 | `asof` | Date of the data | Script |
 
 ### 5.2 Shared store collections (what users save)
@@ -98,6 +103,21 @@ Full table, one row per sub-screen: `TAB_MAP.csv`. Summary:
 | `edits` | A rate or request is fixed in the tool, or a carrier suspended | `kind (rate / req / susp), act, key, orig, set, why, until, by, created` |
 | `config` | Source file settings | `export_path, import_path, status` |
 | `gwWatch`, `gwGri`, `gwMkt` | Market alerts: disruptions, rate-increase notices, market index values | `area, level, note, impact, src, date` / `car, lane, kind, amt, eff, src` / `date, idx, lane, val, unit, src` |
+
+### 5.4 DPW Pricing Rate Bank (the tool's own source)
+
+Built for the tool, not a copy of the team Rate Bank. Dummy data only.
+
+| Sheet | What it holds | What the tool does with it |
+| --- | --- | --- |
+| Rates | One row per rate: Rate ID, Direction, Cargo, Contract Type, Customer, Carrier, POL, POL Terminal, POD, Via, 20' / 40' / 20' RF / 40' RF, THC, Free Time, Valid From / To, Spot Sailing, Transit Days, Source, Source Ref, Added By / On, Comment. Grey columns calculate: effective validity, Status (Live / Expiring / Expired), Suspended, Counts for lowest, Rank on lane | All rate screens; lowest rate; checks; offers |
+| Lists | Drop-down values: carriers, ports, terminals, contract types, currencies, sources | Keeps names identical, so lanes match |
+| Suspensions | Carrier, POD (empty = all), From, Until, Reason, Set by | Suspended lines never show as an option and are stopped before sending |
+| Margin Rules | Fixed margins by direction, cargo and destination list (China USD 25 / 50) | Margin suggestion |
+| Lane Summary | Lowest standard 40' per destination, carrier, POL, counts | Check in Excel; the tool calculates the same |
+| Contacts | Carrier pricing and sales emails | Rate request emails |
+
+Load it: `python3 scripts/pricing_rate_bank_to_data.py "data/DPW Pricing Rate Bank (dummy).xlsx" data/demo_data.json`, then `inject_data.py`. The script reads only Rates, Suspensions, Margin Rules and Contacts, never writes to the workbook, and lists every row problem (duplicate Rate ID, 40' below 20', spot without sailing, Sokhna without terminal, dates, currency). Rebuild the dummy workbook: `scripts/build_pricing_rate_bank.py`. In production the same columns can be a SharePoint List or a database table; the screens do not change.
 
 ### 5.3 Browser-only storage (per user)
 

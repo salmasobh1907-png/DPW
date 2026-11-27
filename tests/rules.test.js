@@ -159,3 +159,63 @@ test('publish rule: no AI / LLM calls inside the page, external hosts are only t
   const allowed = new Set(['cdnjs.cloudflare.com', 'fonts.googleapis.com', 'fonts.gstatic.com', 'mail.google.com', 'outlook.office.com', 'www.w3.org']);
   for (const h of hosts) assert.ok(allowed.has(h), 'unexpected external host: ' + h);
 });
+
+test('rate bank: suspensions come from the Rate Bank "Suspensions" sheet (with dates)', async () => {
+  const r = await run(() => { const R = window.__rules, keep = DATA.susp;
+    DATA.susp = [{ car: 'Aurora Lines', pod: 'Jeddah', since: '2020-01-01', until: '' },
+                 { car: 'Delta Marine', pod: '', since: '2020-01-01', until: '2020-12-31' },   // ended: not suspended
+                 { car: 'Pharos Line', pod: '', since: '2020-01-01', until: '' }];           // empty POD = all lanes
+    const out = [!!R.rbSuspended('Aurora Lines', 'Jeddah'), !!R.rbSuspended('Aurora Lines', 'Valencia'),
+                 !!R.rbSuspended('Delta Marine', 'Jeddah'), !!R.rbSuspended('Pharos Line', 'Anywhere')];
+    DATA.susp = keep; return out; });
+  assert.deepEqual(r, [true, false, false, true]);
+});
+
+test('rate bank: the seeded suspension hides the cheap suspended line at Jebel Ali', async () => {
+  const cars = await run(() => window.__rules.expRows('Jebel Ali', 'Jebel Ali').map(r => r.car));
+  assert.ok(cars.length > 0);
+  assert.ok(!cars.includes('Demo Suspended Line'));
+});
+
+test('rate bank: margin rules come from the "Margin Rules" sheet', async () => {
+  const r = await run(() => { const R = window.__rules; return { n: R.MARGIN_RULES.length, name: R.MARGIN_RULES[0].name, src: Array.isArray(DATA.mrules) }; });
+  assert.equal(r.src, true); assert.equal(r.name, 'Dry export to China');
+});
+
+test('rate bank: every rate row carries a unique Rate ID', () => {
+  const D = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data/demo_data.json'), 'utf8'));
+  const all = [...D.rates, ...D.reefers, ...D.imports];
+  assert.ok(all.every(r => /^(EX|IM)-\d{5}$/.test(r.id)), 'missing or malformed Rate ID');
+  assert.equal(new Set(all.map(r => r.id)).size, all.length, 'duplicate Rate ID');
+});
+
+test('rate bank: the converter flags bad rows', () => {
+  const { execFileSync } = require('node:child_process');
+  const os = require('node:os');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rb-'));
+  const xl = path.join(tmp, 'rb.xlsx'), js = path.join(tmp, 'd.json');
+  fs.copyFileSync(path.resolve(__dirname, '../data/demo_data.json'), js);
+  // build a small workbook with known mistakes
+  execFileSync('python3', ['-c', `
+import openpyxl,datetime,sys
+wb=openpyxl.Workbook(); ws=wb.active; ws.title='Rates'
+ws.append(['Rate ID','Direction','Cargo','Contract Type','Customer (named rates)','Carrier','POL','POL Terminal','POD','Via',"20'","40'","20' RF","40' RF",'Currency',"THC 20'","THC 40'",'THC Currency','Free Time','Valid From','Valid To','Spot Sailing (vessel / voyage)','Transit Days','Source','Source Ref (email subject or file)','Added By','Added On','Comment'])
+ws.append(['EX-00001','Export','Dry','Standard','','A Line','Sokhna','','Jeddah','',900,700,None,None,'USD',None,None,'','','','','','','','','',datetime.datetime(2026,11,1),''])
+ws.append(['EX-00001','Export','Dry','Spot','','B Line','Alexandria','','Valencia','',500,800,None,None,'USD',None,None,'','','','','','','','','',datetime.datetime(2026,11,1),''])
+for n,h in (('Suspensions',['Carrier','POD (empty = all)','From','Until (empty = no end)','Reason','Set by']),('Margin Rules',['Rule name','Direction','Cargo','POD contains (separate with ;)',"Margin 20' (USD)","Margin 40' (USD)",'Note']),('Contacts',['Carrier','Pricing email','Sales email'])):
+    wb.create_sheet(n).append(h)
+wb.save(sys.argv[1])`, xl]);
+  execFileSync('python3', [path.resolve(__dirname, '../scripts/pricing_rate_bank_to_data.py'), xl, js, '2026-11-19']);
+  const k = JSON.parse(fs.readFileSync(js, 'utf8')).health.issues.map(i => i.k).sort();
+  assert.deepEqual(k, ['dup', 'dup', 'r40lt20', 'spot', 'term']); // both rows that share an ID are flagged
+});
+
+test('rule 1 (screen): the default buy rate on a lane is the lowest STANDARD rate, not a spot rate', async () => {
+  const pg = await browser.newPage(); await pg.route(/^https?:\/\//, x => x.abort()); await pg.goto(PAGE); await pg.waitForFunction(() => !!window.__rules);
+  const r = await pg.evaluate(() => new Promise(res => { const t = document.getElementById('to'); t.value = 'Jeddah'; t.dispatchEvent(new Event('change'));
+    setTimeout(() => res({ buy: document.getElementById('q-buy').value, car: document.getElementById('q-car').value,
+      spot: DATA.rates.find(x => x.pod === 'Jeddah' && x.type === 'Spot').r40, min: DATA.lanes.Jeddah.min40 }), 600); }));
+  assert.ok(+r.spot < +r.min, 'test data needs a spot rate cheaper than the lowest standard');
+  assert.equal(+r.buy, +r.min);
+  await pg.close();
+});
