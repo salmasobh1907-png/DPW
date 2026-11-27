@@ -451,6 +451,8 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
 .td-it{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 4px;border-top:1px solid rgba(127,127,127,.18)}.td-tx b{display:block;font-size:14px}.td-tx small{font-size:12px;opacity:.75}.td-tag{font:700 11px/1 system-ui;padding:7px 8px;border-radius:8px;min-width:38px;text-align:center}.td-err{background:#f9d4d4;color:#7f1d1d}.td-due{background:#fde9c8;color:#7c4a03}.td-new{background:#dbe7fb;color:#1e3a8a}
 .as-card{display:flex;flex-direction:column;gap:6px;border-left:0}.as-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.as-lab{font-size:12px;font-weight:700;letter-spacing:.02em;opacity:.7}.as-tt{font-size:18px;line-height:1.3}.as-why{margin:4px 0 0;padding-left:18px;font-size:13px;opacity:.85}.as-clock{font:600 16px system-ui;font-variant-numeric:tabular-nums}.as-run{box-shadow:inset 0 0 0 2px var(--accent,#3b5bdb)}
 .wt-nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:8px 0}.wt-nums span{display:flex;align-items:center;gap:6px;font-size:12px;opacity:.8}.wt-nums span b{width:10px;height:10px;border-radius:3px;display:inline-block}.wt-nums strong{font-size:18px}.wt-bar{position:relative;height:16px;border-radius:8px;background:rgba(127,127,127,.12);overflow:hidden}.wt-bar i{position:absolute;top:0;bottom:0}.wt-ax{display:flex;justify-content:space-between;font-size:12px;opacity:.7;margin-top:4px}
+.td-tools{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 12px}.td-ph{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px}.td-ph b{font-size:17px}.td-ph span{font-size:13px;opacity:.75}.td-ph .mini{margin-left:auto}.td-pre{white-space:pre-wrap;font:13px/1.55 ui-monospace,monospace;background:rgba(127,127,127,.08);padding:12px;border-radius:10px;margin:0;max-height:360px;overflow:auto}
+.td-focus .td-kpis,.td-focus .td-list,.td-focus .td-wt{display:none}
 .dschip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}.ds-ok{background:#d9f2e3;color:#14532d}.ds-due{background:#fde9c8;color:#7c4a03}.ds-err{background:#f9d4d4;color:#7f1d1d}.ds-off,.ds-busy{background:#e5e7eb;color:#374151}.dstbl td{vertical-align:top}
 </style>
 </head>
@@ -4017,9 +4019,9 @@ function tdItems(){ const t=todayISO(), I=[], add=(o)=>I.push(o);
   try{ (QT.items||[]).filter(q=>q.status==="pending"&&q.followUp&&q.followUp<=t).slice(0,4).forEach(q=>add({pri:2,tag:"F/U",title:`${q.customer||"Quote"} · ${q.pol||""} → ${q.pod||""}`,sub:`No answer since ${fmtDate(String(q.day||q.created||"").slice(0,10))}: ask ${q.seller||"sales"} for won or lost and the reason`,act:"Open",go:()=>openTab("q")})); }catch(e){}
   const openReq=(DATA.requests||[]).filter(r=>r.st==="open"||r.st==="pending");
   const gap={}; openReq.forEach(r=>{ const L=(DATA.lanes||{})[r.port]; if(r.port&&(!L||!L.min40)) (gap[r.port]=gap[r.port]||[]).push(r.q); });
-  Object.entries(gap).slice(0,4).forEach(([pod,qs])=>add({pri:2,tag:"GAP",title:`${pod}: asked, no valid ocean rate`,sub:`${qs.length} open request${qs.length>1?"s":""} (${qs.slice(0,3).join(", ")}) wait for a rate`,act:"Ask carriers",go:()=>openTab("req")}));
+  Object.entries(gap).slice(0,4).forEach(([pod,qs])=>add({pri:2,tag:"GAP",title:`${pod}: asked, no valid ocean rate`,sub:`${qs.length} open request${qs.length>1?"s":""} (${qs.slice(0,3).join(", ")}) wait for a rate`,act:"Ask carriers",go:()=>{ TD.panel={k:"rfq",pod}; renderToday(); }}));
   const reqPods=new Set(openReq.map(r=>r.port)), soon=addDays(t,3);
-  (DATA.rates||[]).filter(r=>isStd(r)&&r.valid&&r.valid>=t&&r.valid<=soon&&reqPods.has(r.pod)).slice(0,4).forEach(r=>add({pri:2,tag:"EXP",title:`${r.car} ${r.pol} → ${r.pod} ends ${fmtDate(r.valid)}`,sub:"Lane has open requests. Ask the line for next month's rate.",act:"Ask carrier",go:()=>openTab("req")}));
+  (DATA.rates||[]).filter(r=>isStd(r)&&r.valid&&r.valid>=t&&r.valid<=soon&&reqPods.has(r.pod)).slice(0,4).forEach(r=>add({pri:2,tag:"EXP",title:`${r.car} ${r.pol} → ${r.pod} ends ${fmtDate(r.valid)}`,sub:"Lane has open requests. Ask the line for next month's rate.",act:"Ask carrier",go:()=>{ TD.panel={k:"rfq",pod:r.pod}; renderToday(); }}));
   const nX=(XR.items||[]).length, nW=Object.values(DS.rows||{}).reduce((a,x)=>a+((x.rates||[]).filter(r=>r.wa).length),0), nN=Object.values(DS.rows||{}).reduce((a,x)=>a+((x.news||[]).length),0);
   if(nX) add({pri:3,tag:"OFR",title:`${nX} carrier offer${nX>1?"s":""} read from email`,sub:"Check them and write them into the Rate Bank",act:"Review",go:()=>openTab("off")});
   if(nW||nN) add({pri:3,tag:"WA",title:`WhatsApp: ${nW} rate${nW===1?"":"s"}, ${nN} announcement${nN===1?"":"s"}`,sub:"Rates need email confirmation before you quote",act:"Review",go:()=>openTab("dsrc")});
@@ -4038,19 +4040,25 @@ function renderToday(){ const p=$("p-today"); if(!p||p.hidden) return; const I=t
       ${isFinite(R.buy)?`<div class="td-nums"><div><span>Carrier</span><b>${esc(R.car||"—")}</b></div><div class="pr-only"><span>Buy</span><b>USD ${money(R.buy)}</b></div><div class="pr-only"><span>Margin</span><b>${isFinite(R.mrg)?"USD "+money(R.mrg):"type it"}</b></div><div><span>Sell / container</span><b>${esc(R.sell||"—")}</b></div></div>`:`<p class="warn-t">No valid standard rate on this lane. Ask the carriers.</p>`}
       ${A&&A.rec!=null&&isFinite(R.mrg)&&A.rec!==R.mrg?`<p class="note">Margin advisor suggests USD ${money(A.rec)} (${esc(A.conf)} confidence).</p>`:""}
       ${stop.map(c=>`<div class="td-chk err">Stop: ${c.txt}</div>`).join("")}${warn.map(c=>`<div class="td-chk due">Check: ${c.txt}</div>`).join("")}${!stop.length&&!warn.length&&isFinite(R.buy)?`<div class="td-chk ok">All checks passed</div>`:""}
-      <div class="td-acts"><button type="button" class="svc btn primary" id="tdOpen">Open the offer</button>${A&&A.rec!=null&&isFinite(R.mrg)&&A.rec!==R.mrg?`<button type="button" class="mini ok" id="tdAdv">Use USD ${money(A.rec)}</button>`:""}<button type="button" class="mini" id="tdClr">Clear</button></div></div>`; }
+      <div class="td-acts"><button type="button" class="svc btn primary" id="tdOpen">Open the offer</button>${A&&A.rec!=null&&isFinite(R.mrg)&&A.rec!==R.mrg?`<button type="button" class="mini ok" id="tdAdv">Use USD ${money(A.rec)}</button>`:""}<button type="button" class="mini" id="tdRfq">Ask carriers for this lane</button><button type="button" class="mini" id="tdClr">Clear</button></div></div>`; }
   const asHtml=asCard(I);
   p.innerHTML=`<div class="td-head"><h2>${hi}. ${I.length} thing${I.length===1?"":"s"} need${I.length===1?"s":""} you today</h2></div>
+    <div class="td-tools" role="toolbar" aria-label="Today tools"><button type="button" class="mini" data-tp="brief">Morning brief</button><button type="button" class="mini${tdFocus()?" ok":""}" id="tdFoc" aria-pressed="${tdFocus()}">Focus mode: ${tdFocus()?"on":"off"}</button><button type="button" class="mini" data-tp="hand">Hand over</button><button type="button" class="mini" data-tp="eod">End of day</button></div>
+    ${TD.flash?`<div class="td-chk ${/LATE/.test(TD.flash)?"err":"ok"}" role="status">${esc(TD.flash)}</div>`:""}
     ${asHtml}
+    ${tdPanel()}
     <form id="tdForm" class="td-quick" autocomplete="off"><label for="tdQ" class="td-ql">Quick price</label><input id="tdQ" value="${esc(TD.q)}" placeholder="Sokhna Jeddah 2x40 Gulf Home   or   Q12"><button class="svc btn primary" type="submit">Price it</button><span class="td-kbd" aria-hidden="true">/</span></form>
     ${res}
     <div class="td-kpis"><div><span>Open cases</span><b>${cs.open}</b><small>${cs.late?cs.late+" late":"none late"}</small></div><div><span>Open requests</span><b>${(DATA.requests||[]).filter(r=>r.st==="open"||r.st==="pending").length}</b><small>from the Reference Sheet</small></div>
       <div><span>Hit ratio this month</span><b>${won+lost?Math.round(won/(won+lost)*100)+"%":"—"}</b><small>${won} won of ${won+lost} closed</small></div><div><span>Rates ending in 7 days</span><b>${end7}</b><small>standard rates</small></div></div>
-    <div class="card"><h3>Needs you <span class="dschip ds-off">${I.length}</span></h3>${I.length?I.slice(0,14).map((x,i)=>`<div class="td-it"><span class="td-tag td-${tagC[x.tag]||"new"}">${esc(x.tag)}</span><div class="td-tx"><b>${esc(x.title)}</b><small>${esc(x.sub)}</small></div><button type="button" class="${i===0?"svc btn primary":"mini"}" data-td="${i}">${esc(x.act)}</button></div>`).join(""):`<p class="note">Nothing waiting. New emails, follow-ups and ending rates show up here.</p>`}</div>${(()=>{ try{ csTick(); return wtCard("My working time today"); }catch(e){ return ""; } })()}`;
-  asWire(I);
+    <div class="card td-list"><h3>Needs you <span class="dschip ds-off">${I.length}</span></h3>${I.length?I.slice(0,14).map((x,i)=>`<div class="td-it"><span class="td-tag td-${tagC[x.tag]||"new"}">${esc(x.tag)}</span><div class="td-tx"><b>${esc(x.title)}</b><small>${esc(x.sub)}</small></div><button type="button" class="${i===0?"svc btn primary":"mini"}" data-td="${i}">${esc(x.act)}</button></div>`).join(""):`<p class="note">Nothing waiting. New emails, follow-ups and ending rates show up here.</p>`}</div>${(()=>{ try{ csTick(); return `<div class="td-wt">${wtCard("My working time today")}</div>`; }catch(e){ return ""; } })()}`;
+  asWire(I); p.classList.toggle("td-focus",tdFocus()); TD.flash="";
+  p.querySelectorAll("[data-tp]").forEach(b=>b.onclick=()=>{ TD.panel={k:b.dataset.tp}; renderToday(); });
+  $("tdFoc").onclick=()=>{ lsSet("tdFocus_v1",!tdFocus()); tdFocusWatch(); renderToday(); };
+  tdWirePanel();
   $("tdForm").onsubmit=e=>{ e.preventDefault(); tdQuick($("tdQ").value); };
   p.querySelectorAll("[data-td]").forEach(b=>b.onclick=()=>{ const x=I[+b.dataset.td]; if(x&&x.go) x.go(); });
-  const o=$("tdOpen"); if(o) o.onclick=()=>openTab("lane"); const c=$("tdClr"); if(c) c.onclick=()=>{ TD.res=null; TD.q=""; renderToday(); };
+  const o=$("tdOpen"); if(o) o.onclick=()=>openTab("lane"); const rq=$("tdRfq"); if(rq&&R&&R.P) rq.onclick=()=>{ TD.panel={k:"rfq",pod:R.P.dest,eq:R.P.eq}; renderToday(); }; const c=$("tdClr"); if(c) c.onclick=()=>{ TD.res=null; TD.q=""; renderToday(); };
   const a=$("tdAdv"); if(a) a.onclick=()=>{ $("q-mrg").value=R.adv.rec; MRG_MANUAL=true; try{ buildQuote(); rerenderOptions(); }catch(e){} TD.res.mrg=R.adv.rec; TD.res.sell=$("q-sell").textContent; try{ TD.res.checks=preChecks()||[]; }catch(e){} renderToday(); }; }
 /* "/" jumps to Quick price from anywhere (not while typing in a field) */
 document.addEventListener("keydown",e=>{ if(e.key!=="/"||e.ctrlKey||e.metaKey||e.altKey) return; const tg=e.target, tn=tg&&tg.tagName; if(tn==="INPUT"||tn==="TEXTAREA"||tn==="SELECT"||(tg&&tg.isContentEditable)) return;
@@ -4106,11 +4114,61 @@ function asWire(I){ const N=asNext(I), x=N[0];
   const d=$("asDone"); if(d) d.onclick=()=>{ asDone(); renderToday(); };
   const st=$("asStop"); if(st) st.onclick=()=>{ lsSet("tdTask_v1",null); renderToday(); };
   clearInterval(asWire.t); asWire.t=setInterval(()=>{ const c=$("asClock"), T=asTask(); if(!c||!T){ clearInterval(asWire.t); return; } c.textContent=asDur(Date.now()-T.start); },15e3); }
+/* ---------- Today tools: Auto-RFQ, Morning brief, Hand over, Focus mode, End of day (plain rules, no AI; email = drafts only) ---------- */
+/* 1 Auto-RFQ: carriers that quoted this destination before (not suspended), one draft each, logged in the Pricing log */
+function rfqPlan(pod,eq){ const t=todayISO(), all=(DATA.rates||[]).concat(DATA.reefers||[]).filter(r=>lc(r.pod)===lc(pod));
+  const by={}; all.forEach(r=>{ const g=by[r.car]||(by[r.car]={car:r.car,pols:new Set(),last:"",live:false}); g.pols.add(r.pol); const v=r.valid||endOfMonth(); if(v>g.last) g.last=v; if(v>=t&&isStd(r)) g.live=true; });
+  let L=Object.values(by).filter(g=>!rbSuspended(g.car,pod));
+  if(!L.length) L=Object.keys(DATA.contacts||{}).filter(c=>!rbSuspended(c,pod)).map(c=>({car:c,pols:new Set(),last:"",live:false,guess:true}));
+  const nxt=new Date(); nxt.setDate(nxt.getDate()+5); const mon=MONTHS_EN[nxt.getMonth()];
+  return L.sort((a,b)=>(a.live-b.live)||a.car.localeCompare(b.car)).map(g=>{ const pols=[...g.pols].join(" / ")||"Sokhna / Alexandria / Damietta", mails=carrierMails(g.car);
+    const body=[`Dear ${g.car} team,`,"","Good day.","",`Kindly share your best rate for ${eq||"20' and 40'"} from ${pols} to ${pod}, ${mon}.`,"","Please include: 20' / 40' rate, origin THC, free time at destination, validity, transit time and transshipment port.","","Thank you,",$("q-me").value.trim()||"[Your name]","Pricing – Freight Forwarding","DP World Logistics – Egypt"].join("\n");
+    return {car:g.car,live:g.live,guess:!!g.guess,last:g.last,to:mails.join(";"),href:`mailto:${encodeURIComponent(mails.join(";"))}?subject=${encodeURIComponent(`Rate request: ${pols} to ${pod} - DP World`)}&body=${encodeURIComponent(body)}`}; }); }
+/* 2 Morning brief: text built from Today's lists */
+function briefText(){ const I=asNext(tdItems()), t=todayISO(), now=Date.now(); let open=0, late=0; try{ csLoad().cases.filter(c=>!c.sub).forEach(c=>{ open++; if(csState(c,now).st==="breach") late++; }); }catch(e){}
+  const end7=(DATA.rates||[]).filter(r=>isStd(r)&&r.valid&&r.valid>=t&&r.valid<=addDays(t,7)), gaps=I.filter(x=>x.tag==="GAP"), news=Object.values(DS.rows||{}).flatMap(x=>x.news||[]);
+  const Q=(QT.items||[]).filter(q=>String(q.month||"")===t.slice(0,7)), won=Q.filter(q=>q.status==="won").length, lost=Q.filter(q=>q.status==="lost").length;
+  return [`Pricing morning brief · ${fmtDate(t)}`,"",`Open cases: ${open} (${late} past the SLA)`,`Open requests: ${(DATA.requests||[]).filter(r=>r.st==="open"||r.st==="pending").length}`,`Hit ratio this month: ${won+lost?Math.round(won/(won+lost)*100)+"% ("+won+" of "+(won+lost)+")":"no closed quotes yet"}`,"",
+    "First things to do:",...I.slice(0,5).map((x,i)=>`${i+1}. [${x.tag}] ${x.title}`),"",
+    gaps.length?"Lanes asked with no valid rate: "+gaps.map(g=>g.title.split(":")[0]).join(", "):"Every asked lane has a valid rate.",
+    `Standard rates ending in 7 days: ${end7.length}${end7.length?" ("+[...new Set(end7.map(r=>r.car+" to "+r.pod))].slice(0,6).join(", ")+")":""}`,
+    news.length?`Carrier announcements: ${news.slice(0,4).map(n=>`${n.tag} ${n.car||n.who}`).join(", ")}`:"","","From the DP World Platform (dummy data in the demo)."].filter((l,i,a)=>!(l===""&&a[i-1]==="")).join("\n"); }
+/* 3 Hand over: my open cases to a colleague, with a note in each case's log */
+function handOver(to,note){ const L=csLoad().cases.filter(c=>!c.sub&&c.who==="me"), now=Date.now();
+  L.forEach(c=>{ c.who=to; c.log=c.log||[]; c.log.push([now,"Handed over by "+csName("me")+" to "+csName(to)+(note?": "+note:"")]); if(note) c.hand=note; }); csStore(); return L.length; }
+/* 5 End of day */
+function eodText(){ const done=lsGet("tdDone_v1",[]).filter(d=>d.day===todayISO()), D=(()=>{ try{ csTick(); return wtDay(csDay(Date.now())); }catch(e){ return null; } })(), I=asNext(tdItems());
+  return [`End of day · ${fmtDate(todayISO())}`,"",`Done: ${done.length} task${done.length===1?"":"s"}${done.length?" · "+asDur(done.reduce((a,d)=>a+d.ms,0)):""}`,...done.map(d=>`  ✓ [${d.tag}] ${d.title} · ${asDur(d.ms)}`),"",
+    D?`Time in the tool: active ${asDur(D.active)}, away ${asDur(D.away)}, break ${asDur(D.brk)}`:"","",`Left for tomorrow (${I.length}):`,...I.slice(0,6).map((x,i)=>`${i+1}. [${x.tag}] ${x.title}`)].filter((l,i,a)=>!(l===""&&a[i-1]==="")).join("\n"); }
+function tdPanel(){ const P=TD.panel; if(!P) return "";
+  const head=(t,sub)=>`<div class="td-ph"><b>${esc(t)}</b>${sub?`<span>${esc(sub)}</span>`:""}<button type="button" class="mini" id="tdPx">Close</button></div>`;
+  if(P.k==="rfq"){ const R=rfqPlan(P.pod,P.eq);
+    return `<div class="td-res">${head("Ask carriers: "+P.pod,"One draft per carrier. You press Send in your mail app.")}${R.length?R.map(r=>`<div class="td-it"><span class="td-tag td-${r.live?"new":"due"}">${r.live?"HAS RATE":"NO VALID RATE"}</span><div class="td-tx"><b>${esc(r.car)}</b><small>${r.guess?"No rate on this lane before · ":""}${r.last?"Last rate valid to "+esc(fmtDate(r.last))+" · ":""}${esc(r.to||"no email in Contacts")}</small></div><a class="mini ok" href="${esc(r.href)}" target="_blank" rel="noopener">Open draft</a></div>`).join(""):`<p class="note">No carrier to ask on this lane.</p>`}
+      <div class="td-acts"><button type="button" class="svc btn primary" id="rfqLog">Log ${R.length} request${R.length===1?"":"s"} as asked</button><span class="note" id="rfqMsg"></span></div></div>`; }
+  if(P.k==="brief"||P.k==="eod"){ const txt=P.k==="brief"?briefText():eodText(), su=(P.k==="brief"?"Pricing morning brief ":"End of day ")+fmtDate(todayISO());
+    return `<div class="td-res">${head(P.k==="brief"?"Morning brief":"End of day",P.k==="brief"?"For the team and the manager":"What you did and what is left")}<pre class="td-pre">${esc(txt)}</pre>
+      <div class="td-acts"><button type="button" class="svc btn primary" id="tdCopy">Copy</button><a class="mini" href="mailto:?subject=${encodeURIComponent(su)}&body=${encodeURIComponent(txt)}">Open as email draft</a><span class="note" id="tdCopyMsg"></span></div></div>`; }
+  if(P.k==="hand"){ const n=csLoad().cases.filter(c=>!c.sub&&c.who==="me").length;
+    return `<div class="td-res">${head("Hand over my open cases",n+" open case"+(n===1?"":"s")+" assigned to you")}
+      <form id="hoForm" class="trkform"><label class="f">To<select id="hoTo">${CS_PEOPLE.filter(x=>x.id!=="me").map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("")}</select></label>
+      <label class="f grow">Note for them<input id="hoNote" maxlength="200" placeholder="e.g. Waiting for Aurora's December rates on Jeddah"></label>
+      <div class="td-acts"><button class="svc btn primary" type="submit" ${n?"":"disabled"}>Hand over ${n}</button><span class="note" id="hoMsg"></span></div></form></div>`; }
+  return ""; }
+function tdWirePanel(){ const P=TD.panel; const x=$("tdPx"); if(x) x.onclick=()=>{ TD.panel=null; renderToday(); };
+  const lg=$("rfqLog"); if(lg) lg.onclick=async()=>{ const R=rfqPlan(P.pod,P.eq), d=todayISO(); for(const r of R) await plWrite("add",null,{type:"rcar",q:"",cust:"",lane:"Egypt → "+P.pod,who:r.car,src:"carrier",asked:d,answered:"",note:"Rate request from Today (Auto-RFQ)"}); $("rfqMsg").textContent=`Logged in the Pricing log: ${R.length} request${R.length===1?"":"s"}, waiting for answers.`; };
+  const cp=$("tdCopy"); if(cp) cp.onclick=async()=>{ const t=document.querySelector(".td-pre").textContent; try{ await navigator.clipboard.writeText(t); $("tdCopyMsg").textContent="Copied."; }catch(e){ $("tdCopyMsg").textContent="Select the text and copy it."; } };
+  const ho=$("hoForm"); if(ho) ho.onsubmit=e=>{ e.preventDefault(); const to=$("hoTo").value, n=handOver(to,$("hoNote").value.trim()); TD.panel=null; TD.flash=`${n} case${n===1?"":"s"} handed over to ${csName(to)}.`; renderToday(); }; }
+/* 4 Focus mode: only Next up and Quick price; a new LATE item breaks through */
+function tdFocus(){ return !!lsGet("tdFocus_v1",false); }
+function tdFocusWatch(){ clearInterval(tdFocusWatch.t); if(!tdFocus()) return; const late0=new Set(tdItems().filter(x=>x.tag==="LATE").map(asKey));
+  tdFocusWatch.t=setInterval(()=>{ if(!tdFocus()){ clearInterval(tdFocusWatch.t); return; } const nw=tdItems().filter(x=>x.tag==="LATE"&&!late0.has(asKey(x)));
+    if(nw.length){ nw.forEach(x=>late0.add(asKey(x))); TD.flash="New LATE: "+nw[0].title; try{ document.title="● LATE · "+document.title.replace(/^● LATE · /,""); }catch(e){} if(CUR_TAB==="today") renderToday(); } },60000); }
+setTimeout(()=>{ try{ tdFocusWatch(); }catch(e){} },0);
 { const _rk=renderCkpi; renderCkpi=function(){ _rk.apply(this,arguments); const p=$("p-ckpi"); if(!p||!wtMgr()) return; let row="";
     try{ csTick(); const D=wtDay(csDay(Date.now())); if(D) row=`<tr><td><b>${esc(csName("me"))}</b> (this browser)</td><td>${csTime(D.first)}</td><td>${csTime(D.last)}</td><td class="n">${asDur(D.active)}</td><td class="n">${asDur(D.away)}</td><td class="n">${asDur(D.brk)}</td><td class="n">${asDur(D.off)}</td></tr>`; }catch(e){}
     p.insertAdjacentHTML("beforeend",`<div class="card"><h3>Team working time <span class="dschip ds-off">Managers only</span></h3><p class="note">Active, Away, Break and Off in the tool, per person, today. In this demo each browser keeps only its own log, so only your row shows. On DP World servers every person's log goes to the team database and shows here. Each person sees only their own time. HR and Legal approve before real use.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Person</th><th>First seen</th><th>Last seen</th><th class="n">Active</th><th class="n">Away</th><th class="n">Break</th><th class="n">Off</th></tr></thead><tbody>${row||`<tr><td colspan="7" class="note">No time logged yet today.</td></tr>`}</tbody></table></div></div>`); }; }
-window.__rules = { asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
+window.__rules = { csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
 window.__route = route;
 })();
 </script>

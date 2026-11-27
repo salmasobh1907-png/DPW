@@ -147,6 +147,16 @@ Merge rule: the same carrier + POL + POD + contract type + validity month in two
 - **Next up** (top of Today): every Needs-you item gets a score: type of work (LATE 90, DUE 60, market alert 50, no rate 45, new 40, ending rate 35, follow-up 30, carrier offers 20, WhatsApp 15) + SLA urgency (over the SLA +100, under 30 min +60, under 2 h +30) + key account +15 + assigned to you +10. The top item shows with its reasons. Start (runs its action and a timer), Done (logs the time), Snooze 30 min. Plain rules, no AI.
 - **Working time**: the existing shift clock now keeps a log per day of Active / Away / Break / Off with a timeline and the last 7 days. Off = computer asleep, locked, shut down or the tool closed (a gap of more than 90 s). It measures the tool only (mouse and keys in the tool, tab open), not other programs. Shown to the person (Today) and to managers (Team KPIs, "Managers only"). In the demo each browser holds only its own log. **Before real use: HR and Legal approval, and every person told what is recorded.** For presence across the whole PC, Teams presence through Microsoft Graph (Presence.Read.All) is the existing option.
 
+### 5.8 Today tools (plain rules; email = drafts only, a person presses Send)
+
+| Tool | What it does |
+| --- | --- |
+| Auto-RFQ | From a GAP or EXP item, or "Ask carriers for this lane" under Quick price: lists the carriers that quoted the destination (suspended lines left out), marks who holds a valid standard rate, one email draft each (Contacts), and logs all requests in the Pricing log |
+| Morning brief | Text for the team and the manager: open cases and SLA, open requests, hit ratio, the first 5 things to do, lanes without a rate, rates ending in 7 days, carrier announcements. Copy or open as a draft |
+| Hand over | Moves my open cases to a colleague with a note written in each case log |
+| Focus mode | Shows only Next up and Quick price; a new LATE case breaks through with a banner and the tab title |
+| End of day | Tasks done with time, time in the tool, what is left for tomorrow. Copy or draft |
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).

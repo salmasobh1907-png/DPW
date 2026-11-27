@@ -355,3 +355,25 @@ test('working time: segments are stored per day and add up by state', async () =
     return [D.active / m, D.away / m, D.off / m, D.segs.length]; });
   assert.deepEqual(r, [60, 10, 60, 4]);
 });
+
+test('today tools: Auto-RFQ drafts one email per carrier on the lane, never a suspended one', async () => {
+  const r = await run(() => { const R = window.__rules; return { jed: R.rfqPlan('Jeddah', "40' HC"), jea: R.rfqPlan('Jebel Ali').map(x => x.car) }; });
+  assert.ok(r.jed.length >= 2);
+  assert.ok(r.jed.every(x => x.href.startsWith('mailto:') && /Jeddah/.test(decodeURIComponent(x.href))));
+  assert.ok(!r.jea.includes('Demo Suspended Line'));
+});
+
+test('today tools: morning brief and end of day are plain text with the key lines', async () => {
+  const r = await run(() => ({ b: window.__rules.briefText(), e: window.__rules.eodText() }));
+  assert.match(r.b, /Pricing morning brief/); assert.match(r.b, /Open cases: \d+/); assert.match(r.b, /First things to do:\n1\. \[/);
+  assert.match(r.e, /End of day/); assert.match(r.e, /Left for tomorrow/);
+});
+
+test('today tools: hand over moves only my open cases and writes it in each case log', async () => {
+  const r = await run(() => { const L = window.__rules.csLoad().cases, mine = L.filter(c => !c.sub && c.who === 'me').map(c => c.id), others = L.filter(c => c.who !== 'me').map(c => [c.id, c.who]);
+    const n = window.__rules.handOver('nour', 'Waiting for Aurora');
+    const moved = L.filter(c => mine.includes(c.id)), last = moved[0] && moved[0].log[moved[0].log.length - 1][1];
+    return { n, mine: mine.length, allNour: moved.every(c => c.who === 'nour'), othersSame: others.every(([id, w]) => L.find(c => c.id === id).who === w), last }; });
+  assert.equal(r.n, r.mine); assert.ok(r.n > 0); assert.ok(r.allNour); assert.ok(r.othersSame);
+  assert.match(r.last, /Handed over by .* to Nour Adel: Waiting for Aurora/);
+});
