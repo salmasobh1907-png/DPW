@@ -182,7 +182,7 @@ rates, 24 import rates, 125 requests and 36 bookings.
 `tests/rules.test.js` checks the business rules in the page (needs Node 18+ and Playwright with Chromium; runs offline):
 
 ```
-node --test tests/
+node --test tests/rules.test.js
 ```
 
 It covers: standard-only rows for "lowest" and margin gaps (rule 1), no validity date = end of month (rule 2),

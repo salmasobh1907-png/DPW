@@ -1,5 +1,5 @@
 // Business-rule tests for the DP World Platform prototype (dummy data).
-// Run from the repo root:  node --test tests/
+// Run from the repo root:  node --test tests/rules.test.js
 // Needs Node 18+ and Playwright (Chromium). No network: the page is opened from disk.
 const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
@@ -148,4 +148,14 @@ test('rule 4: no dearer carrier and no past quote -> no flat number, margin must
   assert.equal(r.noBuy, 'NaN');
   assert.equal(r.src, 'none');
   assert.equal(r.shown, '—'); // a sell price is never shown as the bare buy rate
+});
+
+test('publish rule: no AI / LLM calls inside the page, external hosts are only the allowed CDNs', () => {
+  const s = fs.readFileSync(path.resolve(__dirname, '../app/DP_World_Platform_DEMO.html'), 'utf8');
+  for (const bad of [/api\.anthropic\.com/i, /api\.openai\.com/i, /generativelanguage\.googleapis/i, /\/v1\/(messages|chat\/completions|completions)/i,
+                     /claude\.use\(\s*["']ai["']/i, /claude\.(complete|ask|prompt)\s*\(/i])
+    assert.ok(!bad.test(s), 'found AI/LLM call: ' + bad);
+  const hosts = new Set([...s.matchAll(/https?:\/\/([a-z0-9.-]+)/gi)].map(m => m[1].toLowerCase()));
+  const allowed = new Set(['cdnjs.cloudflare.com', 'fonts.googleapis.com', 'fonts.gstatic.com', 'mail.google.com', 'outlook.office.com', 'www.w3.org']);
+  for (const h of hosts) assert.ok(allowed.has(h), 'unexpected external host: ' + h);
 });
