@@ -177,6 +177,18 @@ If these services are missing, the page still opens, shows the sample emails and
 Tested on 24 Nov 2026: all 9 menu screens open with no errors; the scripts give back the same 164 rates, 3 reefer
 rates, 24 import rates, 125 requests and 36 bookings.
 
+### Automated rule tests
+
+`tests/rules.test.js` checks the business rules in the page (needs Node 18+ and Playwright with Chromium; runs offline):
+
+```
+node --test tests/
+```
+
+It covers: standard-only rows for "lowest" and margin gaps (rule 1), no validity date = end of month (rule 2),
+China dry export margin USD 25 / 50 and gap-based margin elsewhere (rule 4), and the lane "lowest 40'" in `data/demo_data.json`.
+The page exposes `window.__rules` (read-only helpers) for these tests.
+
 ## 12. Scripts (Python 3 + openpyxl, no network)
 
 ```
