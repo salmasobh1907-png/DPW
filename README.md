@@ -164,9 +164,18 @@ Merge rule: the same carrier + POL + POD + contract type + validity month in two
 - **Daily history** (`dayHist_v1`, 60 days): per person open, late, answered, average reply time; saved every 5 minutes and when the day changes.
 - **Team dashboard** (Reports, managers only, hidden from others): team totals; each person's open, late, answered, average reply (clock time), oldest open, active and away time, end-of-day choice; the last 14 days done vs left; a daily alert text for the Director (copy or draft). Demo: activity time is dummy and each browser holds its own history; production: all from the database. HR and Legal approve before real use.
 
+### 5.10 Apps hub (links only: no passwords, no AI)
+
+One page with the apps the team uses: Outlook, calendar, Teams, the Gmail test box (prototype), SharePoint team site, Rate Bank on SharePoint (view only), Excel and PowerPoint, NPM, CARGOES, intranet, market index, vessel schedules. Internal links start empty and are typed by the team or set by IT (no invented addresses).
+- **Mail drafts open in** Gmail (prototype test box), Outlook (DP World) or the default mail app: one setting used by every draft the tool prepares (`mailDraft`).
+- **Team**: Email, Teams chat, Call (phone number = company SIM; opens the phone app or Teams on a PC, the SIM on a mobile; without a number a Teams call), Meeting (new Teams meeting).
+- **Carriers**: Email plus links to each carrier's website, spot quote, schedules and tracking pages (shown in Auto-RFQ too). The person logs in; the tool stores no passwords.
+- Settings are kept in the browser in the demo and can be copied to colleagues; IT sets them for everyone in production.
+- Level 2 and 3 (reading mail, presence, calendar, Teams Phone, SharePoint, NPM, CARGOES, carrier APIs) are in `docs/IT_Data_Sources_Request.html`.
+
 ### 5.3 Browser-only storage (per user)
 
-Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).
+Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).
 In production the cases must move to the database (see section 9).
 
 ## 6. Business rules built in

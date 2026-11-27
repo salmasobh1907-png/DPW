@@ -156,7 +156,7 @@ test('publish rule: no AI / LLM calls inside the page, external hosts are only t
                      /claude\.use\(\s*["']ai["']/i, /claude\.(complete|ask|prompt)\s*\(/i])
     assert.ok(!bad.test(s), 'found AI/LLM call: ' + bad);
   const hosts = new Set([...s.matchAll(/https?:\/\/([a-z0-9.-]+)/gi)].map(m => m[1].toLowerCase()));
-  const allowed = new Set(['cdnjs.cloudflare.com', 'fonts.googleapis.com', 'fonts.gstatic.com', 'mail.google.com', 'outlook.office.com', 'www.w3.org']);
+  const allowed = new Set(['cdnjs.cloudflare.com', 'fonts.googleapis.com', 'fonts.gstatic.com', 'mail.google.com', 'outlook.office.com', 'www.w3.org', 'teams.microsoft.com', 'www.office.com']); // links the user opens, not code the page loads
   for (const h of hosts) assert.ok(allowed.has(h), 'unexpected external host: ' + h);
 });
 
@@ -359,7 +359,7 @@ test('working time: segments are stored per day and add up by state', async () =
 test('today tools: Auto-RFQ drafts one email per carrier on the lane, never a suspended one', async () => {
   const r = await run(() => { const R = window.__rules; return { jed: R.rfqPlan('Jeddah', "40' HC"), jea: R.rfqPlan('Jebel Ali').map(x => x.car) }; });
   assert.ok(r.jed.length >= 2);
-  assert.ok(r.jed.every(x => x.href.startsWith('mailto:') && /Jeddah/.test(decodeURIComponent(x.href))));
+  assert.ok(r.jed.every(x => /^(https:\/\/mail\.google\.com|https:\/\/outlook\.office\.com|mailto:)/.test(x.href) && /Jeddah/.test(decodeURIComponent(x.href))));
   assert.ok(!r.jea.includes('Demo Suspended Line'));
 });
 
@@ -400,4 +400,17 @@ test('team: per-person numbers add up to the cases, and the leaving choice goes 
   assert.equal(r.open, r.casesOpen); assert.equal(r.ans, r.casesAns);
   assert.equal(r.eod, 'home'); assert.equal(r.note, 'Waiting for Aurora'); assert.ok(r.snap);
   assert.match(r.alert, /Will finish from home \(Waiting for Aurora\)/);
+});
+
+test('apps hub: one setting decides where every email draft opens; Teams and phone links are well formed', async () => {
+  const r = await run(() => { const R = window.__rules, k = 'apps_v1', keep = localStorage.getItem(k), out = {};
+    for (const m of ['gmail', 'outlook', 'mailto']) { const c = R.apCfg(); c.mail = m; localStorage.setItem(k, JSON.stringify(c)); out[m] = R.mailDraft(['a@x.example', 'b@x.example'], 'Rate request', 'Hello'); }
+    if (keep) localStorage.setItem(k, keep); else localStorage.removeItem(k);
+    return { ...out, chat: R.teamsChat('nour@x.example', 'Hi'), meet: R.teamsMeet(['a@x.example'], 'Pricing'), tel: R.telLink('+20 100 000-0000') }; });
+  assert.match(r.gmail, /^https:\/\/mail\.google\.com\/mail\/.*view=cm.*to=a%40x\.example%2Cb%40x\.example/);
+  assert.match(r.outlook, /^https:\/\/outlook\.office\.com\/mail\/deeplink\/compose\?to=a%40x\.example%2Cb%40x\.example&subject=Rate%20request/);
+  assert.match(r.mailto, /^mailto:/);
+  assert.equal(r.chat, 'https://teams.microsoft.com/l/chat/0/0?users=nour%40x.example&message=Hi');
+  assert.match(r.meet, /^https:\/\/teams\.microsoft\.com\/l\/meeting\/new\?subject=Pricing&attendees=a%40x\.example/);
+  assert.equal(r.tel, 'tel:+201000000000');
 });

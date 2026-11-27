@@ -456,6 +456,7 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
 .cy-bar{display:inline-flex;gap:3px;vertical-align:middle;margin-right:6px}.cy-bar i{width:16px;height:6px;border-radius:3px;background:rgba(127,127,127,.25)}.cy-bar i.on{background:#18a57b}
 .eod-dlg{max-width:560px;width:calc(100% - 32px);border:0;border-radius:16px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.3)}.eod-dlg::backdrop{background:rgba(10,20,40,.45)}.eod-dlg h3{margin:0 0 10px}.eod-ch{border:0;padding:0;margin:12px 0;display:flex;flex-direction:column;gap:8px}.eod-ch label{display:flex;gap:8px;align-items:center;font-size:14px}
 .hm-row{display:grid;grid-template-columns:96px minmax(0,1fr) 140px;gap:10px;align-items:center;font-size:13px;margin:5px 0}.hm-bar{display:flex;height:12px;border-radius:6px;background:rgba(127,127,127,.12);overflow:hidden}.hm-bar .a{background:#18a57b}.hm-bar .o{background:#e0a23b}
+.ap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}.ap-tile{display:flex;align-items:center;gap:8px;border:1px solid rgba(127,127,127,.25);border-radius:12px;padding:10px 12px}.ap-tile>a,.ap-tile>span{flex:1;min-width:0;text-decoration:none;color:inherit}.ap-tile b{display:block;font-size:14px}.ap-tile small{display:block;font-size:12px;opacity:.7;overflow-wrap:anywhere}.ap-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.ap-seg{display:flex;gap:6px;flex-wrap:wrap}.ap-ed{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;padding:8px 0 12px;border-bottom:1px dashed rgba(127,127,127,.3)}
 .dschip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}.ds-ok{background:#d9f2e3;color:#14532d}.ds-due{background:#fde9c8;color:#7c4a03}.ds-err{background:#f9d4d4;color:#7f1d1d}.ds-off,.ds-busy{background:#e5e7eb;color:#374151}.dstbl td{vertical-align:top}
 </style>
 </head>
@@ -670,6 +671,7 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
     <section class="pane" id="p-dsrc" hidden></section>
     <section class="pane" id="p-today" hidden></section>
     <section class="pane" id="p-team" hidden></section>
+    <section class="pane" id="p-apps" hidden></section>
     <section class="pane" id="p-ibx" hidden></section>
     <section class="pane" id="p-sheet" hidden></section>
     <section class="pane" id="p-plog" hidden></section>
@@ -2810,7 +2812,7 @@ try{ csStartTimer(); }catch(e){}
 
 const ICON=n=>`<svg class="ic sm" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 const NAV={
-  pricing:[["Daily work",[["today","Today","check"],["ibx","Inbox","inbox"],["cases","Shared inbox cases","clock"],["lane","Rates & offer","map"],["q","Offers & feedback","file"]],"pricing + sales"],
+  pricing:[["Daily work",[["today","Today","check"],["apps","Apps hub","box"],["ibx","Inbox","inbox"],["cases","Shared inbox cases","clock"],["lane","Rates & offer","map"],["q","Offers & feedback","file"]],"pricing + sales"],
            ["Rate Bank",[["sheet","Rate Bank","db"],["trk","Trucking rates","truck"]],"pricing"],
            ["Reports",[["home","Overview","home"],["team","Team dashboard","chart"]],"managers"],
            ["Reference",[["svc","Alliance loops","ship"],["info","Help & settings","help"]],"everyone"]],
@@ -2825,11 +2827,11 @@ function navKey(t){ return PAR[t]||t; }
 function renderSub(t){ let bar=$("subsw"); const pk=navKey(t), L=SUBS[pk]; if(!bar){ bar=document.createElement("div"); bar.id="subsw"; bar.className="subsw"; bar.setAttribute("role","group"); bar.setAttribute("aria-label","Part of this page"); const w=$("work"); w.insertBefore(bar,w.firstChild); }
   const ok=L&&(isPricing()||pk!=="info"); bar.hidden=!ok; if(!ok) return; bar.innerHTML=L.map(([k,l])=>`<button type="button" data-sk="${k}" aria-pressed="${k===t}">${esc((!isPricing()&&SUBS_SALES[k])||l)}</button>`).join(""); bar.querySelectorAll("[data-sk]").forEach(x=>x.onclick=()=>openTab(x.dataset.sk)); }
 const NAVOPEN=new Set();
-const PAGE={cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],team:["Team dashboard","Each person: open, late, answered, reply time, working time and end-of-day choice · managers only"],today:["Today","Everything that needs Pricing now, and Quick price in one line"],dsrc:["Data sources","Rate Bank, carrier emails, online links and files: freshness, order and conflicts"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
+const PAGE={cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],apps:["Apps hub","Outlook, Teams, files, DP World systems and carrier sites in one place, with one-click email, chat, call and meeting"],team:["Team dashboard","Each person: open, late, answered, reply time, working time and end-of-day choice · managers only"],today:["Today","Everything that needs Pricing now, and Quick price in one line"],dsrc:["Data sources","Rate Bank, carrier emails, online links and files: freshness, order and conflicts"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
   q:["Offers & quotes","Offers pricing sent to sales, and quotes sales sent to customers"],fb:["Sales feedback","What sales hear from customers, with pricing's replies"],off:["Carrier offers","A carrier email or Excel turned into Rate Bank rows"],
   req:["Ask carriers","Monthly “Rate Idea” emails to the lines"],svc:["Alliance loops","Reference list of liner rotations that call Egypt, 19 Oct 2026"],vol:["Carrier volumes","What we booked with each line, for contract and volume talks"],trk:["Trucking rates","Pickup in Egypt for EXW requests, and cross-border trucks"],hl:["Rate Bank check","Rows in the Rate Bank that are wrong or easy to misread"],gw:["Market alerts","Disruptions, rate-increase notices and the weekly market index"],info:["Help","How the platform works and where the numbers come from"]};
 const PAGE_SALES={ibx:["Inbox","Your customer requests from email · demo with dummy data"],lane:["Find a rate","Route, carrier rates, customer offer and quotation"],q:["My offers & quotes","Pricing's offers to you, your quotes to customers, follow-ups and hit ratio"],fb:["Feedback to pricing","Tell pricing what the customer said and read their answer"]};
-const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",dsrc:"Data",today:"Today",team:"Team",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
+const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",dsrc:"Data",today:"Today",team:"Team",apps:"Apps",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
 let ROLE=lsGet("rg-role","pricing"), CUR_TAB="lane";
 QT.isOwner=false;
 function canPricing(){ return !QT.shared || QT.isOwner || ((QT.settings&&QT.settings.pricing)||[]).includes(QT.meId); }
@@ -2856,9 +2858,9 @@ function setTitle(t){ const P=(!isPricing()&&PAGE_SALES[t])||PAGE[t]||["",""]; $
 document.addEventListener("click",e=>{ const c=e.target.closest&&e.target.closest(".cmt"); if(!c) return; e.stopPropagation(); c.classList.toggle("open"); c.title=c.classList.contains("open")?"Click to shorten":"Click to read the full note"; },true);
 function openTab(t,quiet){
   if(!allowed(t)) t="lane";
-  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","dsrc","today","team","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
+  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","dsrc","today","team","apps","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
   panes.forEach(k=>{ const p=$("p-"+k); if(p) p.hidden=k!==t; });
-  { const wasNo=document.body.classList.contains("nomap"); document.body.classList.toggle("nomap",t==="trk"||t==="sheet"||t==="ibx"||t==="cases"||t==="ckpi"||t==="cmbx"||t==="dsrc"||t==="today"||t==="team"); if(wasNo&&t!=="trk"&&t!=="sheet"&&t!=="ibx"&&t!=="cases"&&t!=="ckpi"&&t!=="cmbx"&&t!=="dsrc"&&t!=="today"&&t!=="team") setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
+  { const wasNo=document.body.classList.contains("nomap"); document.body.classList.toggle("nomap",t==="trk"||t==="sheet"||t==="ibx"||t==="cases"||t==="ckpi"||t==="cmbx"||t==="dsrc"||t==="today"||t==="team"||t==="apps"); if(wasNo&&t!=="trk"&&t!=="sheet"&&t!=="ibx"&&t!=="cases"&&t!=="ckpi"&&t!=="cmbx"&&t!=="dsrc"&&t!=="today"&&t!=="team"&&t!=="apps") setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
   document.querySelectorAll("#nav button[data-k],#bnav button[data-k]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.k===navKey(t)))); renderSub(t);
   { const nb=document.querySelector('#nav button[data-k="'+navKey(t)+'"]'); if(nb&&nb.closest(".gi[hidden]")) renderNav(); }
   setTitle(t); $("work").scrollTop=0; if(!quiet) window.scrollTo&&window.scrollTo(0,0);
@@ -2879,6 +2881,7 @@ function openTab(t,quiet){
   if(t==="gw") renderGw();
   if(t==="src") renderSrc();
   if(t==="dsrc") dsRender();
+  if(t==="apps") setTimeout(()=>{ try{ renderApps(); }catch(e){ console.error(e); } },0);
   if(t==="team") setTimeout(()=>{ try{ renderTeam(); }catch(e){ console.error(e); } },0);
   if(t==="today") setTimeout(()=>{ try{ renderToday(); }catch(e){ console.error(e); } },0); /* after the page finishes loading */
   if(t==="plog") renderPlog();
@@ -4131,7 +4134,7 @@ function rfqPlan(pod,eq){ const t=todayISO(), all=(DATA.rates||[]).concat(DATA.r
   const nxt=new Date(); nxt.setDate(nxt.getDate()+5); const mon=MONTHS_EN[nxt.getMonth()];
   return L.sort((a,b)=>(a.live-b.live)||a.car.localeCompare(b.car)).map(g=>{ const pols=[...g.pols].join(" / ")||"Sokhna / Alexandria / Damietta", mails=carrierMails(g.car);
     const body=[`Dear ${g.car} team,`,"","Good day.","",`Kindly share your best rate for ${eq||"20' and 40'"} from ${pols} to ${pod}, ${mon}.`,"","Please include: 20' / 40' rate, origin THC, free time at destination, validity, transit time and transshipment port.","","Thank you,",$("q-me").value.trim()||"[Your name]","Pricing – Freight Forwarding","DP World Logistics – Egypt"].join("\n");
-    return {car:g.car,live:g.live,guess:!!g.guess,last:g.last,to:mails.join(";"),href:`mailto:${encodeURIComponent(mails.join(";"))}?subject=${encodeURIComponent(`Rate request: ${pols} to ${pod} - DP World`)}&body=${encodeURIComponent(body)}`}; }); }
+    return {car:g.car,live:g.live,guess:!!g.guess,last:g.last,to:mails.join(";"),href:mailDraft(mails,`Rate request: ${pols} to ${pod} - DP World`,body),links:apCarrierLinks(g.car)}; }); }
 /* 2 Morning brief: text built from Today's lists */
 function briefText(){ const I=asNext(tdItems()), t=todayISO(), now=Date.now(); let open=0, late=0; try{ csLoad().cases.filter(c=>!c.sub).forEach(c=>{ open++; if(csState(c,now).st==="breach") late++; }); }catch(e){}
   const end7=(DATA.rates||[]).filter(r=>isStd(r)&&r.valid&&r.valid>=t&&r.valid<=addDays(t,7)), gaps=I.filter(x=>x.tag==="GAP"), news=Object.values(DS.rows||{}).flatMap(x=>x.news||[]);
@@ -4151,11 +4154,11 @@ function eodText(){ const done=lsGet("tdDone_v1",[]).filter(d=>d.day===todayISO(
 function tdPanel(){ const P=TD.panel; if(!P) return "";
   const head=(t,sub)=>`<div class="td-ph"><b>${esc(t)}</b>${sub?`<span>${esc(sub)}</span>`:""}<button type="button" class="mini" id="tdPx">Close</button></div>`;
   if(P.k==="rfq"){ const R=rfqPlan(P.pod,P.eq);
-    return `<div class="td-res">${head("Ask carriers: "+P.pod,"One draft per carrier. You press Send in your mail app.")}${R.length?R.map(r=>`<div class="td-it"><span class="td-tag td-${r.live?"new":"due"}">${r.live?"HAS RATE":"NO VALID RATE"}</span><div class="td-tx"><b>${esc(r.car)}</b><small>${r.guess?"No rate on this lane before · ":""}${r.last?"Last rate valid to "+esc(fmtDate(r.last))+" · ":""}${esc(r.to||"no email in Contacts")}</small></div><a class="mini ok" href="${esc(r.href)}" target="_blank" rel="noopener">Open draft</a></div>`).join(""):`<p class="note">No carrier to ask on this lane.</p>`}
+    return `<div class="td-res">${head("Ask carriers: "+P.pod,"One draft per carrier. You press Send in your mail app.")}${R.length?R.map(r=>`<div class="td-it"><span class="td-tag td-${r.live?"new":"due"}">${r.live?"HAS RATE":"NO VALID RATE"}</span><div class="td-tx"><b>${esc(r.car)}</b><small>${r.guess?"No rate on this lane before · ":""}${r.last?"Last rate valid to "+esc(fmtDate(r.last))+" · ":""}${esc(r.to||"no email in Contacts")}</small></div>${(r.links||[]).map(x=>`<a class="mini" href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.n)}</a>`).join("")}<a class="mini ok" href="${esc(r.href)}" target="_blank" rel="noopener">Open draft</a></div>`).join(""):`<p class="note">No carrier to ask on this lane.</p>`}
       <div class="td-acts"><button type="button" class="svc btn primary" id="rfqLog">Log ${R.length} request${R.length===1?"":"s"} as asked</button><span class="note" id="rfqMsg"></span></div></div>`; }
   if(P.k==="brief"||P.k==="eod"){ const txt=P.k==="brief"?briefText():eodText(), su=(P.k==="brief"?"Pricing morning brief ":"End of day ")+fmtDate(todayISO());
     return `<div class="td-res">${head(P.k==="brief"?"Morning brief":"End of day",P.k==="brief"?"For the team and the manager":"What you did and what is left")}<pre class="td-pre">${esc(txt)}</pre>
-      <div class="td-acts"><button type="button" class="svc btn primary" id="tdCopy">Copy</button><a class="mini" href="mailto:?subject=${encodeURIComponent(su)}&body=${encodeURIComponent(txt)}">Open as email draft</a>${P.k==="eod"?`<button type="button" class="mini ok" id="eodLeave">I am leaving now</button>`:""}<span class="note" id="tdCopyMsg"></span></div></div>`; }
+      <div class="td-acts"><button type="button" class="svc btn primary" id="tdCopy">Copy</button><a class="mini" target="_blank" rel="noopener" href="${esc(mailDraft("",su,txt))}">Open as email draft</a>${P.k==="eod"?`<button type="button" class="mini ok" id="eodLeave">I am leaving now</button>`:""}<span class="note" id="tdCopyMsg"></span></div></div>`; }
   if(P.k==="hand"){ const n=csLoad().cases.filter(c=>!c.sub&&c.who==="me").length;
     return `<div class="td-res">${head("Hand over my open cases",n+" open case"+(n===1?"":"s")+" assigned to you")}
       <form id="hoForm" class="trkform"><label class="f">To<select id="hoTo">${CS_PEOPLE.filter(x=>x.id!=="me").map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("")}</select></label>
@@ -4236,16 +4239,72 @@ function renderTeam(){ const p=$("p-team"); if(!p) return; if(!wtMgr()){ p.inner
       <p class="note">Open, late, answered and reply time come from the shared inbox cases. Active and away time: dummy numbers in the demo; on DP World servers each person's time log. HR and Legal approve before real use.</p></div>
     <div class="card"><h3>Last ${days.length} day${days.length===1?"":"s"}: answered and left open</h3>${days.map(d=>{ const X=Object.values(H[d].people||{}), a=X.reduce((s,x)=>s+x.answered,0), o=X.reduce((s,x)=>s+x.open,0);
       return `<div class="hm-row"><span>${esc(d)}</span><div class="hm-bar"><i class="a" style="width:${a/maxD*100}%"></i><i class="o" style="width:${o/maxD*100}%"></i></div><span>${a} done · ${o} left</span></div>`; }).join("")}<p class="note">Saved through the day and at day change. Green = answered, amber = left open.</p></div>
-    <div class="card"><h3>Daily alert for the Director</h3><pre class="td-pre" id="tmTxt">${esc(teamAlert(S,me))}</pre><div class="td-acts"><button type="button" class="svc btn primary" id="tmCopy">Copy</button><a class="mini" href="mailto:?subject=${encodeURIComponent("Pricing team: open work "+fmtDate(todayISO()))}&body=${encodeURIComponent(teamAlert(S,me))}">Open as email draft</a><span class="note" id="tmMsg"></span></div></div>`;
+    <div class="card"><h3>Daily alert for the Director</h3><pre class="td-pre" id="tmTxt">${esc(teamAlert(S,me))}</pre><div class="td-acts"><button type="button" class="svc btn primary" id="tmCopy">Copy</button><a class="mini" target="_blank" rel="noopener" href="${esc(mailDraft("","Pricing team: open work "+fmtDate(todayISO()),teamAlert(S,me)))}">Open as email draft</a><span class="note" id="tmMsg"></span></div></div>`;
   const c=$("tmCopy"); if(c) c.onclick=async()=>{ try{ await navigator.clipboard.writeText($("tmTxt").textContent); $("tmMsg").textContent="Copied."; }catch(e){ $("tmMsg").textContent="Select the text and copy it."; } }; }
 function teamAlert(S,me){ const P=Object.values(S.people).sort((a,b)=>b.late-a.late||b.open-a.open);
   return [`Pricing team · ${fmtDate(todayISO())} · open work`,"",`Not taken yet: ${S.unassigned}`,...P.map(x=>`${x.name}: ${x.answered} answered, ${x.open} open${x.late?`, ${x.late} past the SLA`:""}${x.id==="me"&&me?` · ${EOD_CH[me.choice]}${me.note?" ("+me.note+")":""}`:""}`),"","From the DP World Platform (dummy data in the demo)."].join("\n"); }
+/* ---------- Apps hub: one place for the apps the team uses, and one-click actions (links only: no passwords, no AI) ----------
+   Mail drafts open in Gmail (prototype test box on claude.ai) or Outlook (DP World), one setting. Teams chat / call / meeting
+   and phone (company SIM) by standard links. Internal links (SharePoint, NPM, CARGOES …) are typed by the team or set by IT. */
+const AP_KEY="apps_v1";
+const AP_DEF={mail:"gmail",groups:[
+  {id:"mail",name:"Mail, calendar and Teams",items:[{n:"Outlook (web)",u:"https://outlook.office.com/mail/"},{n:"Outlook calendar",u:"https://outlook.office.com/calendar/"},{n:"Teams",u:"https://teams.microsoft.com/"},{n:"Gmail test box (prototype)",u:"https://mail.google.com/"}]},
+  {id:"files",name:"Files and reports",items:[{n:"SharePoint: Pricing team site",u:""},{n:"Rate Bank on SharePoint (view only)",u:""},{n:"Excel (web)",u:"https://www.office.com/launch/excel"},{n:"PowerPoint (web)",u:"https://www.office.com/launch/powerpoint"}]},
+  {id:"dpw",name:"DP World systems",items:[{n:"NPM (Network Pricing Manager)",u:""},{n:"CARGOES",u:""},{n:"DP World intranet",u:""}]},
+  {id:"mkt",name:"Market and schedules",items:[{n:"Market index",u:""},{n:"Vessel schedules",u:""}]}],
+  carriers:{}, phones:{}};
+function apCfg(){ const c=lsGet(AP_KEY,null); return c&&c.groups?c:JSON.parse(JSON.stringify(AP_DEF)); }
+function apSave(c){ lsSet(AP_KEY,c); }
+function apMode(){ const c=apCfg(); return c.mail==="outlook"?"outlook":c.mail==="mailto"?"mailto":"gmail"; }
+/* one draft link for the whole tool */
+function mailDraft(to,su,body){ const T=Array.isArray(to)?to.join(";"):(to||""), m=apMode();
+  if(m==="outlook") return "https://outlook.office.com/mail/deeplink/compose?to="+encodeURIComponent(T.replace(/;/g,","))+"&subject="+encodeURIComponent(su||"")+"&body="+encodeURIComponent(body||"");
+  if(m==="gmail") return gmCompose(IBX_PRICING,T.replace(/;/g,","),su||"",body||"");
+  return "mailto:"+encodeURIComponent(T)+"?subject="+encodeURIComponent(su||"")+"&body="+encodeURIComponent(body||""); }
+const teamsChat=(mail,msg)=>"https://teams.microsoft.com/l/chat/0/0?users="+encodeURIComponent(mail)+(msg?"&message="+encodeURIComponent(msg):"");
+const teamsCall=mail=>"https://teams.microsoft.com/l/call/0/0?users="+encodeURIComponent(mail);
+const teamsMeet=(mails,su)=>"https://teams.microsoft.com/l/meeting/new?subject="+encodeURIComponent(su||"")+"&attendees="+encodeURIComponent([].concat(mails).join(","));
+const telLink=n=>"tel:"+String(n||"").replace(/[^\d+]/g,"");
+const apOk=u=>/^(https:\/\/|tel:|mailto:)/i.test(String(u||""));
+/* small action row for a person or a carrier */
+function apActs(o){ const L=[]; if(o.mail) L.push(`<a class="mini" target="_blank" rel="noopener" href="${esc(mailDraft(o.mail,o.su||"",o.body||""))}">Email</a>`);
+  if(o.mail&&o.teams!==false) L.push(`<a class="mini" target="_blank" rel="noopener" href="${esc(teamsChat(o.mail,o.msg||""))}">Teams chat</a>`);
+  if(o.phone) L.push(`<a class="mini" href="${esc(telLink(o.phone))}" title="${esc(o.phone)}">Call ${esc(o.phone)}</a>`); else if(o.mail&&o.teams!==false) L.push(`<a class="mini" target="_blank" rel="noopener" href="${esc(teamsCall(o.mail))}">Teams call</a>`);
+  if(o.mail&&o.meet) L.push(`<a class="mini" target="_blank" rel="noopener" href="${esc(teamsMeet(o.mail,o.meet))}">Meeting</a>`);
+  (o.links||[]).filter(x=>apOk(x.u)).forEach(x=>L.push(`<a class="mini ok" target="_blank" rel="noopener" href="${esc(x.u)}">${esc(x.n)}</a>`));
+  return `<span class="ap-acts">${L.join("")}</span>`; }
+function apCarrierLinks(car){ const c=apCfg().carriers[car]||{}; return [["Website",c.web],["Spot quote",c.spot],["Schedules",c.sched],["Tracking",c.track]].filter(([,u])=>u).map(([n,u])=>({n,u})); }
+function renderApps(){ const p=$("p-apps"); if(!p) return; const C=apCfg(), m=apMode(), cars=Object.keys(DATA.contacts||{}).sort();
+  const grp=g=>`<div class="card"><h3>${esc(g.name)}</h3><div class="ap-grid">${g.items.map((it,i)=>`<div class="ap-tile">${apOk(it.u)?`<a href="${esc(it.u)}" target="_blank" rel="noopener"><b>${esc(it.n)}</b><small>${esc(String(it.u).replace(/^https:\/\//,"").slice(0,48))}</small></a>`:`<span><b>${esc(it.n)}</b><small>No link yet</small></span>`}<button type="button" class="mini" data-ape="${esc(g.id)}|${i}" aria-label="Set link for ${esc(it.n)}">Set link</button></div>`).join("")}</div></div>`;
+  p.innerHTML=`<div class="card"><h3>Mail drafts open in</h3><div role="group" aria-label="Mail app" class="ap-seg">${[["gmail","Gmail (prototype test box)"],["outlook","Outlook (DP World)"],["mailto","My default mail app"]].map(([k,l])=>`<button type="button" class="mini${m===k?" ok":""}" aria-pressed="${m===k}" data-apm="${k}">${l}</button>`).join("")}</div>
+      <p class="note">Every email the tool prepares (offers, rate requests, follow-ups, briefs) opens as a draft there. A person presses Send. On DP World servers IT sets Outlook.</p></div>
+    ${C.groups.map(grp).join("")}
+    <div class="card"><h3>Team: one click to email, chat, call or meet</h3>${CS_PEOPLE.filter(x=>x.id!=="me").map(x=>`<div class="td-it"><span class="td-tag td-new">${esc(x.name.split(" ").map(w=>w[0]).join(""))}</span><div class="td-tx"><b>${esc(x.name)}</b><small>${esc(x.mail)}${C.phones[x.id]?" · "+esc(C.phones[x.id]):""}</small></div><span class="ap-acts">${apActs({mail:x.mail,phone:C.phones[x.id],meet:"Pricing: quick call"})}<button type="button" class="mini" data-app="${esc(x.id)}">Set phone</button></span></div>`).join("")}
+      <p class="note">Call uses the phone number you set (opens the phone app or Teams on a PC, the SIM on a mobile); without a number it starts a Teams call.</p></div>
+    <div class="card"><h3>Carriers</h3><p class="note">Links to each carrier's own website, spot quote, schedules and tracking pages. You log in yourself; the tool never stores passwords.</p>
+      ${cars.map(c=>{ const e=(DATA.contacts||{})[c]||[]; return `<div class="td-it"><span class="td-tag td-due">${esc(c.slice(0,3).toUpperCase())}</span><div class="td-tx"><b>${esc(c)}</b><small>${esc(e.filter(Boolean).join(" · ")||"no email in Contacts")}</small></div><span class="ap-acts">${apActs({mail:e[0],teams:false,links:apCarrierLinks(c),su:"DP World rate request"})}<button type="button" class="mini" data-apc="${esc(c)}">Set links</button></span></div>`; }).join("")}</div>
+    <div class="card"><details><summary>Copy these settings to other people</summary><p class="note">Settings live in this browser in the demo. Copy them and send them to a colleague, or IT loads them for everyone.</p>
+      <textarea id="apJson" rows="5" style="width:100%;font:12px monospace">${esc(JSON.stringify(C))}</textarea><div class="td-acts"><button type="button" class="mini ok" id="apLoad">Load pasted settings</button><button type="button" class="mini" id="apReset">Back to defaults</button><span class="note" id="apMsg"></span></div></details></div>`;
+  p.querySelectorAll("[data-apm]").forEach(b=>b.onclick=()=>{ const c=apCfg(); c.mail=b.dataset.apm; apSave(c); renderApps(); });
+  /* inline editor (pop-up prompts do not work everywhere): one small form under the clicked row */
+  const edit=(btn,fields,save)=>{ const host=btn.closest(".ap-tile,.td-it"); const old=host.nextElementSibling; if(old&&old.classList.contains("ap-ed")){ old.remove(); return; }
+    const f=document.createElement("form"); f.className="ap-ed"; f.innerHTML=fields.map((x,i)=>`<label class="f">${esc(x.l)}<input data-i="${i}" value="${esc(x.v||"")}" placeholder="${esc(x.ph||"")}" ${x.type?`type="${x.type}"`:""}></label>`).join("")+`<div class="td-acts"><button class="mini ok" type="submit">Save</button><button class="mini" type="button" data-x="1">Cancel</button><span class="note warn-t" data-m="1"></span></div>`;
+    host.after(f); f.querySelector("input").focus(); f.querySelector("[data-x]").onclick=()=>f.remove();
+    f.onsubmit=e=>{ e.preventDefault(); const v=[...f.querySelectorAll("input")].map(i=>i.value.trim()); const err=save(v); if(err){ f.querySelector("[data-m]").textContent=err; return; } renderApps(); }; };
+  p.querySelectorAll("[data-ape]").forEach(b=>b.onclick=()=>{ const [g,i]=b.dataset.ape.split("|"), c=apCfg(), it=c.groups.find(x=>x.id===g).items[+i];
+    edit(b,[{l:"Link for "+it.n,v:it.u,ph:"https://…",type:"url"}],([u])=>{ if(u&&!apOk(u)) return "Use a link that starts with https://"; it.u=u; apSave(c); }); });
+  p.querySelectorAll("[data-app]").forEach(b=>b.onclick=()=>{ const c=apCfg(), id=b.dataset.app;
+    edit(b,[{l:"Work phone (company SIM)",v:c.phones[id],ph:"+20 100 000 0000",type:"tel"}],([u])=>{ if(u&&!/^[+\d][\d\s()-]{5,}$/.test(u)) return "Type a phone number"; c.phones[id]=u; apSave(c); }); });
+  p.querySelectorAll("[data-apc]").forEach(b=>b.onclick=()=>{ const c=apCfg(), k=b.dataset.apc, o=c.carriers[k]||{}, F=[["web","Website"],["spot","Spot quote page"],["sched","Schedules page"],["track","Tracking page"]];
+    edit(b,F.map(([f,l])=>({l,v:o[f],ph:"https://… (empty = none)",type:"url"})),v=>{ if(v.some(u=>u&&!apOk(u))) return "Links must start with https://"; F.forEach(([f],i)=>o[f]=v[i]); c.carriers[k]=o; apSave(c); }); });
+  $("apLoad").onclick=()=>{ try{ const c=JSON.parse($("apJson").value); if(!c||!Array.isArray(c.groups)) throw 0; c.groups.forEach(g=>g.items.forEach(it=>{ if(it.u&&!apOk(it.u)) it.u=""; })); apSave(c); renderApps(); }catch(e){ $("apMsg").textContent="That is not a settings text from this page."; } };
+  $("apReset").onclick=()=>{ try{ localStorage.removeItem(AP_KEY); }catch(e){} renderApps(); }; }
 setTimeout(()=>{ try{ tdFocusWatch(); }catch(e){} try{ eodWatch(); histSnap(); setInterval(histSnap,300000); }catch(e){} },0);
 { const _rk=renderCkpi; renderCkpi=function(){ _rk.apply(this,arguments); const p=$("p-ckpi"); if(!p||!wtMgr()) return; let row="";
     try{ csTick(); const D=wtDay(csDay(Date.now())); if(D) row=`<tr><td><b>${esc(csName("me"))}</b> (this browser)</td><td>${csTime(D.first)}</td><td>${csTime(D.last)}</td><td class="n">${asDur(D.active)}</td><td class="n">${asDur(D.away)}</td><td class="n">${asDur(D.brk)}</td><td class="n">${asDur(D.off)}</td></tr>`; }catch(e){}
     p.insertAdjacentHTML("beforeend",`<div class="card"><h3>Team working time <span class="dschip ds-off">Managers only</span></h3><p class="note">Active, Away, Break and Off in the tool, per person, today. In this demo each browser keeps only its own log, so only your row shows. On DP World servers every person's log goes to the team database and shows here. Each person sees only their own time. HR and Legal approve before real use.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Person</th><th>First seen</th><th>Last seen</th><th class="n">Active</th><th class="n">Away</th><th class="n">Break</th><th class="n">Off</th></tr></thead><tbody>${row||`<tr><td colspan="7" class="note">No time logged yet today.</td></tr>`}</tbody></table></div></div>`); }; }
-window.__rules = { QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
+window.__rules = { mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
 window.__route = route;
 })();
 </script>
