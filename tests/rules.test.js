@@ -7,7 +7,7 @@ const path = require('node:path');
 const fs = require('node:fs');
 const { chromium } = require('playwright');
 
-const PAGE = 'file://' + path.resolve(__dirname, '../app/DP_World_Platform_DEMO.html');
+const PAGE = 'file://' + path.resolve(__dirname, '../app/DP_World_Platform_DEMO.html') + '?skipLogin=1';
 let browser, page; const pageErrors = [];
 
 before(async () => {
@@ -428,4 +428,32 @@ test('viewers: Pricing, Sales and Director each get their own menu; only Pricing
   assert.ok(!out.sales.nav.includes('team') && !out.sales.nav.includes('today')); assert.equal(out.sales.salesClass, true);
   assert.ok(out.pricing.nav.includes('today') && out.pricing.nav.includes('cases'));
   assert.notDeepEqual(out.director.nav, out.pricing.nav);
+});
+
+test('responsibilities: the matrix shows load, shared work, one-person tasks and gaps (tenders)', async () => {
+  const r = await run(() => { const M = window.__rules.tkMatrix();
+    return { gaps: M.gaps.map(t => t.title), shared: M.shared.length, single: M.single.length, meH: +M.load.me.hours.toFixed(2), nourH: +M.load.nour.hours.toFixed(2), meHelps: M.load.me.helps }; });
+  assert.deepEqual(r.gaps, ['Answer tenders']);
+  assert.ok(r.shared >= 5);                   // pricing work shared by the two pricing people
+  assert.ok(r.meH > r.nourH);                 // the one who also supports colleagues carries more
+  assert.ok(r.meHelps >= 5);
+});
+
+test('responsibilities: daily ticks and counts are kept per person and day', async () => {
+  const r = await run(() => { const R = window.__rules, k = 'tkLog_v1', keep = localStorage.getItem(k); localStorage.removeItem(k);
+    R.tkMark('me', 't4', 1); R.tkMark('me', 't6', 1); R.tkMark('me', 't6', 1); R.tkMark('me', 't6', -1); R.tkMark('nour', 't4', 1);
+    const out = { me: R.tkDone('me'), nour: R.tkDone('nour') }; if (keep) localStorage.setItem(k, keep); else localStorage.removeItem(k); return out; });
+  assert.deepEqual(r, { me: { t4: 1, t6: 1 }, nour: { t4: 1 } });
+});
+
+test('sign-in: the app starts on a sign-in screen; picking a user sets the view and shows the launch summary', async () => {
+  const pg = await browser.newPage(); await pg.route(/^https?:\/\//, x => x.abort());
+  await pg.goto(PAGE.replace('?skipLogin=1', '')); await pg.waitForSelector('#loginDlg[open]');
+  await pg.click('[data-lg="director"]'); await pg.waitForSelector('#launchDlg[open]');
+  const facts = await pg.$$eval('#launchDlg li', L => L.map(x => x.textContent));
+  await pg.click('#launchDlg [data-lgo="team"]'); await pg.waitForTimeout(300);
+  const st = await pg.evaluate(() => ({ pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id, who: window.__rules.whoAmI().name, dir: window.__rules.isDirector() }));
+  await pg.close();
+  assert.ok(facts.some(f => /Nobody owns: Answer tenders/.test(f)));
+  assert.deepEqual(st, { pane: 'p-team', who: 'Director', dir: true });
 });

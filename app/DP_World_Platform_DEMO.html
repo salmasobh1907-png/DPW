@@ -457,6 +457,9 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
 .eod-dlg{max-width:560px;width:calc(100% - 32px);border:0;border-radius:16px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.3)}.eod-dlg::backdrop{background:rgba(10,20,40,.45)}.eod-dlg h3{margin:0 0 10px}.eod-ch{border:0;padding:0;margin:12px 0;display:flex;flex-direction:column;gap:8px}.eod-ch label{display:flex;gap:8px;align-items:center;font-size:14px}
 .hm-row{display:grid;grid-template-columns:96px minmax(0,1fr) 140px;gap:10px;align-items:center;font-size:13px;margin:5px 0}.hm-bar{display:flex;height:12px;border-radius:6px;background:rgba(127,127,127,.12);overflow:hidden}.hm-bar .a{background:#18a57b}.hm-bar .o{background:#e0a23b}
 .ap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}.ap-tile{display:flex;align-items:center;gap:8px;border:1px solid rgba(127,127,127,.25);border-radius:12px;padding:10px 12px}.ap-tile>a,.ap-tile>span{flex:1;min-width:0;text-decoration:none;color:inherit}.ap-tile b{display:block;font-size:14px}.ap-tile small{display:block;font-size:12px;opacity:.7;overflow-wrap:anywhere}.ap-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.ap-seg{display:flex;gap:6px;flex-wrap:wrap}.ap-ed{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;padding:8px 0 12px;border-bottom:1px dashed rgba(127,127,127,.3)}
+.lg-dlg{max-width:620px}.lg-head{display:flex;gap:14px;align-items:center;margin-bottom:14px}.lg-head h2{margin:0;font-size:24px}.lg-logo{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--nav,#0b1a33);color:#fff;font-weight:700}.lg-ms{width:100%;justify-content:center;min-height:44px;opacity:.6}
+.lg-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;margin-top:10px}.lg-u{display:flex;gap:10px;align-items:center;text-align:left;padding:10px 12px;border:1px solid var(--line,#ddd);border-radius:12px;background:var(--surface,#fff);color:inherit;cursor:pointer;min-height:56px}.lg-u:hover,.lg-u:focus-visible{border-color:var(--accent);background:var(--accent-soft)}.lg-u b{display:block;font-size:14px}.lg-u small{font-size:12px;opacity:.75}.lg-facts{font-size:15px;margin:6px 0 14px}.lg-who{font:700 12px/1 system-ui;width:36px}
+.tk-load .hm-row{grid-template-columns:110px minmax(0,1fr) minmax(200px,340px)}.tk-h{margin:14px 0 2px;font-size:13px;opacity:.7}.tk-n{font-size:13px;min-width:56px;text-align:center;align-self:center}.tk-chk{display:inline-flex;gap:6px;align-items:center;margin-right:12px;font-size:14px}
 .dschip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}.ds-ok{background:#d9f2e3;color:#14532d}.ds-due{background:#fde9c8;color:#7c4a03}.ds-err{background:#f9d4d4;color:#7f1d1d}.ds-off,.ds-busy{background:#e5e7eb;color:#374151}.dstbl td{vertical-align:top}
 /* ===== New look: a layer on top of the classic tokens; body.nl switches it ===== */
 body.nl{--bg:#f4f6fa;--surface:#ffffff;--surface-2:#f7f9fc;--line:#e3e8ef;--line-2:#cfd8e3;--ink:#0f1b2d;--muted:#55657a;--faint:#8492a6;--accent:#1d5bd8;--accent-ink:#ffffff;--accent-soft:#e8f0fd;--focus:#1d5bd8;--nav:#0b1a33;--nav-2:#14294b;--nav-ink:#eaf0f8;--nav-muted:#93a6c0;--shadow:0 1px 2px rgba(15,27,45,.05),0 8px 24px rgba(15,27,45,.06)}
@@ -528,6 +531,7 @@ body.nl .side,body.nl .rail,body.nl nav.side{background:linear-gradient(180deg,#
   <header class="top">
     <div class="ttl"><h1 id="pgTitle">Rates &amp; offer</h1><div class="sub" id="pgSub"></div></div>
     <div class="role" id="roleSw" role="group" aria-label="View as" hidden><span class="lbl">View as</span><button id="r-pricing" aria-pressed="true"><svg class="ic sm"><use href="#i-chart"/></svg>Pricing</button><button id="r-sales" aria-pressed="false"><svg class="ic sm"><use href="#i-bag"/></svg>Sales</button><button id="r-director" aria-pressed="false"><svg class="ic sm"><use href="#i-home"/></svg>Director</button></div>
+    <button class="iconbtn lg-who" id="whoBtn" aria-label="Signed in user: switch user" title="Switch user">?</button>
     <button class="iconbtn" id="lookBtn" aria-pressed="true" aria-label="New look on or off" title="New look on or off"><svg class="ic"><use href="#i-sun"/></svg></button>
     <span class="chipd" title="Source: Rate Bank Export / Import on SharePoint"><span class="dot"></span>Rate Bank · <span id="asof3"></span></span>
     <button class="iconbtn" id="noteBtn" aria-pressed="false" aria-label="Show or hide the explanations" title="Show or hide the explanations"><svg class="ic"><use href="#i-help"/></svg></button>
@@ -703,6 +707,7 @@ body.nl .side,body.nl .rail,body.nl nav.side{background:linear-gradient(180deg,#
     <section class="pane" id="p-today" hidden></section>
     <section class="pane" id="p-team" hidden></section>
     <section class="pane" id="p-apps" hidden></section>
+    <section class="pane" id="p-tasks" hidden></section>
     <section class="pane" id="p-ibx" hidden></section>
     <section class="pane" id="p-sheet" hidden></section>
     <section class="pane" id="p-plog" hidden></section>
@@ -2843,7 +2848,7 @@ try{ csStartTimer(); }catch(e){}
 
 const ICON=n=>`<svg class="ic sm" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 const NAV={
-  pricing:[["Daily work",[["today","Today","check"],["apps","Apps hub","box"],["ibx","Inbox","inbox"],["cases","Shared inbox cases","clock"],["lane","Rates & offer","map"],["q","Offers & feedback","file"]],"pricing + sales"],
+  pricing:[["Daily work",[["today","Today","check"],["tasks","My responsibilities","note"],["apps","Apps hub","box"],["ibx","Inbox","inbox"],["cases","Shared inbox cases","clock"],["lane","Rates & offer","map"],["q","Offers & feedback","file"]],"pricing + sales"],
            ["Rate Bank",[["sheet","Rate Bank","db"],["trk","Trucking rates","truck"]],"pricing"],
            ["Reports",[["home","Overview","home"],["team","Team dashboard","chart"]],"managers"],
            ["Reference",[["svc","Alliance loops","ship"],["info","Help & settings","help"]],"everyone"]],
@@ -2861,11 +2866,11 @@ function navKey(t){ return PAR[t]||t; }
 function renderSub(t){ let bar=$("subsw"); const pk=navKey(t), L=SUBS[pk]; if(!bar){ bar=document.createElement("div"); bar.id="subsw"; bar.className="subsw"; bar.setAttribute("role","group"); bar.setAttribute("aria-label","Part of this page"); const w=$("work"); w.insertBefore(bar,w.firstChild); }
   const ok=L&&(isPricing()||pk!=="info"); bar.hidden=!ok; if(!ok) return; bar.innerHTML=L.map(([k,l])=>`<button type="button" data-sk="${k}" aria-pressed="${k===t}">${esc((!isPricing()&&SUBS_SALES[k])||l)}</button>`).join(""); bar.querySelectorAll("[data-sk]").forEach(x=>x.onclick=()=>openTab(x.dataset.sk)); }
 const NAVOPEN=new Set();
-const PAGE={cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],apps:["Apps hub","Outlook, Teams, files, DP World systems and carrier sites in one place, with one-click email, chat, call and meeting"],team:["Team dashboard","Each person: open, late, answered, reply time, working time and end-of-day choice · managers only"],today:["Today","Everything that needs Pricing now, and Quick price in one line"],dsrc:["Data sources","Rate Bank, carrier emails, online links and files: freshness, order and conflicts"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
+const PAGE={cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],tasks:["My responsibilities","The work you do, ticked or counted each day, as your manager sees it"],apps:["Apps hub","Outlook, Teams, files, DP World systems and carrier sites in one place, with one-click email, chat, call and meeting"],team:["Team dashboard","Each person: open, late, answered, reply time, working time and end-of-day choice · managers only"],today:["Today","Everything that needs Pricing now, and Quick price in one line"],dsrc:["Data sources","Rate Bank, carrier emails, online links and files: freshness, order and conflicts"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
   q:["Offers & quotes","Offers pricing sent to sales, and quotes sales sent to customers"],fb:["Sales feedback","What sales hear from customers, with pricing's replies"],off:["Carrier offers","A carrier email or Excel turned into Rate Bank rows"],
   req:["Ask carriers","Monthly “Rate Idea” emails to the lines"],svc:["Alliance loops","Reference list of liner rotations that call Egypt, 19 Oct 2026"],vol:["Carrier volumes","What we booked with each line, for contract and volume talks"],trk:["Trucking rates","Pickup in Egypt for EXW requests, and cross-border trucks"],hl:["Rate Bank check","Rows in the Rate Bank that are wrong or easy to misread"],gw:["Market alerts","Disruptions, rate-increase notices and the weekly market index"],info:["Help","How the platform works and where the numbers come from"]};
 const PAGE_SALES={ibx:["Inbox","Your customer requests from email · demo with dummy data"],lane:["Find a rate","Route, carrier rates, customer offer and quotation"],q:["My offers & quotes","Pricing's offers to you, your quotes to customers, follow-ups and hit ratio"],fb:["Feedback to pricing","Tell pricing what the customer said and read their answer"]};
-const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",dsrc:"Data",today:"Today",team:"Team",apps:"Apps",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
+const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",dsrc:"Data",today:"Today",team:"Team",apps:"Apps",tasks:"Tasks",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
 let ROLE=lsGet("rg-role","pricing"), CUR_TAB="lane";
 QT.isOwner=false;
 function canPricing(){ return !QT.shared || QT.isOwner || ((QT.settings&&QT.settings.pricing)||[]).includes(QT.meId); }
@@ -2893,9 +2898,9 @@ function setTitle(t){ const P=(!isPricing()&&PAGE_SALES[t])||PAGE[t]||["",""]; $
 document.addEventListener("click",e=>{ const c=e.target.closest&&e.target.closest(".cmt"); if(!c) return; e.stopPropagation(); c.classList.toggle("open"); c.title=c.classList.contains("open")?"Click to shorten":"Click to read the full note"; },true);
 function openTab(t,quiet){
   if(!allowed(t)) t="lane";
-  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","dsrc","today","team","apps","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
+  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","dsrc","today","team","apps","tasks","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
   panes.forEach(k=>{ const p=$("p-"+k); if(p) p.hidden=k!==t; });
-  { const wasNo=document.body.classList.contains("nomap"); document.body.classList.toggle("nomap",t==="trk"||t==="sheet"||t==="ibx"||t==="cases"||t==="ckpi"||t==="cmbx"||t==="dsrc"||t==="today"||t==="team"||t==="apps"); if(wasNo&&t!=="trk"&&t!=="sheet"&&t!=="ibx"&&t!=="cases"&&t!=="ckpi"&&t!=="cmbx"&&t!=="dsrc"&&t!=="today"&&t!=="team"&&t!=="apps") setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
+  { const wasNo=document.body.classList.contains("nomap"); document.body.classList.toggle("nomap",t==="trk"||t==="sheet"||t==="ibx"||t==="cases"||t==="ckpi"||t==="cmbx"||t==="dsrc"||t==="today"||t==="team"||t==="apps"||t==="tasks"); if(wasNo&&t!=="trk"&&t!=="sheet"&&t!=="ibx"&&t!=="cases"&&t!=="ckpi"&&t!=="cmbx"&&t!=="dsrc"&&t!=="today"&&t!=="team"&&t!=="apps"&&t!=="tasks") setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
   document.querySelectorAll("#nav button[data-k],#bnav button[data-k]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.k===navKey(t)))); renderSub(t);
   { const nb=document.querySelector('#nav button[data-k="'+navKey(t)+'"]'); if(nb&&nb.closest(".gi[hidden]")) renderNav(); }
   setTitle(t); $("work").scrollTop=0; if(!quiet) window.scrollTo&&window.scrollTo(0,0);
@@ -2916,6 +2921,7 @@ function openTab(t,quiet){
   if(t==="gw") renderGw();
   if(t==="src") renderSrc();
   if(t==="dsrc") dsRender();
+  if(t==="tasks") setTimeout(()=>{ try{ renderTasks(); }catch(e){ console.error(e); } },0);
   if(t==="apps") setTimeout(()=>{ try{ renderApps(); }catch(e){ console.error(e); } },0);
   if(t==="team") setTimeout(()=>{ try{ renderTeam(); }catch(e){ console.error(e); } },0);
   if(t==="today") setTimeout(()=>{ try{ renderToday(); }catch(e){ console.error(e); } },0); /* after the page finishes loading */
@@ -4186,7 +4192,7 @@ function handOver(to,note){ const L=csLoad().cases.filter(c=>!c.sub&&c.who==="me
 /* 5 End of day */
 function eodText(){ const done=lsGet("tdDone_v1",[]).filter(d=>d.day===todayISO()), D=(()=>{ try{ csTick(); return wtDay(csDay(Date.now())); }catch(e){ return null; } })(), I=asNext(tdItems());
   return [`End of day · ${fmtDate(todayISO())}`,"",`Done: ${done.length} task${done.length===1?"":"s"}${done.length?" · "+asDur(done.reduce((a,d)=>a+d.ms,0)):""}`,...done.map(d=>`  ✓ [${d.tag}] ${d.title} · ${asDur(d.ms)}`),"",
-    D?`Time in the tool: active ${asDur(D.active)}, away ${asDur(D.away)}, break ${asDur(D.brk)}`:"","",`Left for tomorrow (${I.length}):`,...I.slice(0,6).map((x,i)=>`${i+1}. [${x.tag}] ${x.title}`)].filter((l,i,a)=>!(l===""&&a[i-1]==="")).join("\n"); }
+    D?`Time in the tool: active ${asDur(D.active)}, away ${asDur(D.away)}, break ${asDur(D.brk)}`:"",(()=>{ try{ const W=whoAmI()||USERS[0], T=tkAll().filter(t=>(t.owners||[]).includes(W.id)), Dn=tkDone(W.id), dl=T.filter(t=>t.freq==="daily"); return `Responsibilities: ${dl.filter(t=>Dn[t.id]).length} of ${dl.length} daily ticked; ${Object.values(Dn).reduce((a,b)=>a+b,0)} items counted`+(dl.filter(t=>!Dn[t.id]).length?` (not ticked: ${dl.filter(t=>!Dn[t.id]).map(t=>t.title).join("; ")})`:""); }catch(e){ return ""; } })(),"",`Left for tomorrow (${I.length}):`,...I.slice(0,6).map((x,i)=>`${i+1}. [${x.tag}] ${x.title}`)].filter((l,i,a)=>!(l===""&&a[i-1]==="")).join("\n"); }
 function tdPanel(){ const P=TD.panel; if(!P) return "";
   const head=(t,sub)=>`<div class="td-ph"><b>${esc(t)}</b>${sub?`<span>${esc(sub)}</span>`:""}<button type="button" class="mini" id="tdPx">Close</button></div>`;
   if(P.k==="rfq"){ const R=rfqPlan(P.pod,P.eq);
@@ -4275,6 +4281,7 @@ function renderTeam(){ const p=$("p-team"); if(!p) return; if(!wtMgr()){ p.inner
       <p class="note">Open, late, answered and reply time come from the shared inbox cases. Active and away time: dummy numbers in the demo; on DP World servers each person's time log. HR and Legal approve before real use.</p></div>
     <div class="card"><h3>Last ${days.length} day${days.length===1?"":"s"}: answered and left open</h3>${days.map(d=>{ const X=Object.values(H[d].people||{}), a=X.reduce((s,x)=>s+x.answered,0), o=X.reduce((s,x)=>s+x.open,0);
       return `<div class="hm-row"><span>${esc(d)}</span><div class="hm-bar"><i class="a" style="width:${a/maxD*100}%"></i><i class="o" style="width:${o/maxD*100}%"></i></div><span>${a} done · ${o} left</span></div>`; }).join("")}<p class="note">Saved through the day and at day change. Green = answered, amber = left open.</p></div>
+    ${(()=>{ try{ return tkTeamCard(); }catch(e){ return ""; } })()}
     <div class="card"><h3>Daily alert for the Director</h3><pre class="td-pre" id="tmTxt">${esc(teamAlert(S,me))}</pre><div class="td-acts"><button type="button" class="svc btn primary" id="tmCopy">Copy</button><a class="mini" target="_blank" rel="noopener" href="${esc(mailDraft("","Pricing team: open work "+fmtDate(todayISO()),teamAlert(S,me)))}">Open as email draft</a><span class="note" id="tmMsg"></span></div></div>`;
   const c=$("tmCopy"); if(c) c.onclick=async()=>{ try{ await navigator.clipboard.writeText($("tmTxt").textContent); $("tmMsg").textContent="Copied."; }catch(e){ $("tmMsg").textContent="Select the text and copy it."; } }; }
 function teamAlert(S,me){ const P=Object.values(S.people).sort((a,b)=>b.late-a.late||b.open-a.open);
@@ -4335,12 +4342,112 @@ function renderApps(){ const p=$("p-apps"); if(!p) return; const C=apCfg(), m=ap
     edit(b,F.map(([f,l])=>({l,v:o[f],ph:"https://… (empty = none)",type:"url"})),v=>{ if(v.some(u=>u&&!apOk(u))) return "Links must start with https://"; F.forEach(([f],i)=>o[f]=v[i]); c.carriers[k]=o; apSave(c); }); });
   $("apLoad").onclick=()=>{ try{ const c=JSON.parse($("apJson").value); if(!c||!Array.isArray(c.groups)) throw 0; c.groups.forEach(g=>g.items.forEach(it=>{ if(it.u&&!apOk(it.u)) it.u=""; })); apSave(c); renderApps(); }catch(e){ $("apMsg").textContent="That is not a settings text from this page."; } };
   $("apReset").onclick=()=>{ try{ localStorage.removeItem(AP_KEY); }catch(e){} renderApps(); }; }
+/* ---------- Sign-in (demo), smart launch, and Responsibilities (who does what). Plain rules, no AI, no passwords. ----------
+   Production: DP World sign-in (Entra ID) gives the person and the view; the demo lets you pick a dummy user. */
+const WHO_KEY="who_v1";
+const USERS=[{id:"me",name:"You",team:"Pricing",role:"pricing"},{id:"nour",name:"Nour Adel",team:"Pricing",role:"pricing"},{id:"omar",name:"Omar Fathy",team:"Customs clearance & trucking",role:"pricing"},
+  {id:"mariam",name:"Mariam Hany",team:"Network requests",role:"pricing"},{id:"ahmed",name:"Ahmed Samir",team:"Documentation & systems",role:"pricing"},{id:"karim",name:"Karim Nabil",team:"Sales",role:"sales"},{id:"director",name:"Director",team:"Management",role:"director"}];
+function whoAmI(){ const w=lsGet(WHO_KEY,null); return w&&USERS.find(u=>u.id===w.id)||null; }
+function uName(id){ const u=USERS.find(x=>x.id===id); return u?u.name:id; }
+/* ---------- Responsibilities ---------- */
+const TK_KEY="tkTasks_v1", TKL_KEY="tkLog_v1";
+const TK_CAT=["Pricing","Accounts","Rate Bank & records","Bookings & handover","Support to colleagues","Reporting","Customs & trucking","Documentation & systems","Network","Tools & improvement","Tenders"];
+const TK_FREQ={daily:"Daily",req:"Per request",booking:"Per booking",weekly:"Weekly",monthly:"Monthly"};
+const TK_SEED=[ /* dummy example of a real split of work; customer names replaced by account types */
+ {id:"t1",title:"Answer export rate requests (Egypt sales and network agents)",cat:"Pricing",freq:"req",min:20,per:25,owners:["me","nour"]},
+ {id:"t2",title:"Follow up key accounts: Tea / FMCG account and Electronics account",cat:"Accounts",freq:"daily",min:30,per:5,owners:["me"]},
+ {id:"t3",title:"Answer rates for the Food account and other accounts",cat:"Accounts",freq:"req",min:20,per:10,owners:["nour"]},
+ {id:"t4",title:"Update the Rate Bank",cat:"Rate Bank & records",freq:"daily",min:30,per:5,owners:["me","nour"]},
+ {id:"t5",title:"Update the Reference Sheet: requests done or not done",cat:"Rate Bank & records",freq:"daily",min:20,per:5,owners:["me","nour"]},
+ {id:"t6",title:"Record bookings",cat:"Bookings & handover",freq:"booking",min:15,per:8,owners:["me","nour"]},
+ {id:"t7",title:"Send the handover to the operations team",cat:"Bookings & handover",freq:"booking",min:15,per:8,owners:["me","nour"]},
+ {id:"t8",title:"Furniture retailer account: follow loading plans and send B/L instructions to suppliers",cat:"Support to colleagues",freq:"daily",min:45,per:5,owners:["me"],helps:"omar"},
+ {id:"t9",title:"Furniture retailer account: recheck the booking confirmations suppliers send back by email",cat:"Support to colleagues",freq:"booking",min:15,per:10,owners:["me"],helps:"omar"},
+ {id:"t10",title:"Furniture retailer account: update the shared Excel with all booking details",cat:"Support to colleagues",freq:"daily",min:30,per:5,owners:["me"],helps:"omar"},
+ {id:"t11",title:"Send the daily furniture retailer report to my manager",cat:"Reporting",freq:"daily",min:20,per:5,owners:["me"]},
+ {id:"t12",title:"Support documentation and system work",cat:"Support to colleagues",freq:"weekly",min:60,per:2,owners:["me"],helps:"ahmed"},
+ {id:"t13",title:"Handle vendor creations",cat:"Support to colleagues",freq:"req",min:30,per:3,owners:["me"],helps:"ahmed"},
+ {id:"t14",title:"Build the pricing tool and its presentation",cat:"Tools & improvement",freq:"weekly",min:120,per:3,owners:["me"]},
+ {id:"t15",title:"Customs clearance",cat:"Customs & trucking",freq:"req",min:40,per:15,owners:["omar"]},
+ {id:"t16",title:"Trucking and transportation",cat:"Customs & trucking",freq:"req",min:30,per:15,owners:["omar"]},
+ {id:"t17",title:"Documentation and system",cat:"Documentation & systems",freq:"daily",min:60,per:5,owners:["ahmed"]},
+ {id:"t18",title:"Network requests from DP World offices abroad",cat:"Network",freq:"req",min:25,per:15,owners:["mariam"]},
+ {id:"t19",title:"Answer tenders",cat:"Tenders",freq:"req",min:240,per:1,owners:[]}];
+function tkAll(){ const t=lsGet(TK_KEY,null); return Array.isArray(t)?t:JSON.parse(JSON.stringify(TK_SEED)); }
+function tkSave(t){ lsSet(TK_KEY,t); }
+function tkWeekH(t){ return (+t.min||0)*(+t.per||0)/60; }  /* estimated hours a week = minutes each × times a week */
+function tkLog(){ return lsGet(TKL_KEY,{}); }
+function tkDone(pid,day){ return ((tkLog()[day||todayISO()]||{})[pid])||{}; }
+function tkMark(pid,tid,delta){ const L=tkLog(), d=todayISO(); L[d]=L[d]||{}; const P=L[d][pid]=L[d][pid]||{}; P[tid]=Math.max(0,(P[tid]||0)+delta); if(!P[tid]) delete P[tid];
+  const days=Object.keys(L).sort(); while(days.length>60) delete L[days.shift()]; lsSet(TKL_KEY,L); }
+/* who does what: per person load, shared work, single owners, gaps */
+function tkMatrix(){ const T=tkAll(), people=USERS.filter(u=>u.role!=="director"&&u.role!=="sales").map(u=>u.id);
+  const load={}; people.forEach(p=>load[p]={tasks:0,hours:0,helps:0,doneToday:Object.values(tkDone(p)).reduce((a,b)=>a+b,0)});
+  T.forEach(t=>(t.owners||[]).forEach(p=>{ if(!load[p]) return; load[p].tasks++; load[p].hours+=tkWeekH(t)/Math.max(1,t.owners.length); if(t.helps) load[p].helps++; }));
+  return {T,people,load,gaps:T.filter(t=>!(t.owners||[]).length),single:T.filter(t=>(t.owners||[]).length===1),shared:T.filter(t=>(t.owners||[]).length>1),helps:T.filter(t=>t.helps&&(t.owners||[]).length)}; }
+function renderTasks(){ const p=$("p-tasks"); if(!p) return; const W=whoAmI()||USERS[0], pid=W.id, T=tkAll(), mine=T.filter(t=>(t.owners||[]).includes(pid)), D=tkDone(pid);
+  const daily=mine.filter(t=>t.freq==="daily"), dd=daily.filter(t=>D[t.id]).length, wk=mine.reduce((a,t)=>a+tkWeekH(t)/Math.max(1,t.owners.length),0);
+  const row=t=>{ const n=D[t.id]||0, others=(t.owners||[]).filter(x=>x!==pid);
+    return `<div class="td-it tk-row"><span class="td-tag td-${t.freq==="daily"?(n?"new":"due"):"new"}">${esc(TK_FREQ[t.freq]||t.freq)}</span><div class="td-tx"><b>${esc(t.title)}</b><small>${esc(t.cat)}${t.helps?` · supports ${esc(uName(t.helps))} (${esc((USERS.find(u=>u.id===t.helps)||{}).team||"")})`:""}${others.length?` · shared with ${esc(others.map(uName).join(", "))}`:" · only you"} · about ${t.min} min × ${t.per} a week</small></div>
+      <span class="ap-acts">${t.freq==="daily"?`<button type="button" class="mini${n?" ok":""}" data-tkd="${esc(t.id)}" aria-pressed="${!!n}">${n?"Done today ✓":"Mark done"}</button>`:`<button type="button" class="mini" data-tkm="${esc(t.id)}" aria-label="One less">−</button><span class="tk-n" aria-live="polite">${n} today</span><button type="button" class="mini ok" data-tkp="${esc(t.id)}" aria-label="One more">+1</button>`}<button type="button" class="mini" data-tkx="${esc(t.id)}">Remove</button></span></div>`; };
+  const byCat=TK_CAT.map(c=>[c,mine.filter(t=>t.cat===c)]).filter(([,L])=>L.length);
+  p.innerHTML=`<div class="td-kpis"><div><span>My responsibilities</span><b>${mine.length}</b><small>${mine.filter(t=>t.helps).length} supporting colleagues</small></div><div><span>Daily tasks done</span><b>${dd} / ${daily.length}</b><small>today</small></div><div><span>Done today (all)</span><b>${Object.values(D).reduce((a,b)=>a+b,0)}</b><small>items counted</small></div><div><span>Estimated load</span><b>${wk.toFixed(1)} h</b><small>a week (shared tasks split)</small></div></div>
+    <div class="card"><h3>${esc(W.name)} · ${esc(W.team)}</h3><p class="note">Your responsibilities, as your manager sees them. Daily tasks get a tick; per-request and per-booking work gets a count. Times are your own estimates: edit them so the team load is fair.</p>
+      ${byCat.map(([c,L])=>`<h4 class="tk-h">${esc(c)}</h4>${L.map(row).join("")}`).join("")||`<p class="note">No responsibilities yet. Add the work you do below.</p>`}</div>
+    <div class="card"><h3>Add a responsibility</h3><form id="tkAdd" class="trkform">
+      <label class="f grow">What you do<input id="tkT" required maxlength="140" placeholder="e.g. Send the weekly reefer report to sales"></label>
+      <label class="f">Area<select id="tkC">${TK_CAT.map(c=>`<option>${esc(c)}</option>`).join("")}</select></label>
+      <label class="f">How often<select id="tkF">${Object.entries(TK_FREQ).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></label>
+      <label class="f">Minutes each<input id="tkM" type="number" min="1" max="600" value="20"></label><label class="f">Times a week<input id="tkP" type="number" min="0" max="200" value="5"></label>
+      <label class="f">Supports (optional)<select id="tkH"><option value="">Nobody</option>${USERS.filter(u=>u.id!==pid&&u.role!=="director").map(u=>`<option value="${u.id}">${esc(u.name)} · ${esc(u.team)}</option>`).join("")}</select></label>
+      <fieldset class="f" style="border:0;padding:0"><legend>Shared with</legend>${USERS.filter(u=>u.id!==pid&&u.role==="pricing").map(u=>`<label class="tk-chk"><input type="checkbox" value="${u.id}" data-tks> ${esc(u.name)}</label>`).join("")}</fieldset>
+      <div class="td-acts"><button class="svc btn primary" type="submit">Add</button><span class="note" id="tkMsg"></span></div></form></div>`;
+  p.querySelectorAll("[data-tkd]").forEach(b=>b.onclick=()=>{ tkMark(pid,b.dataset.tkd,(D[b.dataset.tkd]?-1:1)); renderTasks(); });
+  p.querySelectorAll("[data-tkp]").forEach(b=>b.onclick=()=>{ tkMark(pid,b.dataset.tkp,1); renderTasks(); });
+  p.querySelectorAll("[data-tkm]").forEach(b=>b.onclick=()=>{ tkMark(pid,b.dataset.tkm,-1); renderTasks(); });
+  p.querySelectorAll("[data-tkx]").forEach(b=>b.onclick=()=>{ if(b.dataset.sure!=="1"){ b.dataset.sure="1"; b.textContent="Sure?"; return; } const A=tkAll(), t=A.find(x=>x.id===b.dataset.tkx); if(t){ t.owners=(t.owners||[]).filter(x=>x!==pid); } tkSave(A); renderTasks(); });
+  $("tkAdd").onsubmit=e=>{ e.preventDefault(); const A=tkAll(), sh=[...p.querySelectorAll("[data-tks]:checked")].map(i=>i.value);
+    A.push({id:"t"+Date.now().toString(36),title:$("tkT").value.trim(),cat:$("tkC").value,freq:$("tkF").value,min:+$("tkM").value||0,per:+$("tkP").value||0,owners:[pid,...sh],helps:$("tkH").value||undefined}); tkSave(A); renderTasks(); }; }
+/* manager card on the Team dashboard */
+function tkTeamCard(){ const M=tkMatrix(), P=M.people, maxH=Math.max(1,...P.map(p=>M.load[p].hours));
+  const cell=(t,p)=>(t.owners||[]).includes(p)?`<td class="n" title="Owns it">●</td>`:t.helps===p?`<td class="n" title="Gets support">○</td>`:`<td></td>`;
+  return `<div class="card"><h3>Responsibilities: who does what <span class="dschip ds-off">Managers only</span></h3>
+    ${M.gaps.length?`<div class="td-chk err">Nobody owns: ${M.gaps.map(t=>esc(t.title)).join(", ")}</div>`:""}
+    <div class="tk-load">${P.map(p=>{ const L=M.load[p]; return `<div class="hm-row"><span>${esc(uName(p))}</span><div class="hm-bar"><i class="a" style="width:${L.hours/maxH*100}%"></i></div><span>${L.hours.toFixed(1)} h/week · ${L.tasks} tasks${L.helps?` · supports others in ${L.helps}`:""} · ${L.doneToday} done today</span></div>`; }).join("")}</div>
+    <details><summary>Task by task (● owns · ○ gets support)</summary><div class="csTblW"><table class="csTbl"><thead><tr><th>Responsibility</th><th>How often</th>${P.map(p=>`<th class="n">${esc(uName(p).split(" ")[0])}</th>`).join("")}</tr></thead><tbody>
+      ${M.T.map(t=>`<tr><td>${esc(t.title)}${!(t.owners||[]).length?` <span class="pill lost">no owner</span>`:(t.owners.length===1?` <span class="pill open">one person</span>`:"")}</td><td>${esc(TK_FREQ[t.freq]||t.freq)}</td>${P.map(p=>cell(t,p)).join("")}</tr>`).join("")}</tbody></table></div></details>
+    <p class="note">Hours are each person's own estimates (minutes × times a week), shared tasks split between owners. "One person" = no back-up if that person is away. Demo: dummy people and accounts.</p></div>`; }
+/* ---------- Sign-in screen and smart launch ---------- */
+function loginShow(){ let d=$("loginDlg"); if(d) d.remove(); d=document.createElement("dialog"); d.id="loginDlg"; d.className="eod-dlg lg-dlg";
+  d.innerHTML=`<div class="lg-head"><div class="lg-logo" aria-hidden="true">DP</div><div><h2>Freight Platform</h2><p class="note">DP World Egypt · Pricing</p></div></div>
+    <button type="button" class="svc btn primary lg-ms" disabled>Sign in with Microsoft (DP World)</button><p class="note">On DP World servers you sign in with your company account and your view comes from your group. This demo uses dummy people: pick one.</p>
+    <div class="lg-list">${USERS.map(u=>`<button type="button" class="lg-u" data-lg="${u.id}"><span class="td-tag td-${u.role==="director"?"err":u.role==="sales"?"due":"new"}">${esc(u.name.split(" ").map(w=>w[0]).join("").slice(0,2))}</span><span><b>${esc(u.name)}</b><small>${esc(u.team)} · ${u.role==="director"?"Director view":u.role==="sales"?"Sales view":"Pricing view"}</small></span></button>`).join("")}</div>`;
+  document.body.appendChild(d); d.addEventListener("cancel",e=>e.preventDefault()); /* sign-in cannot be skipped */
+  d.querySelectorAll("[data-lg]").forEach(b=>b.onclick=()=>{ const u=USERS.find(x=>x.id===b.dataset.lg); lsSet(WHO_KEY,{id:u.id,at:Date.now()}); d.close(); d.remove(); try{ sessionStorage.removeItem("launch_v1"); }catch(e){} afterLogin(true); });
+  try{ d.showModal(); }catch(e){ d.setAttribute("open",""); } }
+function launchFacts(u){ const F=[]; try{ const now=Date.now(), C=csLoad().cases.filter(c=>!c.sub), late=C.filter(c=>csState(c,now).st==="breach").length;
+    if(u.role==="director"){ const M=tkMatrix(), S=teamStats(); F.push(`${Object.values(S.people).reduce((a,x)=>a+x.open,0)} open cases in the team, ${late} past the SLA, ${S.unassigned} not taken yet`); if(M.gaps.length) F.push(`Nobody owns: ${M.gaps.map(t=>t.title).join(", ")}`); F.push(`${M.single.length} responsibilities depend on one person`); }
+    else if(u.role==="sales"){ F.push("Your offers and quotes are in Offers & feedback"); F.push("Find a rate: type the lane in Rates & offer"); }
+    else { const I=asNext(tdItems()), mine=tkAll().filter(t=>(t.owners||[]).includes(u.id)&&t.freq==="daily"); F.push(`${I.length} things need Pricing today, ${late} past the SLA`); if(I[0]) F.push(`First: ${I[0].title}`); F.push(`${mine.length} daily responsibilities to tick`); const end=(DATA.rates||[]).filter(r=>isStd(r)&&r.valid&&r.valid>=todayISO()&&r.valid<=addDays(todayISO(),7)).length; if(end) F.push(`${end} standard rates end this week`); } }catch(e){}
+  return F; }
+function launchShow(u){ let d=$("launchDlg"); if(d) d.remove(); d=document.createElement("dialog"); d.id="launchDlg"; d.className="eod-dlg lg-dlg";
+  const h=new Date().getHours(), hi=h<12?"Good morning":h<17?"Good afternoon":"Good evening", F=launchFacts(u);
+  const go=u.role==="director"?["team","Open the Team dashboard"]:u.role==="sales"?["lane","Find a rate"]:["today","Start with Next up"];
+  d.innerHTML=`<h2>${hi}${u.id==="me"?"":", "+esc(u.name.split(" ")[0])}</h2><ul class="as-why lg-facts">${F.map(f=>`<li>${esc(f)}</li>`).join("")}</ul>
+    <div class="td-acts"><button type="button" class="svc btn primary" data-lgo="${go[0]}">${go[1]}</button>${u.role!=="sales"?`<button type="button" class="mini" data-lgo="tasks">My responsibilities</button>`:""}<button type="button" class="mini" data-lgo="">Skip</button></div>`;
+  document.body.appendChild(d); d.querySelectorAll("[data-lgo]").forEach(b=>b.onclick=()=>{ d.close(); d.remove(); if(b.dataset.lgo) openTab(b.dataset.lgo); });
+  try{ d.showModal(); }catch(e){ d.setAttribute("open",""); } }
+function afterLogin(fresh){ const u=whoAmI(); if(!u){ loginShow(); return; }
+  if(ROLE!==u.role) setRole(u.role); const wb=$("whoBtn"); if(wb){ wb.textContent=u.name.split(" ").map(w=>w[0]).join("").slice(0,2); wb.title="Signed in as "+u.name+" · click to switch user"; }
+  let seen=false; try{ seen=sessionStorage.getItem("launch_v1")==="1"; sessionStorage.setItem("launch_v1","1"); }catch(e){}
+  if(fresh||!seen) setTimeout(()=>launchShow(u),fresh?50:400); }
+setTimeout(()=>{ try{ if(!/[?&]skipLogin=1/.test(location.search)) afterLogin(false); }catch(e){ console.error(e); } const wb=$("whoBtn"); if(wb) wb.onclick=()=>loginShow(); },600); /* tests open the page with ?skipLogin=1 */
 setTimeout(()=>{ try{ tdFocusWatch(); }catch(e){} try{ eodWatch(); histSnap(); setInterval(histSnap,300000); }catch(e){} },0);
 { const _rk=renderCkpi; renderCkpi=function(){ _rk.apply(this,arguments); const p=$("p-ckpi"); if(!p||!wtMgr()) return; let row="";
     try{ csTick(); const D=wtDay(csDay(Date.now())); if(D) row=`<tr><td><b>${esc(csName("me"))}</b> (this browser)</td><td>${csTime(D.first)}</td><td>${csTime(D.last)}</td><td class="n">${asDur(D.active)}</td><td class="n">${asDur(D.away)}</td><td class="n">${asDur(D.brk)}</td><td class="n">${asDur(D.off)}</td></tr>`; }catch(e){}
     p.insertAdjacentHTML("beforeend",`<div class="card"><h3>Team working time <span class="dschip ds-off">Managers only</span></h3><p class="note">Active, Away, Break and Off in the tool, per person, today. In this demo each browser keeps only its own log, so only your row shows. On DP World servers every person's log goes to the team database and shows here. Each person sees only their own time. HR and Legal approve before real use.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Person</th><th>First seen</th><th>Last seen</th><th class="n">Active</th><th class="n">Away</th><th class="n">Break</th><th class="n">Off</th></tr></thead><tbody>${row||`<tr><td colspan="7" class="note">No time logged yet today.</td></tr>`}</tbody></table></div></div>`); }; }
-window.__rules = { wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
+window.__rules = { tkAll, tkMatrix, tkMark, tkDone, whoAmI, launchFacts, wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
 window.__route = route;
 })();
 </script>

@@ -175,6 +175,14 @@ One page with the apps the team uses: Outlook, calendar, Teams, the Gmail test b
 - Settings are kept in the browser in the demo and can be copied to colleagues; IT sets them for everyone in production.
 - Level 2 and 3 (reading mail, presence, calendar, Teams Phone, SharePoint, NPM, CARGOES, carrier APIs) are in `docs/IT_Data_Sources_Request.html`.
 
+### 5.11 Sign-in, launch summary and Responsibilities
+
+- **Sign-in**: the app opens on a sign-in screen. Production: "Sign in with Microsoft" (Entra ID), the view comes from the person's group. Demo: pick a dummy person (Pricing, Customs & trucking, Network, Documentation, Sales, Director). No passwords anywhere. The round button with the initials at the top switches user. Automated tests open the page with `?skipLogin=1`.
+- **Launch summary**: after sign-in (and once per browser session) a short card for that person: Pricing (things that need Pricing, late, first item, daily responsibilities, rates ending this week), Director (team open / late / not taken, responsibilities nobody owns, one-person tasks), Sales (where to start). One button to start.
+- **My responsibilities** (Pricing menu): each person's list of work by area (pricing, accounts, Rate Bank and records, bookings and handover, support to colleagues, reporting, customs and trucking, documentation, network, tools, tenders), how often, minutes each × times a week (own estimate), who it supports and who shares it. Daily tasks get a tick, per-request and per-booking work a count (`tkTasks_v1`, `tkLog_v1`). End of day includes the ticks.
+- **Responsibilities: who does what** (Team dashboard, managers only): load per person in hours a week (shared tasks split), tasks supporting others, done today; task-by-task matrix; "one person" tasks (no back-up) and work **nobody owns** (in the demo: tenders).
+- Demo content: the split of work is a dummy example; customer names are replaced by account types and colleagues by the demo people.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).
