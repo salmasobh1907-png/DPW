@@ -1,0 +1,135 @@
+<title>Egypt Pricing Layer Strategy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;800&display=swap">
+<style>
+/* VOICE work, a one-page strategy note for the Director and IT
+   IDEA a newspaper business page: the finding as headline, one stack diagram, short sourced paragraphs
+   PICTURE layered stack: data sources -> Egypt pricing and decision layer (the tool) -> sales and customers
+   COLOUR pale pink ground, near-black ink, teal for "built", claret for "gap"
+   TYPE Libre Franklin 800 + Libre Franklin
+   LAYOUT laptop: headline left, stack right; phone: headline, stack, text */
+:root{color-scheme:light dark;--bg:light-dark(#ffe3dc,#1c1512);--card:light-dark(#fff4f0,#2a201c);--ink:light-dark(#1a1817,#f4ebe7);--mut:light-dark(#5b4f4a,#c2b3ad);--line:light-dark(#e9bfb3,#4a3a34);--teal:light-dark(#0d7680,#4fc3cc);--clar:light-dark(#990f3d,#f2708f);--tsoft:light-dark(#d3ecee,#163638);--csoft:light-dark(#f6d3dc,#3d1a24)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 "Libre Franklin",Arial,sans-serif;margin:0;overflow-x:clip}
+.band{padding-block:clamp(24px,4vw,52px);padding-left:max(5vw,16px,env(safe-area-inset-left,0px));padding-right:max(5vw,16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto}
+.note{font-size:13px;color:var(--mut)}
+h1{font-weight:800;font-size:clamp(30px,4.2vw,46px);line-height:1.06;letter-spacing:-.02em;margin:6px 0 14px}
+h2{font-weight:800;font-size:22px;line-height:1.2;letter-spacing:-.01em;margin:0 0 10px}
+p{margin:0 0 10px;max-width:68ch}
+.top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,48px);align-items:start}
+.ask{border-top:3px solid var(--ink);padding-top:12px;margin-top:16px}
+.ask ol{margin:6px 0 0;padding-left:20px}.ask li{margin-bottom:6px}
+.stack{display:flex;flex-direction:column;gap:8px}
+.lay{border:1px solid var(--line);background:var(--card);border-radius:4px;padding:12px 14px}
+.lay b{display:block;font-size:15px}
+.lay.core{border:2px solid var(--teal);background:var(--tsoft)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{font-size:13px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);background:var(--bg);white-space:nowrap}
+.chip.ok{border-color:var(--teal);color:var(--teal)}.chip.gap{border-color:var(--clar);color:var(--clar)}
+.arrow{text-align:center;color:var(--mut);font-size:13px;line-height:1}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,3vw,36px)}
+.cols ul{margin:0;padding-left:18px}.cols li{margin-bottom:8px}
+.k{font-weight:800}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--mut)}
+.ok-t{color:var(--teal);font-weight:600;white-space:nowrap}.gap-t{color:var(--clar);font-weight:600;white-space:nowrap}
+.plan{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.plan>div{border-top:3px solid var(--teal);padding-top:8px}
+.src{font-size:13px;color:var(--mut)}.src a{color:inherit}
+.src ol{padding-left:18px;margin:6px 0 0}
+@media(max-width:820px){.top,.cols,.plan{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){table{font-size:13px}th,td{padding:6px 4px}}
+</style>
+
+<section class="band"><div class="wrap top">
+  <div>
+    <div class="note">Strategy note · DP World Egypt, Freight Forwarding · Pricing · 27 Nov 2026 · public sources + a working prototype with dummy data</div>
+    <h1>Logistics margins are thin and Sokhna now has a rival terminal: Egypt needs a fast, rule-based pricing layer</h1>
+    <p>DP World is investing heavily in Egyptian logistics, but forwarding earns a fraction of port margins and competition is rising. Every quote we lose, or win too cheaply, matters. The prototype shows how one internal web app can make quoting faster and protect margin, while feeding from the Rate Bank today and NPM / CARGOES later instead of replacing them.</p>
+    <div class="ask"><h2>The ask</h2><ol>
+      <li><b>Approve a pilot</b> of the tool as one internal web app hosted by IT (Entra ID sign-in, Pricing vs Sales roles).</li>
+      <li><b>Hold the BTI data-sources meeting</b>: Rate Bank on SharePoint (read only), shared mailboxes via Microsoft Graph (read only), then NPM.</li>
+      <li><b>Name one data owner</b> each for rates, FX and customs (ACI) so the rules have a trusted source.</li>
+    </ol></div>
+  </div>
+  <div class="stack" aria-label="Where the tool sits">
+    <div class="lay"><b>Sales and customers</b><span class="note">Quote email, locked PDF with check code, reply drafts. Sales never see buy rates.</span></div>
+    <div class="arrow">▲ sell rates only</div>
+    <div class="lay core"><b>Egypt pricing and decision layer (the tool)</b><span class="note">Plain rules, no AI. Lowest standard rate, margin advisor, buy + profit = sell, Cockpit per Director.</span>
+      <div class="chips"><span class="chip ok">Quick price</span><span class="chip ok">Margin advisor</span><span class="chip ok">Sokhna terminal flag</span><span class="chip ok">Rate-move alert</span><span class="chip ok">Free time and D&amp;D</span><span class="chip ok">ACI check</span><span class="chip ok">FX with date</span><span class="chip ok">Cockpit</span></div></div>
+    <div class="arrow">▲ read only</div>
+    <div class="lay"><b>Data sources</b>
+      <div class="chips"><span class="chip ok">Rate Bank (Excel, now)</span><span class="chip gap">SharePoint (IT)</span><span class="chip gap">Shared mailboxes (Graph)</span><span class="chip gap">NPM</span><span class="chip gap">CARGOES</span><span class="chip gap">Finance FX / ERP</span></div></div>
+    <div class="note">Teal: working in the prototype. Claret: needs IT / BTI.</div>
+  </div>
+</div></section>
+
+<section class="band" style="padding-top:0"><div class="wrap">
+  <h2>What the public record says</h2>
+  <div class="cols">
+    <div><p class="k">Strengths</p><ul>
+      <li>Over USD 1.4bn invested in Egyptian logistics: Sokhna port, Sokhna Logistics Park in SCZONE, a Logistics Distribution Centre opened July 2026, five offices. [1][2]</li>
+      <li>Group logistics revenue grew about 28% in 2025. [3]</li>
+      <li>CARGOES Runner already exists for forwarder quoting and booking. [9]</li>
+    </ul></div>
+    <div><p class="k">Risks</p><ul>
+      <li>Logistics EBITDA margin about 14% vs about 49% in ports: small leaks in margin matter. [3]</li>
+      <li>Red Sea Container Terminal at Sokhna opened January 2026; some carriers moved calls to it. [4]</li>
+      <li>Fragmented market with DHL, DSV, Kuehne+Nagel, CEVA. [5]</li>
+      <li>EGP above 56 per USD; demurrage and storage about USD 150 per box per day. [6]</li>
+      <li>ACI is mandatory for air cargo too since 1 January 2026. [7]</li>
+    </ul></div>
+    <div><p class="k">Opportunities</p><ul>
+      <li>Non-oil exports up about 17% in 2025. [8]</li>
+      <li>Suez Canal traffic recovering: routings and rates will keep moving, so speed of re-quoting wins. [10]</li>
+      <li>Bundles of port, park, warehouse and forwarding (our inference).</li>
+    </ul></div>
+  </div>
+</div></section>
+
+<section class="band" style="padding-top:0"><div class="wrap">
+  <h2>How the prototype answers each need</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Need</th><th>In the tool</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Quote fast</td><td>Quick price, smart request from the email, reply draft with sell only</td><td class="ok-t">Built</td></tr>
+      <tr><td>Protect margin</td><td>Margin advisor from the gap to other carriers and the market; fixed USD 25 / 50 only on China dry export</td><td class="ok-t">Built</td></tr>
+      <tr><td>Rates keep moving</td><td>Rate-move alert: lowest standard rate this month vs last month, 5% or more, on Today and in the quote</td><td class="ok-t">Built</td></tr>
+      <tr><td>Second terminal at Sokhna</td><td>Terminal shown on each rate; DP World terminal first; other terminal flagged</td><td class="ok-t">Built</td></tr>
+      <tr><td>D&amp;D cost exposure</td><td>Free time per option, warning when missing, cost line (days × boxes × USD per day), D&amp;D term in the quote</td><td class="ok-t">Built</td></tr>
+      <tr><td>ACI / Nafeza</td><td>Imports: ACID (19 digits) check before loading, and an ACID line in the quote</td><td class="ok-t">Built</td></tr>
+      <tr><td>Weak EGP</td><td>Currency on every quote; EGP at the bank rate on the invoice date, with the reference rate and its date</td><td class="ok-t">Built</td></tr>
+      <tr><td>One-person dependency</td><td>Responsibilities with back-ups, forward with person, mailbox and reason</td><td class="ok-t">Built</td></tr>
+      <tr><td>Live data</td><td>Data layer ready to swap Excel for SharePoint, then NPM, without changing screens</td><td class="gap-t">Needs IT</td></tr>
+    </tbody></table></div>
+</div></section>
+
+<section class="band" style="padding-top:0"><div class="wrap">
+  <h2>Next 90 days</h2>
+  <div class="plan">
+    <div><b>Weeks 1–4</b><p>BTI meeting; read-only access to the Rate Bank on SharePoint and one shared mailbox; FX and ACI data owners named.</p></div>
+    <div><b>Weeks 5–8</b><p>IT hosts the pilot with Entra ID; Pricing team uses it on live requests; reference numbers and quote check codes kept in a database.</p></div>
+    <div><b>Weeks 9–12</b><p>Measure time to quote, win rate and margin vs the 3 months before; decide on NPM and CARGOES connection.</p></div>
+  </div>
+</div></section>
+
+<section class="band" style="padding-top:0"><div class="wrap src">
+  <p>The prototype uses dummy data only; no DP World internal figures are in this note. Figures above are from public sources, and "inference" marks our own reading.</p>
+  <ol>
+    <li><a href="https://www.dpworld.com/en/news/dp-world-launches-egypts-first-integrated-logistics-distribution-centre-at-sokhna-logistics-park">DP World: Egypt's first integrated Logistics Distribution Centre</a></li>
+    <li><a href="https://www.arabfinance.com/en/news/newdetails/13201">Arab Finance</a></li>
+    <li><a href="https://www.londonstockexchange.com/en/news/article/91SN/dp-world-limited-announces-fy2025-results/17499147">DP World FY2025 results (LSE)</a></li>
+    <li><a href="https://www.joc.com/article/egypt-opens-new-semiautomated-red-sea-terminal-as-suez-traffic-grows-6153045">JOC: new Red Sea terminal</a></li>
+    <li><a href="https://www.mordorintelligence.com/industry-reports/egypt-freight-logistics-market-study">Mordor Intelligence: Egypt freight market</a></li>
+    <li><a href="https://enterpriseam.com/egypt/2026/10/28/importers-say-fx-is-flowing-but-a-weaker-egp-bank-fees-and-port-charges-are-lifting-costs/">EnterpriseAM: FX and port charges</a></li>
+    <li><a href="https://kadmar.com/kadmar-circular-no-64-2025-mandatory-implementation-of-advance-cargo-information-aci-for-air-freight-shipments-to-egypt-effective-1-jan-2026/">Kadmar: ACI for air freight</a></li>
+    <li><a href="https://sis.gov.eg/en/media-center/news/investment-minister-reviews-2025-foreign-trade-indicators/">SIS: 2025 foreign trade</a></li>
+    <li><a href="https://www.dpworld.com/en/digital-solutions">DP World digital solutions (CARGOES)</a></li>
+    <li><a href="https://shippingarabia.com/suez-canal-traffic-recovery-october-2026/">Shipping Arabia: Suez Canal recovery</a></li>
+  </ol>
+</div></section>

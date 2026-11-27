@@ -681,3 +681,24 @@ test('cockpit: a customer is flagged "down" only on complete months (the current
     const C = window.__rules.ckCustomers(); DATA.requests = keep; return Object.fromEntries(C.map(x => [x.c, x.down])); });
   assert.deepEqual(r, { Steady: false, Falling: true });
 });
+
+test('rate moves: lowest standard rate this month vs last expired month on the same lane; small moves and special rates ignored', async () => {
+  const r = await run(() => { const R = window.__rules;
+    const rows = [{ car: 'A', pol: 'Sokhna', pod: 'Busan', r40: 900, valid: '2026-10-31' }, { car: 'B', pol: 'Sokhna', pod: 'Busan', r40: 1000, valid: '2026-12-31' },
+      { car: 'A', pol: 'Sokhna', pod: 'Jeddah', r40: 850, valid: '2026-10-31' }, { car: 'B', pol: 'Sokhna', pod: 'Jeddah', r40: 860, valid: '2026-12-31' },
+      { car: 'C', pol: 'Sokhna', pod: 'Jeddah', r40: 500, valid: '2026-12-31', type: 'Spot' }];
+    return { m: R.rateMoves(rows, '2026-11-27', 5).map(x => [x.pod, x.was, x.now, x.pct, x.dir]), demo: R.rateMoves([...DATA.rates, ...DATA.imports], '2026-11-27', 5).length }; });
+  assert.deepEqual(r.m, [['Busan', 900, 1000, 11.1, 'up']]);
+  assert.ok(r.demo >= 3);
+});
+
+test('free time / D&D, ACI and currency terms in the quote', async () => {
+  const r = await run(() => { const R = window.__rules;
+    return { dd: R.ddCost(5, 2, 150).total, ft: [R.ftDays('21 days combined'), R.ftDays('')],
+      aci: [R.aciCheck('exp', '').need, R.aciCheck('imp', '').ok, R.aciCheck('imp', '12345').ok, R.aciCheck('imp', '1234567890123456789').ok],
+      t1: R.rxTerms({ dir: 'imp', missingFt: true, curs: ['USD'], set: { fx: 56.4, fxDate: '2026-11-27' } }), t2: R.rxTerms({ dir: 'exp', curs: ['USD'], set: {} }) }; });
+  assert.equal(r.dd, 1500); assert.deepEqual(r.ft, [21, null]);
+  assert.deepEqual(r.aci, [false, false, false, true]);
+  assert.ok(r.t1.some(t => /ACID/.test(t))); assert.ok(r.t1.some(t => /56\.40 EGP per USD on 27 Nov 2026/.test(t))); assert.ok(r.t1.some(t => /Free time as per carrier tariff/.test(t)));
+  assert.ok(!r.t2.some(t => /ACID|EGP/.test(t))); assert.ok(r.t2.includes('All rates in USD.'));
+});

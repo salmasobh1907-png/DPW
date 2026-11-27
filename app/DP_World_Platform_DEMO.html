@@ -406,6 +406,7 @@ body:not(.notes-on) .xp{display:none!important}
 .pct .pcx{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.35}
 .pct td.mono{white-space:nowrap}
 @media (max-width:600px){.pct{font-size:12px}.pct th,.pct td{padding:7px 4px}.pct th:first-child{width:31%}.pct .ofp{padding:4px 3px;font-size:12px;min-width:38px}}
+.rxg{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px 18px;font-size:13px}.rxg>div{min-width:0}.rxg input{padding:3px 6px;border:1px solid var(--line-2);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit}
 .dfb:empty{display:none}.dfb{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}.dfbh{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}.dfbh .mini{margin-left:auto}
 /* dpw-look */
 :root{--accent:#3e3c90;--accent-soft:#ecebf6;--focus:#3e3c90;--nav:#17163f;--nav-2:#272661}
@@ -597,6 +598,7 @@ body.nl .side,body.nl .rail,body.nl nav.side{background:linear-gradient(180deg,#
         <p class="note xp" style="margin:0 0 10px">Use this when the customer should choose between carriers or ports. Tick rates in the table above, or let the platform suggest them. The customer sees sell rates only.</p>
         <div class="qact"><button class="mini ok" id="of-sug">Suggest 3 options</button><button class="mini" id="of-clr">Clear</button><label class="tg" style="font-size:12.5px;margin-left:6px"><input type="checkbox" id="of-car" checked>Show carrier names</label></div>
         <div id="of-mkt" class="ofmkt" hidden></div>
+        <div id="rx-box" class="ofmkt pr-only" hidden></div>
         <div class="oftabs" id="of-tabs" hidden style="margin-top:14px"><div class="seg" role="group" aria-label="Which option to send" id="of-pick"></div><div class="seg" role="group" aria-label="Email layout"><button id="of-short" aria-pressed="false">Short</button><button id="of-table" aria-pressed="true">Table</button></div></div>
         <div id="of-prev" class="offerprev" style="margin-top:12px"></div>
         <div class="qact" style="margin-top:12px"><button class="svc btn primary" id="of-copy">Copy for Outlook</button><a class="svc btn" id="of-mail" href="#">Open in email</a><button class="svc btn" id="of-pdf" type="button">PDF</button><button class="svc btn" id="of-xls" type="button">Excel</button><span class="note" id="of-msg" aria-live="polite"></span></div>
@@ -1305,7 +1307,7 @@ function renderDesk(){ const h=$("deskHead"); if(!h) return; const L=deskReqs(),
    <ol class="dtl">${T.map(([t,w,ok,d])=>`<li class="${ok?"ok":""}"><b>${t}</b><span>${w||"&nbsp;"}</span><em>${d}</em></li>`).join("")}</ol><div id="deskFb" class="dfb"></div>`; try{ renderFbLane(); }catch(x){}
   const sel=h.querySelector("#deskPick"); if(sel) sel.onchange=ev=>{ const x=IBX.items.find(y=>y.id===ev.target.value); if(x) ibxToQuote(x); }; }
 function renderOffer(){
-  const box=$("of-prev"); if(!box) return; const M0=offerModel(); ofTabs(M0); const M=ofView(M0), q=quote; const showCar=$("of-car").checked; try{ renderMkt(M); }catch(e){ const k=$("of-mkt"); if(k) k.hidden=true; }
+  const box=$("of-prev"); if(!box) return; const M0=offerModel(); ofTabs(M0); const M=ofView(M0), q=quote; const showCar=$("of-car").checked; try{ renderMkt(M); }catch(e){ const k=$("of-mkt"); if(k) k.hidden=true; } try{ rxBox(M); }catch(e){}
   const imp=q.dir==="imp", pols=[...new Set(M.list.map(x=>x.r.pol))], pods=[...new Set(M.list.map(x=>x.r.pod))];
   const origin=imp?(pols.length===1?pols[0]:(q.dest||"")):(pols.length===1?pols[0]+", Egypt":"Egypt"), target=imp?(pods.length===1?pods[0]+", Egypt":"Egypt"):(q.dest||"");
   if(!M.list.length){ box.innerHTML=`<p style="color:#555;margin:0">No options yet. Tick 2 to 4 rates in the table above, or press <b>Suggest 3 options</b>.</p>`; $("of-mail").href="#"; return; }
@@ -1316,7 +1318,7 @@ function renderOffer(){
   if(!M.one) cnotes.forEach(c=>rmk.push(`${c.x.label}${showCar?" ("+c.x.r.car+")":""}: ${c.n}`)); else cnotes.forEach(c=>{ if(!rmk.includes(c.n)) rmk.push(c.n); });
   const head=`<tr><th ${th}>Option</th>${showCar?`<th ${th}>Carrier</th>`:""}<th ${th}>Routing</th><th ${th}>Transit</th>${M.has20?`<th ${th}>${M.h20}<br>USD</th>`:""}${M.has40?`<th ${th}>${M.h40}<br>USD</th>`:""}${M.hasThc?`<th ${th}>Origin THC<br>20' / 40'</th>`:""}${M.hasFt?`<th ${th}>Free time<br>at destination</th>`:""}<th ${th}>Valid until</th></tr>`;
   const rows=M.list.map((x,i)=>{ const r=x.r; return `<tr style="background:${i%2?"#f4f7fa":"#fff"}"><td ${td} nowrap><b>${x.label}</b>${x.tags.length?`<br><span style="color:#0a7a3e;font-size:12px;white-space:nowrap">${x.tags.join("<br>")}</span>`:""}</td>${showCar?`<td ${td}>${esc(r.car)}</td>`:""}<td ${td}>${esc(polTxt(r))} → ${esc(r.pod)}${r.ts&&!/^direct$/i.test(r.ts)?`<br><span style="color:#666;font-size:12px">via ${esc(r.ts)}</span>`:r.ts?`<br><span style="color:#666;font-size:12px">direct</span>`:""}</td><td ${tdn}>${r.tt!=null?`${r.ttEst?"about ":""}${r.tt} days`:"on request"}</td>${M.has20?`<td ${tdn}><b>${x.s20!=null?money(x.s20):"—"}</b></td>`:""}${M.has40?`<td ${tdn}><b>${x.s40!=null?money(x.s40):"—"}</b></td>`:""}${M.hasThc?`<td ${tdn}>${r.thc20!=null||r.thc40!=null?`${r.thc20!=null?money(r.thc20):"–"} / ${r.thc40!=null?money(r.thc40):"–"} ${esc(r.thccur||"USD")}`:"–"}</td>`:""}${M.hasFt?`<td ${td}>${esc(ftTxt(r.ft)||"on request")}</td>`:""}<td ${tdn}>${esc(fmtDate(r.valid))}</td></tr>`; }).join("");
-  const terms=[...exwTerm(),...rmk, M.thcm==="incl"?"Rates include origin THC.":M.thcm==="sep"?"Origin THC as per terminal tariff, payable at origin.":"", "Rates per container, ocean freight; destination local charges as per carrier / terminal tariff.","Subject to space and equipment availability at time of booking, and to war risk, emergency bunker or other surcharges applicable at shipment."].filter(Boolean);
+  const terms=[...exwTerm(),...rmk,...rxOfferTerms(M), M.thcm==="incl"?"Rates include origin THC.":M.thcm==="sep"?"Origin THC as per terminal tariff, payable at origin.":"", "Rates per container, ocean freight; destination local charges as per carrier / terminal tariff.","Subject to space and equipment availability at time of booking, and to war risk, emergency bunker or other surcharges applicable at shipment."].filter(Boolean);
   const shortHtml=M.list.map(x=>{ const r=x.r; const pr=[M.has20&&x.s20!=null?`${M.h20}: <b>USD ${money(x.s20)}</b>`:"",M.has40&&x.s40!=null?`${M.h40}: <b>USD ${money(x.s40)}</b>`:""].filter(Boolean).join(" · ");
     return `<div style="margin:0 0 8px;padding:8px 10px;border-left:3px solid #0b2e4f;background:#f4f7fa"><b>${esc(x.label)}${x.tags.length?" ("+esc(x.tags.join(", "))+")":""}${showCar?" – "+esc(r.car):""}</b><br>${esc(polTxt(r))} → ${esc(r.pod)}${r.ts&&!/^direct$/i.test(r.ts)?" via "+esc(r.ts):""} · transit ${r.tt!=null?(r.ttEst?"about ":"")+r.tt+" days":"on request"}<br>${pr}${r.ft?` · free time ${esc(ftTxt(r.ft))}`:""} · valid until ${esc(fmtDate(r.valid))}</div>`; }).join("");
   box.innerHTML=`<p>Dear ${esc(name)},</p><p>Thank you for your request. Please find our ocean freight ${M.one?"offer":"options"} from <b>${esc(origin)}</b> to <b>${esc(target)}</b>:</p>
@@ -4134,7 +4136,7 @@ function tdItems(){ const t=todayISO(), I=[], add=(o)=>I.push(o);
   if(nW||nN) add({pri:3,tag:"WA",title:`WhatsApp: ${nW} rate${nW===1?"":"s"}, ${nN} announcement${nN===1?"":"s"}`,sub:"Rates need email confirmation before you quote",act:"Review",go:()=>openTab("dsrc")});
   try{ (GW.watch||[]).filter(w=>/high|red|severe/i.test(String(w.level||""))).slice(0,2).forEach(w=>add({pri:1,tag:"ALR",title:`${w.area||"Market"}: ${w.note||"risk level up"}`,sub:w.impact||"Check open requests on this route",act:"See",go:()=>openTab("gw")})); }catch(e){}
   return I.sort((a,b)=>a.pri-b.pri); }
-function renderToday(){ const p=$("p-today"); if(!p||p.hidden) return; const I=tdItems(), t=todayISO();
+function renderToday(){ try{ setTimeout(rxTodayCard,0); }catch(e){} const p=$("p-today"); if(!p||p.hidden) return; const I=tdItems(), t=todayISO();
   let cs={open:0,late:0}; try{ const now=Date.now(); csLoad().cases.filter(c=>!c.sub).forEach(c=>{ cs.open++; if(csState(c,now).st==="breach") cs.late++; }); }catch(e){}
   const Q=(QT.items||[]).filter(q=>String(q.month||"")===t.slice(0,7)), won=Q.filter(q=>q.status==="won").length, lost=Q.filter(q=>q.status==="lost").length;
   const end7=(DATA.rates||[]).filter(r=>isStd(r)&&r.valid&&r.valid>=t&&r.valid<=addDays(t,7)).length;
@@ -4980,6 +4982,77 @@ function renderCockpit(){ const p=$("p-cockpit"); if(!p) return; const mine=dept
     <div class="card"><h3>Morning brief</h3><pre class="td-pre" id="ckTxt">${esc(ckBrief(K,pains,D.filter(t=>!st(t)),F))}</pre><div class="td-acts"><button type="button" class="mini ok" id="ckCopy">Copy</button><a class="mini" target="_blank" rel="noopener" href="${esc(mailDraft("","Cockpit "+fmtDate(todayISO()),ckBrief(K,pains,D.filter(t=>!st(t)),F)))}">Open as email draft</a></div></div>`;
   p.querySelectorAll("[data-dec]").forEach(b=>b.onclick=()=>{ decSet(D[+b.dataset.dec],b.dataset.v); renderCockpit(); });
   $("ckCopy").onclick=async()=>{ try{ await navigator.clipboard.writeText($("ckTxt").textContent); }catch(e){} }; }
+/* ===== Quote checks from the market research: rate moves, free time and D&D, ACI, currency and FX date =====
+   Plain rules only. Settings saved in this browser (rx_v1). The D&D cost per day and the FX rate are set by Pricing. */
+const RX_DEF={pct:5,dd:150,ddSrc:"Market level, Egypt ports (set by Pricing)",fx:null,fxDate:"",fxBy:""};
+function rxSet(){ return Object.assign({},RX_DEF,lsGet("rx_v1",{})); }
+function rxSave(p){ const S=Object.assign(rxSet(),p); lsSet("rx_v1",{pct:S.pct,dd:S.dd,ddSrc:S.ddSrc,fx:S.fx,fxDate:S.fxDate,fxBy:S.fxBy}); return S; }
+function rxStd(r){ const t=String(r&&r.type||"").trim(); return !t||/^standard$/i.test(t); }
+function rxEom(iso){ const d=new Date(iso.slice(0,10)+"T00:00:00"); return localISO(new Date(d.getFullYear(),d.getMonth()+1,0)); }
+function rxValid(r,today){ return r.valid&&/^\d{4}-\d\d-\d\d/.test(r.valid)?r.valid.slice(0,10):rxEom(today); } /* no date = valid to month end */
+/* Rate moves: lowest standard 40' (else 20') per lane now vs the last expired month on the same lane */
+function rateMoves(rows,today,pct){ pct=pct==null?5:+pct; const L={};
+  (rows||[]).forEach(r=>{ if(!rxStd(r)||!r.pol||!r.pod) return; const v=rxValid(r,today), k=r.pol+"|"+r.pod;
+    (L[k]=L[k]||{pol:r.pol,pod:r.pod,now:[],old:[]})[v>=today?"now":"old"].push(Object.assign({},r,{_v:v})); });
+  const out=[];
+  Object.values(L).forEach(l=>{ if(!l.now.length||!l.old.length) return;
+    const col=l.now.some(r=>r.r40>0)&&l.old.some(r=>r.r40>0)?"r40":"r20";
+    const now=l.now.filter(r=>r[col]>0), lastM=l.old.map(r=>r._v.slice(0,7)).sort().pop(), old=l.old.filter(r=>r._v.slice(0,7)===lastM&&r[col]>0);
+    if(!now.length||!old.length) return;
+    const a=old.reduce((x,y)=>y[col]<x[col]?y:x), b=now.reduce((x,y)=>y[col]<x[col]?y:x), d=b[col]-a[col], p=Math.round(d/a[col]*1000)/10;
+    if(Math.abs(p)>=pct) out.push({pol:l.pol,pod:l.pod,eq:col==="r40"?"40'":"20'",was:a[col],wasCar:a.car,wasMonth:lastM,now:b[col],nowCar:b.car,diff:d,pct:p,dir:d>0?"up":"down"}); });
+  return out.sort((x,y)=>Math.abs(y.pct)-Math.abs(x.pct)); }
+/* D&D: cost if the box stays past free time */
+function rxMon(m){ const d=new Date(String(m)+"-01T00:00:00"); return isNaN(d)?String(m||""):d.toLocaleDateString("en-GB",{month:"short",year:"numeric"}); }
+function ftDays(ft){ const m=String(ft||"").match(/(\d{1,3})/); return m?+m[1]:null; }
+function ddCost(daysOver,boxes,perDay){ const d=Math.max(0,Math.round(+daysOver||0)), b=Math.max(1,Math.round(+boxes||1)), p=Math.max(0,+perDay||0); return {d,b,p,total:d*b*p}; }
+/* ACI (Nafeza): imports to Egypt need the ACID before loading at origin. ACID = 19 digits. */
+function aciCheck(dir,acid){ if(dir!=="imp") return {need:false,ok:true,why:"Not needed: export from Egypt."};
+  const a=String(acid||"").replace(/\s+/g,""); if(!a) return {need:true,ok:false,why:"Import to Egypt: ask the consignee for the ACID number before the cargo is loaded."};
+  if(!/^\d{19}$/.test(a)) return {need:true,ok:false,why:"The ACID should be 19 digits. Check it with the consignee."};
+  return {need:true,ok:true,why:"ACID entered (19 digits). Confirm it is approved on Nafeza before loading."}; }
+/* Terms the quote gets from these checks (customer sees these; no internal costs) */
+function rxTerms(o){ o=o||{}; const S=o.set||rxSet(), T=[];
+  if(o.missingFt) T.push("Free time as per carrier tariff, to be confirmed at booking.");
+  T.push("After free time, demurrage and detention are charged as per carrier / terminal tariff.");
+  const cur=(o.curs&&o.curs.length?o.curs:["USD"]); T.push(cur.length===1?`All rates in ${cur[0]}.`:`Rates in ${cur.join(" and ")} as shown per line.`);
+  if(S.fx>0&&S.fxDate) T.push(`If paid in EGP: the bank rate on the invoice date applies (for reference ${(+S.fx).toFixed(2)} EGP per USD on ${fmtDate(S.fxDate)}).`);
+  if(o.dir==="imp") T.push("Import to Egypt: the consignee must issue the ACID number (ACI / Nafeza) before the cargo is loaded at origin.");
+  return T; }
+const RX={acid:"",over:5,boxes:1};
+function rxOfferTerms(M){ try{ const L=(M&&M.list)||[]; return rxTerms({dir:quote.dir,missingFt:L.some(x=>!x.r.ft),curs:[...new Set(L.map(x=>x.r.cur||"USD"))]}); }catch(e){ return []; } }
+function rxBox(M){ const k=$("rx-box"); if(!k) return; const L=(M&&M.list)||[]; if(!L.length||!isPricing()){ k.hidden=true; return; } k.hidden=false;
+  const S=rxSet(), t=todayISO(), dir=quote.dir, A=aciCheck(dir,RX.acid);
+  const lanes=new Set(L.map(x=>x.r.pol+"|"+x.r.pod)), mv=rateMoves([...(DATA.rates||[]),...(DATA.imports||[])],t,S.pct).filter(m=>lanes.has(m.pol+"|"+m.pod));
+  const curs=[...new Set(L.map(x=>x.r.cur||"USD"))], nonUsd=L.filter(x=>(x.r.cur||"USD")!=="USD");
+  const fxOld=S.fxDate&&S.fxDate<addDays(t,-7);
+  const ftRows=L.map(x=>`<li>${esc(x.label)}: ${x.r.ft?esc(ftTxt(x.r.ft)):'<b class="warn-t">no free time on the rate: ask the carrier</b>'}</li>`).join("");
+  const C=ddCost(RX.over,RX.boxes,S.dd);
+  k.innerHTML=`<h3 style="margin:0 0 6px">Before you send <span class="note">(inside the tool only, not in the email)</span></h3>
+  <div class="rxg">
+   <div><b>Rate move on this lane</b>${mv.length?mv.map(m=>`<div class="${m.dir==="up"?"bad-t":"ok-t"}">${esc(m.pol)} → ${esc(m.pod)} ${m.eq}: USD ${money(m.was)} (${esc(rxMon(m.wasMonth))}) → USD ${money(m.now)} now, ${m.pct>0?"+":""}${m.pct}%</div>`).join(""):`<div class="note">No move of ${S.pct}% or more against last month.</div>`}<span class="note">Source: Rate Bank (dummy), lowest standard rate.</span></div>
+   <div><b>Free time and D&amp;D</b><ul style="margin:4px 0;padding-left:18px">${ftRows}</ul>
+    <label class="note">If the box stays <input id="rx-over" type="number" min="0" max="60" value="${C.d}" style="width:58px"> days over free time, <input id="rx-bx" type="number" min="1" max="99" value="${C.b}" style="width:52px"> box(es):</label>
+    <div>about <b>USD ${money(C.total)}</b> <span class="note">= ${C.d} days × ${C.b} × USD ${money(C.p)} per day (${esc(S.ddSrc)})</span></div></div>
+   <div><b>ACI / Nafeza</b><div class="${A.ok?"ok-t":"warn-t"}">${esc(A.why)}</div>${A.need?`<label class="note">ACID number <input id="rx-acid" value="${esc(RX.acid)}" inputmode="numeric" maxlength="23" placeholder="19 digits" style="width:200px"></label>`:""}</div>
+   <div><b>Currency and FX</b><div>${nonUsd.length?`<span class="warn-t">Not USD: ${esc(nonUsd.map(x=>x.label+" "+(x.r.cur)).join(", "))}. Say the currency on each line.</span>`:"All options in USD."}</div>
+    <label class="note">EGP per USD <input id="rx-fx" type="number" step="0.01" min="1" value="${S.fx||""}" style="width:90px"></label> <label class="note">on <input id="rx-fxd" type="date" value="${esc(S.fxDate||t)}" style="width:150px"></label> <button class="mini" id="rx-fxs" type="button">Save rate</button>
+    <div class="note">${S.fx?`Quote says ${(+S.fx).toFixed(2)} on ${esc(fmtDate(S.fxDate))}${S.fxBy?" · set by "+esc(S.fxBy):""}${fxOld?' · <b class="warn-t">older than 7 days: update it</b>':""}.`:"No rate saved: the quote says USD only."} Use the bank rate; the tool does not fetch it.</div></div>
+  </div>`;
+  const re=()=>{ rxBox(offerModel()); };
+  $("rx-over").onchange=e=>{ RX.over=+e.target.value; re(); }; $("rx-bx").onchange=e=>{ RX.boxes=+e.target.value; re(); };
+  if($("rx-acid")) $("rx-acid").onchange=e=>{ RX.acid=e.target.value; re(); };
+  $("rx-fxs").onclick=()=>{ const v=+$("rx-fx").value, d=$("rx-fxd").value; if(!(v>0)||!/^\d{4}-\d\d-\d\d$/.test(d)){ $("rx-fx").focus(); return; }
+    let by=""; try{ by=$("q-me").value.trim(); }catch(e){} rxSave({fx:Math.round(v*100)/100,fxDate:d,fxBy:by}); renderOffer(); };
+}
+/* Today: rate moves card for Pricing */
+function rxTodayCard(){ const p=$("p-today"); if(!p||p.hidden||!isPricing()) return; const old=$("rx-today"); if(old) old.remove();
+  const S=rxSet(), mv=rateMoves([...(DATA.rates||[]),...(DATA.imports||[])],todayISO(),S.pct); if(!mv.length) return;
+  const c=document.createElement("div"); c.className="card"; c.id="rx-today";
+  c.innerHTML=`<h3>Rate moves: ${mv.length} lane${mv.length>1?"s":""} moved ${S.pct}% or more <span class="note">this month vs last month, lowest standard rate, Rate Bank (dummy)</span></h3>
+  <div class="tbl-wrap"><table class="opts"><thead><tr><th>Lane</th><th>Box</th><th class="n">Last month</th><th class="n">Now</th><th class="n">Move</th><th>What to do</th></tr></thead><tbody>${mv.slice(0,8).map(m=>`<tr><td>${esc(m.pol)} → ${esc(m.pod)}</td><td>${m.eq}</td><td class="n">${money(m.was)} <span class="note">${esc(m.wasCar)}</span></td><td class="n">${money(m.now)} <span class="note">${esc(m.nowCar)}</span></td><td class="n ${m.dir==="up"?"bad-t":"ok-t"}">${m.pct>0?"+":""}${m.pct}%</td><td class="note">${m.dir==="up"?"Re-check open offers on this lane before they are accepted.":"Tell sales: we can quote lower or keep more margin."}</td></tr>`).join("")}</tbody></table></div>
+  <p class="note" style="margin:8px 0 0">Alert level: a move of ${S.pct}% or more on the lowest standard rate. Last month = the latest expired month on that lane.</p>`;
+  p.appendChild(c); }
 /* settings screens are view only for everyone but the admin */
 { const wrap=(get,set,id,keep)=>{ const o=get(); set(function(){ const r=o.apply(this,arguments); try{ lockPane(id,keep); }catch(e){} return r; }); };
   wrap(()=>renderSrc,f=>renderSrc=f,"p-src"); wrap(()=>dsRender,f=>dsRender=f,"p-dsrc"); wrap(()=>renderApps,f=>renderApps=f,"p-apps"); wrap(()=>renderDict,f=>renderDict=f,"p-dict","#kbT,#kbTry button"); wrap(()=>renderCmbx,f=>renderCmbx=f,"p-cmbx"); wrap(()=>renderTasks,f=>renderTasks=f,"p-tasks","[data-tkd],[data-tkp],[data-tkm]"); }
@@ -5004,7 +5077,7 @@ setTimeout(()=>{ try{ tdFocusWatch(); }catch(e){} try{ eodWatch(); histSnap(); s
     try{ csTick(); const D=wtDay(csDay(Date.now())); if(D) row=`<tr><td><b>${esc(csName("me"))}</b> (this browser)</td><td>${csTime(D.first)}</td><td>${csTime(D.last)}</td><td class="n">${asDur(D.active)}</td><td class="n">${asDur(D.away)}</td><td class="n">${asDur(D.brk)}</td><td class="n">${asDur(D.off)}</td></tr>`; }catch(e){}
     p.insertAdjacentHTML("beforeend",`<div class="card"><h3>Team working time <span class="dschip ds-off">Managers only</span></h3><p class="note">Active, Away, Break and Off in the tool, per person, today. In this demo each browser keeps only its own log, so only your row shows. On DP World servers every person's log goes to the team database and shows here. Each person sees only their own time. HR and Legal approve before real use.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Person</th><th>First seen</th><th>Last seen</th><th class="n">Active</th><th class="n">Away</th><th class="n">Break</th><th class="n">Off</th></tr></thead><tbody>${row||`<tr><td colspan="7" class="note">No time logged yet today.</td></tr>`}</tbody></table></div></div>`); }; }
-window.__rules = { ckCustomers, ckForecast, decSet, decAll, smTarget, smOpts, smMargins, spRead, spRecipe, spLogAdd, kbImportRows, kbCheckRows, kbKnownPort, deptHealth, kpiStatus, deptMine, appName, applyBrand, ofCheck, ofVerify, ofRecord, ofNextNo, brandLogo, kbNorm, kbPort, kbAdd, kbAll, bm25Rank, kbMissAdd, gTraining, gAsk, GUIDE, teamScope, userLevel, execStats, execRisks, cycleStats, dirFind, fwdCase, DIR_MBX, isAdmin, tktNew, tktUpd, tktAll, errAdd, adminAlerts, lockPane, tkAll, tkMatrix, tkMark, tkDone, whoAmI, launchFacts, wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
+window.__rules = { rateMoves, ddCost, aciCheck, rxTerms, ftDays, ckCustomers, ckForecast, decSet, decAll, smTarget, smOpts, smMargins, spRead, spRecipe, spLogAdd, kbImportRows, kbCheckRows, kbKnownPort, deptHealth, kpiStatus, deptMine, appName, applyBrand, ofCheck, ofVerify, ofRecord, ofNextNo, brandLogo, kbNorm, kbPort, kbAdd, kbAll, bm25Rank, kbMissAdd, gTraining, gAsk, GUIDE, teamScope, userLevel, execStats, execRisks, cycleStats, dirFind, fwdCase, DIR_MBX, isAdmin, tktNew, tktUpd, tktAll, errAdd, adminAlerts, lockPane, tkAll, tkMatrix, tkMark, tkDone, whoAmI, launchFacts, wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
 window.__route = route;
 })();
 </script>
