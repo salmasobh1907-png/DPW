@@ -464,6 +464,9 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
 .tk-t{border-top:1px solid var(--line,#e3e8ef);padding:10px 0}.tk-t summary{display:flex;flex-wrap:wrap;gap:8px;align-items:center;cursor:pointer}.tk-t summary small{flex-basis:100%;opacity:.75;font-size:12px}.tk-c{border-left:3px solid var(--accent);padding:6px 10px;margin:6px 0;background:var(--surface-2,#f7f9fc);border-radius:0 8px 8px 0;font-size:13px}.tk-c.sys{border-left-color:var(--line-2,#ccc);opacity:.8}
 .fw-list{position:absolute;left:0;right:0;top:100%;z-index:30;background:var(--surface,#fff);border:1px solid var(--line-2,#ccc);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.15);padding:4px;margin-top:4px}.fw-list button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;color:inherit;cursor:pointer}.fw-list button:hover,.fw-list button:focus{background:var(--accent-soft)}.fw-list b{display:block;font-size:14px}.fw-list small{font-size:12px;opacity:.75}
 .cy-k{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;font-size:13px;padding:2px 0}
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:16px}.ex-dec{margin:0;padding-left:20px;font-size:14px;line-height:1.6}
+.org{display:flex;flex-direction:column;align-items:center;gap:14px}.org-teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;width:100%;position:relative;padding-top:14px;border-top:2px solid var(--line-2,#cfd8e3)}.org-t{display:flex;flex-direction:column;gap:6px}.org-tn{font-size:12px;font-weight:700;opacity:.7}
+.org-b{border:1px solid var(--line,#e3e8ef);border-radius:12px;padding:8px 10px;background:var(--surface,#fff)}.org-b b{display:block;font-size:13px}.org-b small{font-size:11px;opacity:.7}.org-b.dir{background:var(--nav,#0b1a33);color:#fff;border-color:transparent;min-width:220px;text-align:center}.org-b.lead{border-width:2px}.org-b.on{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
 .dschip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}.ds-ok{background:#d9f2e3;color:#14532d}.ds-due{background:#fde9c8;color:#7c4a03}.ds-err{background:#f9d4d4;color:#7f1d1d}.ds-off,.ds-busy{background:#e5e7eb;color:#374151}.dstbl td{vertical-align:top}
 /* ===== New look: a layer on top of the classic tokens; body.nl switches it ===== */
 body.nl{--bg:#f4f6fa;--surface:#ffffff;--surface-2:#f7f9fc;--line:#e3e8ef;--line-2:#cfd8e3;--ink:#0f1b2d;--muted:#55657a;--faint:#8492a6;--accent:#1d5bd8;--accent-ink:#ffffff;--accent-soft:#e8f0fd;--focus:#1d5bd8;--nav:#0b1a33;--nav-2:#14294b;--nav-ink:#eaf0f8;--nav-muted:#93a6c0;--shadow:0 1px 2px rgba(15,27,45,.05),0 8px 24px rgba(15,27,45,.06)}
@@ -534,7 +537,7 @@ body.nl .side,body.nl .rail,body.nl nav.side{background:linear-gradient(180deg,#
   </nav>
   <header class="top">
     <div class="ttl"><h1 id="pgTitle">Rates &amp; offer</h1><div class="sub" id="pgSub"></div></div>
-    <div class="role" id="roleSw" role="group" aria-label="View as" hidden><span class="lbl">View as</span><button id="r-pricing" aria-pressed="true"><svg class="ic sm"><use href="#i-chart"/></svg>Pricing</button><button id="r-sales" aria-pressed="false"><svg class="ic sm"><use href="#i-bag"/></svg>Sales</button><button id="r-director" aria-pressed="false"><svg class="ic sm"><use href="#i-home"/></svg>Director</button></div>
+    <div class="role" id="roleSw" role="group" aria-label="View as" hidden><span class="lbl">View as</span><button id="r-pricing" aria-pressed="true"><svg class="ic sm"><use href="#i-chart"/></svg>Pricing</button><button id="r-sales" aria-pressed="false"><svg class="ic sm"><use href="#i-bag"/></svg>Sales</button><button id="r-manager" aria-pressed="false"><svg class="ic sm"><use href="#i-chart"/></svg>Manager</button><button id="r-director" aria-pressed="false"><svg class="ic sm"><use href="#i-home"/></svg>Director</button></div>
     <button class="iconbtn lg-who" id="whoBtn" aria-label="Signed in user: switch user" title="Switch user">?</button>
     <button class="iconbtn" id="lookBtn" aria-pressed="true" aria-label="New look on or off" title="New look on or off"><svg class="ic"><use href="#i-sun"/></svg></button>
     <span class="chipd" title="Source: Rate Bank Export / Import on SharePoint"><span class="dot"></span>Rate Bank · <span id="asof3"></span></span>
@@ -713,6 +716,7 @@ body.nl .side,body.nl .rail,body.nl nav.side{background:linear-gradient(180deg,#
     <section class="pane" id="p-apps" hidden></section>
     <section class="pane" id="p-tasks" hidden></section>
     <section class="pane" id="p-support" hidden></section>
+    <section class="pane" id="p-exec" hidden></section>
     <section class="pane" id="p-ibx" hidden></section>
     <section class="pane" id="p-sheet" hidden></section>
     <section class="pane" id="p-plog" hidden></section>
@@ -2864,6 +2868,9 @@ const NAV={
   sales:[["Daily work",[["ibx","Inbox","inbox"],["lane","Find a rate","map"],["q","My offers & feedback","file"]],"sales"],
          ["Reference",[["trk","Trucking rates","truck"],["svc","Alliance loops","ship"],["support","Support","help"],["info","Help","help"]],"everyone"]]
 };
+{ const mgmt=[["exec","Executive summary","chart"],["team","Team dashboard","chart"],["home","Overview","home"]], keep=new Set(mgmt.map(x=>x[0]));
+  const rest=NAV.pricing.map(([g,items,sub])=>[g,items.filter(x=>!keep.has(x[0])),sub]).filter(g=>g[1].length);
+  NAV.director=[["Management",mgmt,"all teams"],...rest]; NAV.manager=[["Team management",mgmt,"your team"],...rest]; } /* nothing employees use is hidden from managers */
 // merged tabs: one nav item, a small switch on top of the page
 const SUBS={cases:[["cases","Cases"],["ckpi","Team KPIs"],["cmbx","Mailboxes & SLA"]],q:[["q","Offers & quotes"],["fb","Sales feedback"]],sheet:[["sheet","Rate Data Base"],["off","Carrier offers"],["req","Ask carriers"],["plog","Pricing log"],["hl","Rate check"]],home:[["home","Overview"],["dem","Customer requests"],["gw","Market alerts"],["vol","Carrier volumes"]],info:[["info","Help"],["src","Settings & sources"],["dsrc","Data sources"]]};
 const SUBS_SALES={q:"My offers & quotes",fb:"Feedback to pricing"};
@@ -2872,18 +2879,18 @@ function navKey(t){ return PAR[t]||t; }
 function renderSub(t){ let bar=$("subsw"); const pk=navKey(t), L=SUBS[pk]; if(!bar){ bar=document.createElement("div"); bar.id="subsw"; bar.className="subsw"; bar.setAttribute("role","group"); bar.setAttribute("aria-label","Part of this page"); const w=$("work"); w.insertBefore(bar,w.firstChild); }
   const ok=L&&(isPricing()||pk!=="info"); bar.hidden=!ok; if(!ok) return; bar.innerHTML=L.map(([k,l])=>`<button type="button" data-sk="${k}" aria-pressed="${k===t}">${esc((!isPricing()&&SUBS_SALES[k])||l)}</button>`).join(""); bar.querySelectorAll("[data-sk]").forEach(x=>x.onclick=()=>openTab(x.dataset.sk)); }
 const NAVOPEN=new Set();
-const PAGE={cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],support:["Support","Report a problem, ask for a change or share an idea; answers and status"],tasks:["My responsibilities","The work you do, ticked or counted each day, as your manager sees it"],apps:["Apps hub","Outlook, Teams, files, DP World systems and carrier sites in one place, with one-click email, chat, call and meeting"],team:["Team dashboard","Each person: open, late, answered, reply time, working time and end-of-day choice · managers only"],today:["Today","Everything that needs Pricing now, and Quick price in one line"],dsrc:["Data sources","Rate Bank, carrier emails, online links and files: freshness, order and conflicts"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
+const PAGE={cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],exec:["Executive summary","Results, risks and the decisions for today · managers and Director"],support:["Support","Report a problem, ask for a change or share an idea; answers and status"],tasks:["My responsibilities","The work you do, ticked or counted each day, as your manager sees it"],apps:["Apps hub","Outlook, Teams, files, DP World systems and carrier sites in one place, with one-click email, chat, call and meeting"],team:["Team dashboard","Each person: open, late, answered, reply time, working time and end-of-day choice · managers only"],today:["Today","Everything that needs Pricing now, and Quick price in one line"],dsrc:["Data sources","Rate Bank, carrier emails, online links and files: freshness, order and conflicts"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
   q:["Offers & quotes","Offers pricing sent to sales, and quotes sales sent to customers"],fb:["Sales feedback","What sales hear from customers, with pricing's replies"],off:["Carrier offers","A carrier email or Excel turned into Rate Bank rows"],
   req:["Ask carriers","Monthly “Rate Idea” emails to the lines"],svc:["Alliance loops","Reference list of liner rotations that call Egypt, 19 Oct 2026"],vol:["Carrier volumes","What we booked with each line, for contract and volume talks"],trk:["Trucking rates","Pickup in Egypt for EXW requests, and cross-border trucks"],hl:["Rate Bank check","Rows in the Rate Bank that are wrong or easy to misread"],gw:["Market alerts","Disruptions, rate-increase notices and the weekly market index"],info:["Help","How the platform works and where the numbers come from"]};
 const PAGE_SALES={ibx:["Inbox","Your customer requests from email · demo with dummy data"],lane:["Find a rate","Route, carrier rates, customer offer and quotation"],q:["My offers & quotes","Pricing's offers to you, your quotes to customers, follow-ups and hit ratio"],fb:["Feedback to pricing","Tell pricing what the customer said and read their answer"]};
-const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",dsrc:"Data",today:"Today",team:"Team",apps:"Apps",tasks:"Tasks",support:"Support",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
+const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",dsrc:"Data",today:"Today",team:"Team",apps:"Apps",tasks:"Tasks",support:"Support",exec:"Exec",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
 let ROLE=lsGet("rg-role","pricing"), CUR_TAB="lane";
 QT.isOwner=false;
 function canPricing(){ return !QT.shared || QT.isOwner || ((QT.settings&&QT.settings.pricing)||[]).includes(QT.meId); }
-function isPricing(){ return (ROLE==="pricing"||ROLE==="director") && canPricing(); } /* the Director sees buy rates and margins too */
+function isPricing(){ return (ROLE==="pricing"||ROLE==="director"||ROLE==="manager") && canPricing(); } /* the Director sees buy rates and margins too */
 function isDirector(){ return ROLE==="director" && canPricing(); }
-function navItems(){ return NAV[isDirector()?"director":isPricing()?"pricing":"sales"]; }
-function allowed(k){ if(k==="team"&&!wtMgr()) return false; return navItems().some(g=>g[1].some(x=>x[0]===k||(x[0]===PAR[k]&&(isPricing()||(k!=="src"&&k!=="dsrc"))))); }
+function navItems(){ return NAV[isDirector()?"director":(ROLE==="manager"&&canPricing())?"manager":isPricing()?"pricing":"sales"]; }
+function allowed(k){ if((k==="team"||k==="exec")&&!wtMgr()) return false; return navItems().some(g=>g[1].some(x=>x[0]===k||(x[0]===PAR[k]&&(isPricing()||(k!=="src"&&k!=="dsrc"))))); }
 function renderNav(){
   const groups=navItems(), btn=(k,t,i,mob)=>`<button role="tab" id="${mob?"b":"t"}-${k}" data-k="${k}" aria-selected="${k===navKey(CUR_TAB)}" title="${esc(t)}"><svg class="ic" aria-hidden="true"><use href="#i-${i}"/></svg><span class="lbl">${esc(mob?(SHORT[k]||t):t)}</span><span class="cnt" data-cnt="${k}" hidden></span></button>`;
   $("nav").innerHTML=groups.map(([g,items,who],gi)=>{ const has=items.some(x=>x[0]===navKey(CUR_TAB)), open=gi===0||has||NAVOPEN.has(g);
@@ -2893,20 +2900,20 @@ function renderNav(){
   $("bnav").innerHTML=groups.flatMap(g=>g[1]).filter(x=>x[0]!=="info").map(([k,t,i])=>btn(k,t,i,true)).join("");
   document.querySelectorAll("#nav button[data-k],#bnav button[data-k]").forEach(b=>b.onclick=()=>openTab(b.dataset.k));
   const cp=canPricing(); $("roleSw").hidden=!cp||(signedIn()&&!isAdmin()); /* the tool owner keeps the switch to see every view */ /* signed in: the view comes from the person, no switching */ document.body.classList.toggle("sales",!isPricing());
-  $("r-pricing").setAttribute("aria-pressed",String(isPricing()&&!isDirector())); $("r-sales").setAttribute("aria-pressed",String(!isPricing())); $("r-director").setAttribute("aria-pressed",String(isDirector())); document.body.classList.toggle("director",isDirector());
-  $("footRole").textContent=isDirector()?"Director view":isPricing()?"Pricing view":"Sales view";
+  $("r-pricing").setAttribute("aria-pressed",String(isPricing()&&!isDirector()&&ROLE!=="manager")); $("r-manager").setAttribute("aria-pressed",String(ROLE==="manager")); $("r-sales").setAttribute("aria-pressed",String(!isPricing())); $("r-director").setAttribute("aria-pressed",String(isDirector())); document.body.classList.toggle("director",isDirector());
+  $("footRole").textContent=isDirector()?"Director view":ROLE==="manager"?"Manager view":isPricing()?"Pricing view":"Sales view";
   updateBadges(); try{ plBadge(); }catch(e){}
 }
-function setRole(r){ IBX.open=null; try{ $("q-me").value=r==="sales"?DEMO_SP:(QT.meName||"Pricing team"); }catch(e){} ROLE=r; lsSet("rg-role",r); MRG_MANUAL=false; renderNav(); if(r==="director") openTab("team"); else if(!allowed(CUR_TAB)) openTab(r==="director"?"team":"lane"); else openTab(CUR_TAB,true); if(CUR_TAB!=="lane"){ updateLane(false); } renderOffer(); renderQ(); renderFbLane(); renderFbAll(); renderFbSend(); if(CUR_TAB==="ibx") renderIbx(); }
+function setRole(r){ IBX.open=null; try{ $("q-me").value=r==="sales"?DEMO_SP:(QT.meName||"Pricing team"); }catch(e){} ROLE=r; lsSet("rg-role",r); MRG_MANUAL=false; renderNav(); if(r==="director"||r==="manager") openTab("exec"); else if(!allowed(CUR_TAB)) openTab(r==="director"?"team":"lane"); else openTab(CUR_TAB,true); if(CUR_TAB!=="lane"){ updateLane(false); } renderOffer(); renderQ(); renderFbLane(); renderFbAll(); renderFbSend(); if(CUR_TAB==="ibx") renderIbx(); }
 let _roleWas=null;
 function applyRole(){ renderNav(); if(!allowed(CUR_TAB)) openTab("lane"); else setTitle(CUR_TAB); const now=isPricing(); if(_roleWas!==null&&_roleWas!==now){ rerenderOptions(); buildQuote(); renderOffer(); if(DIR==="exp"&&quote.dest) renderTruck(quote.dest,quote.sea||quote.dest); renderFbSend(); if(CUR_TAB==="trk") renderTrk(); } _roleWas=now; }
 function setTitle(t){ const P=(!isPricing()&&PAGE_SALES[t])||PAGE[t]||["",""]; $("pgTitle").textContent=P[0]; $("pgSub").textContent=P[1]+(t==="home"?` · Rate Bank ${DATA.asof}`:""); document.title="DP World Platform Demo"; }
 document.addEventListener("click",e=>{ const c=e.target.closest&&e.target.closest(".cmt"); if(!c) return; e.stopPropagation(); c.classList.toggle("open"); c.title=c.classList.contains("open")?"Click to shorten":"Click to read the full note"; },true);
 function openTab(t,quiet){
   if(!allowed(t)) t="lane";
-  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","dsrc","today","team","apps","tasks","support","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
+  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","dsrc","today","team","apps","tasks","support","exec","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
   panes.forEach(k=>{ const p=$("p-"+k); if(p) p.hidden=k!==t; });
-  { const wasNo=document.body.classList.contains("nomap"); document.body.classList.toggle("nomap",t==="trk"||t==="sheet"||t==="ibx"||t==="cases"||t==="ckpi"||t==="cmbx"||t==="dsrc"||t==="today"||t==="team"||t==="apps"||t==="tasks"||t==="support"); if(wasNo&&t!=="trk"&&t!=="sheet"&&t!=="ibx"&&t!=="cases"&&t!=="ckpi"&&t!=="cmbx"&&t!=="dsrc"&&t!=="today"&&t!=="team"&&t!=="apps"&&t!=="tasks"&&t!=="support") setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
+  { const wasNo=document.body.classList.contains("nomap"); document.body.classList.toggle("nomap",t==="trk"||t==="sheet"||t==="ibx"||t==="cases"||t==="ckpi"||t==="cmbx"||t==="dsrc"||t==="today"||t==="team"||t==="apps"||t==="tasks"||t==="support"||t==="exec"); if(wasNo&&t!=="trk"&&t!=="sheet"&&t!=="ibx"&&t!=="cases"&&t!=="ckpi"&&t!=="cmbx"&&t!=="dsrc"&&t!=="today"&&t!=="team"&&t!=="apps"&&t!=="tasks"&&t!=="support"&&t!=="exec") setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
   document.querySelectorAll("#nav button[data-k],#bnav button[data-k]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.k===navKey(t)))); renderSub(t);
   { const nb=document.querySelector('#nav button[data-k="'+navKey(t)+'"]'); if(nb&&nb.closest(".gi[hidden]")) renderNav(); }
   setTitle(t); $("work").scrollTop=0; if(!quiet) window.scrollTo&&window.scrollTo(0,0);
@@ -2927,6 +2934,7 @@ function openTab(t,quiet){
   if(t==="gw") renderGw();
   if(t==="src") renderSrc();
   if(t==="dsrc") dsRender();
+  if(t==="exec") setTimeout(()=>{ try{ renderExec(); }catch(e){ console.error(e); } },0);
   if(t==="support") setTimeout(()=>{ try{ renderSupport(); }catch(e){ console.error(e); } },0);
   if(t==="tasks") setTimeout(()=>{ try{ renderTasks(); }catch(e){ console.error(e); } },0);
   if(t==="apps") setTimeout(()=>{ try{ renderApps(); }catch(e){ console.error(e); } },0);
@@ -3757,10 +3765,10 @@ function initShell(){
   $("themeBtn").onclick=()=>{ setTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark"); };
   $("asof3").textContent=DATA.asof;
   { const on=lsGet("newLook_v1",true); document.body.classList.toggle("nl",!!on); const lb=$("lookBtn"); if(lb){ lb.setAttribute("aria-pressed",String(!!on)); lb.onclick=()=>{ const v=!document.body.classList.contains("nl"); document.body.classList.toggle("nl",v); lsSet("newLook_v1",v); lb.setAttribute("aria-pressed",String(v)); }; } }
-$("r-director").onclick=()=>setRole("director"); $("r-pricing").onclick=()=>setRole("pricing"); $("r-sales").onclick=()=>setRole("sales");
+$("r-director").onclick=()=>setRole("director"); $("r-manager").onclick=()=>setRole("manager"); $("r-pricing").onclick=()=>setRole("pricing"); $("r-sales").onclick=()=>setRole("sales");
   $("bell").onclick=openDrawer; $("drawerX").onclick=closeDrawer; $("scrim").onclick=closeDrawer;
   document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("drawer").hidden) closeDrawer(); });
-  const st=lsGet("rg-tab",isDirector()?"team":isPricing()?"today":"lane"); CUR_TAB=st; renderNav(); syncEqCtl();
+  const st=lsGet("rg-tab",(isDirector()||ROLE==="manager")?"exec":isPricing()?"today":"lane"); CUR_TAB=st; renderNav(); syncEqCtl();
 }
 
 // ---------- boot ----------
@@ -4151,7 +4159,7 @@ function wtSeg(from,to,st){ if(!(to>from)) return; const L=lsGet(WT_KEY,{}), d=c
   const s=D.segs, last=s[s.length-1]; if(last&&last[2]===st&&from-last[1]<2000) last[1]=to; else s.push([from,to,st]); D.last=to;
   const days=Object.keys(L).sort(); while(days.length>31) delete L[days.shift()]; lsSet(WT_KEY,L); }
 function wtDay(d){ const D=(lsGet(WT_KEY,{})||{})[d]; if(!D) return null; const t={active:0,away:0,brk:0,off:0}; D.segs.forEach(([a,b,st])=>{ t[st]=(t[st]||0)+(b-a); }); return {...t,first:D.first,last:D.last,segs:D.segs}; }
-function wtMgr(){ const me=CS_PEOPLE.find(p=>p.id==="me"); return !!(isAdmin()||isDirector()||QT.isOwner||(me&&/@lead\./.test(me.mail))); }
+function wtMgr(){ const me=CS_PEOPLE.find(p=>p.id==="me"); return !!(isAdmin()||isDirector()||ROLE==="manager"||QT.isOwner||(me&&/@lead\./.test(me.mail))); }
 function wtCard(title){ const t=todayISO(), D=wtDay(csDay(Date.now())); if(!D) return "";
   const span=Math.max(1,(D.last||Date.now())-D.first), col={active:"#18a57b",away:"#e0a23b",brk:"#7c83db",off:"#c3cad4"}, lab={active:"Active",away:"Away",brk:"Break",off:"Off (asleep, locked or closed)"};
   const bar=D.segs.map(([a,b,st])=>`<i title="${lab[st]} ${csTime(a)}–${csTime(b)}" style="left:${((a-D.first)/span*100).toFixed(2)}%;width:${Math.max(.3,(b-a)/span*100).toFixed(2)}%;background:${col[st]}"></i>`).join("");
@@ -4278,7 +4286,7 @@ function cyCard(){ const L=csLoad().cases.filter(c=>!c.sub&&(c.who==="me"||!c.wh
     ${L.slice(0,10).map(x=>`<div class="td-it"><span class="td-tag td-${!x.c.who?"new":x.c.sub?"due":"err"}">${!x.c.who?"UNREAD":x.c.sub?"OPEN":"REPLY"}</span><div class="td-tx"><b>${esc(String(x.c.subj||"").replace(/^DEMO\s*\|\s*/i,""))}</b><small>${cyBar(x.st)} Step ${x.st.i+1} of 5 · next: ${esc(x.st.next)}</small></div><button type="button" class="mini" data-cyo="${esc(x.c.id)}">Open case</button></div>`).join("")||`<p class="note">All your requests are closed.</p>`}</div>`; }
 /* ---------- Team dashboard (managers only) ---------- */
 function renderTeam(){ const p=$("p-team"); if(!p) return; if(!wtMgr()){ p.innerHTML=`<div class="card"><p class="note">Managers only.</p></div>`; return; }
-  histSnap(); const S=teamStats(), P=Object.values(S.people), H=lsGet(HIST_KEY,{}), days=Object.keys(H).sort().slice(-14), me=eodToday();
+  histSnap(); const S0=teamStats(), S={...S0,people:Object.fromEntries(Object.entries(S0.people).filter(([id])=>inScope(id)))}, P=Object.values(S.people), H=lsGet(HIST_KEY,{}), days=Object.keys(H).sort().slice(-14), me=eodToday();
   const tot=P.reduce((a,x)=>({open:a.open+x.open,late:a.late+x.late,ans:a.ans+x.answered}),{open:0,late:0,ans:0});
   const hrs=m=>m==null?"—":m<60?m+" min":(m/60).toFixed(1)+" h";
   const maxD=Math.max(1,...days.map(d=>Object.values(H[d].people||{}).reduce((a,x)=>a+x.answered+x.open,0)));
@@ -4354,10 +4362,10 @@ function renderApps(){ const p=$("p-apps"); if(!p) return; const C=apCfg(), m=ap
    Production: DP World sign-in (Entra ID) gives the person and the view; the demo lets you pick a dummy user. */
 const WHO_KEY="who_v1";
 const USERS=[{id:"me",name:"You",team:"Pricing",role:"pricing"},{id:"nour",name:"Nour Adel",team:"Pricing",role:"pricing"},{id:"omar",name:"Omar Fathy",team:"Customs clearance & trucking",role:"pricing"},
-  {id:"mariam",name:"Mariam Hany",team:"Network requests",role:"pricing"},{id:"ahmed",name:"Ahmed Samir",team:"Documentation & systems",role:"pricing"},{id:"karim",name:"Karim Nabil",team:"Sales",role:"sales"},{id:"director",name:"Director",team:"Management",role:"director"}];
+  {id:"mariam",name:"Mariam Hany",team:"Network requests",role:"pricing"},{id:"ahmed",name:"Ahmed Samir",team:"Documentation & systems",role:"pricing"},{id:"manager",name:"Pricing Manager",team:"Pricing (manager)",role:"manager"},{id:"karim",name:"Karim Nabil",team:"Sales",role:"sales"},{id:"director",name:"Director",team:"Management",role:"director"}];
 function signedIn(){ if(/[?&]skipLogin=1/.test(location.search)) return false; try{ const w=JSON.parse(localStorage.getItem("who_v1")||"null"); return !!(w&&w.id); }catch(e){ return false; } } /* safe before the sign-in code has loaded */
 function whoAmI(){ const w=lsGet(WHO_KEY,null); return w&&USERS.find(u=>u.id===w.id)||null; }
-function uName(id){ const u=USERS.find(x=>x.id===id); return u?u.name:id; }
+function uName(id){ const u=USERS.find(x=>x.id===id); if(u) return u.name; try{ const d=DIR_PEOPLE.find(x=>x.id===id); if(d) return d.name; }catch(e){} return id; }
 /* ---------- Responsibilities ---------- */
 const TK_KEY="tkTasks_v1", TKL_KEY="tkLog_v1";
 const TK_CAT=["Pricing","Accounts","Rate Bank & records","Bookings & handover","Support to colleagues","Reporting","Customs & trucking","Documentation & systems","Network","Tools & improvement","Tenders"];
@@ -4390,7 +4398,7 @@ function tkDone(pid,day){ return ((tkLog()[day||todayISO()]||{})[pid])||{}; }
 function tkMark(pid,tid,delta){ const L=tkLog(), d=todayISO(); L[d]=L[d]||{}; const P=L[d][pid]=L[d][pid]||{}; P[tid]=Math.max(0,(P[tid]||0)+delta); if(!P[tid]) delete P[tid];
   const days=Object.keys(L).sort(); while(days.length>60) delete L[days.shift()]; lsSet(TKL_KEY,L); }
 /* who does what: per person load, shared work, single owners, gaps */
-function tkMatrix(){ const T=tkAll(), people=USERS.filter(u=>u.role!=="director"&&u.role!=="sales").map(u=>u.id);
+function tkMatrix(){ const T=tkAll(), people=USERS.filter(u=>u.role!=="director"&&u.role!=="sales"&&u.role!=="manager").map(u=>u.id);
   const load={}; people.forEach(p=>load[p]={tasks:0,hours:0,helps:0,doneToday:Object.values(tkDone(p)).reduce((a,b)=>a+b,0)});
   T.forEach(t=>(t.owners||[]).forEach(p=>{ if(!load[p]) return; load[p].tasks++; load[p].hours+=tkWeekH(t)/Math.max(1,t.owners.length); if(t.helps) load[p].helps++; }));
   return {T,people,load,gaps:T.filter(t=>!(t.owners||[]).length),single:T.filter(t=>(t.owners||[]).length===1),shared:T.filter(t=>(t.owners||[]).length>1),helps:T.filter(t=>t.helps&&(t.owners||[]).length)}; }
@@ -4418,7 +4426,7 @@ function renderTasks(){ const p=$("p-tasks"); if(!p) return; const W=whoAmI()||U
   $("tkAdd").onsubmit=e=>{ e.preventDefault(); const A=tkAll(), sh=[...p.querySelectorAll("[data-tks]:checked")].map(i=>i.value);
     A.push({id:"t"+Date.now().toString(36),title:$("tkT").value.trim(),cat:$("tkC").value,freq:$("tkF").value,min:+$("tkM").value||0,per:+$("tkP").value||0,owners:[pid,...sh],helps:$("tkH").value||undefined}); tkSave(A); renderTasks(); }; }
 /* manager card on the Team dashboard */
-function tkTeamCard(){ const M=tkMatrix(), P=M.people, maxH=Math.max(1,...P.map(p=>M.load[p].hours));
+function tkTeamCard(){ const M=tkMatrix(), P=M.people.filter(inScope), maxH=Math.max(1,...P.map(p=>M.load[p].hours));
   const cell=(t,p)=>(t.owners||[]).includes(p)?`<td class="n" title="Owns it">●</td>`:t.helps===p?`<td class="n" title="Gets support">○</td>`:`<td></td>`;
   return `<div class="card"><h3>Responsibilities: who does what <span class="dschip ds-off">Managers only</span></h3>
     ${M.gaps.length?`<div class="td-chk err">Nobody owns: ${M.gaps.map(t=>esc(t.title)).join(", ")}</div>`:""}
@@ -4431,19 +4439,19 @@ function tkTeamCard(){ const M=tkMatrix(), P=M.people, maxH=Math.max(1,...P.map(
 function loginShow(){ let d=$("loginDlg"); if(d) d.remove(); d=document.createElement("dialog"); d.id="loginDlg"; d.className="eod-dlg lg-dlg";
   d.innerHTML=`<div class="lg-head"><div class="lg-logo" aria-hidden="true">DP</div><div><h2>Freight Platform</h2><p class="note">DP World Egypt · Pricing</p></div></div>
     <button type="button" class="svc btn primary lg-ms" disabled>Sign in with Microsoft (DP World)</button><p class="note">On DP World servers you sign in with your company account and your view comes from your group. This demo uses dummy people: pick one.</p>
-    <div class="lg-list">${USERS.map(u=>`<button type="button" class="lg-u" data-lg="${u.id}"><span class="td-tag td-${u.role==="director"?"err":u.role==="sales"?"due":"new"}">${esc(u.name.split(" ").map(w=>w[0]).join("").slice(0,2))}</span><span><b>${esc(u.name)}</b><small>${esc(u.team)} · ${u.role==="director"?"Director view":u.role==="sales"?"Sales view":"Pricing view"}</small></span></button>`).join("")}</div>`;
+    <div class="lg-list">${USERS.map(u=>`<button type="button" class="lg-u" data-lg="${u.id}"><span class="td-tag td-${u.role==="director"?"err":u.role==="sales"?"due":"new"}">${esc(u.name.split(" ").map(w=>w[0]).join("").slice(0,2))}</span><span><b>${esc(u.name)}</b><small>${esc(u.team)} · ${u.role==="director"?"Director view":u.role==="manager"?"Manager view":u.role==="sales"?"Sales view":"Pricing view"}</small></span></button>`).join("")}</div>`;
   document.body.appendChild(d); d.addEventListener("cancel",e=>e.preventDefault()); /* sign-in cannot be skipped */
   d.querySelectorAll("[data-lg]").forEach(b=>b.onclick=()=>{ const u=USERS.find(x=>x.id===b.dataset.lg); lsSet(WHO_KEY,{id:u.id,at:Date.now()}); d.close(); d.remove(); try{ sessionStorage.removeItem("launch_v1"); }catch(e){} afterLogin(true); });
   try{ d.showModal(); }catch(e){ d.setAttribute("open",""); } }
 function launchFacts(u){ const F=[]; try{ const now=Date.now(), C=csLoad().cases.filter(c=>!c.sub), late=C.filter(c=>csState(c,now).st==="breach").length;
-    if(u.role==="director"){ const M=tkMatrix(), S=teamStats(); F.push(`${Object.values(S.people).reduce((a,x)=>a+x.open,0)} open cases in the team, ${late} past the SLA, ${S.unassigned} not taken yet`); if(M.gaps.length) F.push(`Nobody owns: ${M.gaps.map(t=>t.title).join(", ")}`); M.single.filter(t=>t.key).forEach(t=>F.push(`Only ${uName(t.owners[0])} can do: ${t.title} (no back-up yet)`)); F.push(`${M.single.length} responsibilities depend on one person`); }
+    if(u.role==="director"||u.role==="manager"){ const M=tkMatrix(), S=teamStats(); F.push(`${Object.values(S.people).reduce((a,x)=>a+x.open,0)} open cases in the team, ${late} past the SLA, ${S.unassigned} not taken yet`); if(M.gaps.length) F.push(`Nobody owns: ${M.gaps.map(t=>t.title).join(", ")}`); M.single.filter(t=>t.key).forEach(t=>F.push(`Only ${uName(t.owners[0])} can do: ${t.title} (no back-up yet)`)); F.push(`${M.single.length} responsibilities depend on one person`); }
     else if(u.role==="sales"){ F.push("Your offers and quotes are in Offers & feedback"); F.push("Find a rate: type the lane in Rates & offer"); }
     else { const I=asNext(tdItems()), mine=tkAll().filter(t=>(t.owners||[]).includes(u.id)&&t.freq==="daily"); F.push(`${I.length} things need Pricing today, ${late} past the SLA`); if(I[0]) F.push(`First: ${I[0].title}`); F.push(`${mine.length} daily responsibilities to tick`); const end=(DATA.rates||[]).filter(r=>isStd(r)&&r.valid&&r.valid>=todayISO()&&r.valid<=addDays(todayISO(),7)).length; if(end) F.push(`${end} standard rates end this week`); } }catch(e){}
   try{ if(isAdmin()){ const A=adminAlerts(); if(A.newT||A.changes||A.errors) F.unshift(`Tool owner: ${A.newT} new ticket${A.newT===1?"":"s"}, ${A.changes} change${A.changes===1?"":"s"} by others, ${A.errors} error${A.errors===1?"":"s"} recorded`); } }catch(e){}
   return F; }
 function launchShow(u){ let d=$("launchDlg"); if(d) d.remove(); d=document.createElement("dialog"); d.id="launchDlg"; d.className="eod-dlg lg-dlg";
   const h=new Date().getHours(), hi=h<12?"Good morning":h<17?"Good afternoon":"Good evening", F=launchFacts(u);
-  const go=u.role==="director"?["team","Open the Team dashboard"]:u.role==="sales"?["lane","Find a rate"]:["today","Start with Next up"];
+  const go=(u.role==="director"||u.role==="manager")?["exec","Open the Executive summary"]:u.role==="sales"?["lane","Find a rate"]:["today","Start with Next up"];
   d.innerHTML=`<h2>${hi}${u.id==="me"?"":", "+esc(u.name.split(" ")[0])}</h2><ul class="as-why lg-facts">${F.map(f=>`<li>${esc(f)}</li>`).join("")}</ul>
     <div class="td-acts"><button type="button" class="svc btn primary" data-lgo="${go[0]}">${go[1]}</button>${u.role!=="sales"?`<button type="button" class="mini" data-lgo="tasks">My responsibilities</button>`:""}<button type="button" class="mini" data-lgo="">Skip</button></div>`;
   document.body.appendChild(d); d.querySelectorAll("[data-lgo]").forEach(b=>b.onclick=()=>{ d.close(); d.remove(); if(b.dataset.lgo) openTab(b.dataset.lgo); });
@@ -4525,15 +4533,16 @@ function renderSupport(){ const p=$("p-support"); if(!p) return; const adm=isAdm
 /* ---------- Forward / reassign an email to a person in any department, through that department's shared mailbox ----------
    Type a name → pick the person → department and its shared mailboxes → reason (required). Opens a draft to the shared
    mailbox with "Attn: <name>"; logs it in the case; a teammate in the shared inbox also becomes the owner. Dummy directory. */
-const DIR_MBX={"Pricing":["pricing.ocean@demo","kam.pricing@demo","pricing.trucking@demo","pricing.air@demo"],"Network":["network.pricing@demo"],"Internal":["pricing.internal@demo"],
-  "Operations":["operations.export@demo","operations.import@demo"],"Customs & trucking":["customs@demo","trucking@demo"],"Documentation & systems":["documentation@demo"],"Sales":["sales.egypt@demo"]};
+/* the five shared mailboxes an email can be forwarded to (dummy addresses) */
+const FWD_BOXES=[["pricing@demo","Pricing"],["operations@demo","Operations"],["commercial@demo","Commercial"],["freightforwarding@demo","DP World Freight Forwarding"],["air@demo","Air"]];
+const DIR_MBX={"Pricing":["pricing@demo"],"Network":["freightforwarding@demo"],"Internal":["freightforwarding@demo"],"Operations":["operations@demo"],"Customs & trucking":["operations@demo"],"Documentation & systems":["operations@demo"],"Sales":["commercial@demo"],"Air":["air@demo"]};
 const DIR_PEOPLE=[{id:"me",name:"You",dept:"Pricing",mail:"you@lead.dpw-demo"},{id:"nour",name:"Nour Adel",dept:"Pricing",mail:"nour.adel@pricing.dpw-demo"},{id:"omar",name:"Omar Fathy",dept:"Customs & trucking",mail:"omar.fathy@pricing.dpw-demo"},
   {id:"mariam",name:"Mariam Hany",dept:"Network",mail:"mariam.hany@network.dpw-demo"},{id:"ahmed",name:"Ahmed Samir",dept:"Documentation & systems",mail:"ahmed.samir@internal.dpw-demo"},
   {id:"hala",name:"Hala Mostafa",dept:"Operations",mail:"hala.mostafa@ops.dpw-demo"},{id:"tamer",name:"Tamer Saleh",dept:"Customs & trucking",mail:"tamer.saleh@customs.dpw-demo"},
   {id:"karim",name:"Karim Nabil",dept:"Sales",mail:"karim.nabil@sales.dpw-demo"},{id:"dina",name:"Dina Lotfy",dept:"Sales",mail:"dina.lotfy@sales.dpw-demo"}];
 function dirFind(q){ const t=lc(String(q||"").trim()); if(t.length<1) return []; return DIR_PEOPLE.filter(p=>lc(p.name).split(" ").some(w=>w.startsWith(t))||lc(p.name).startsWith(t)||lc(p.mail).startsWith(t)).slice(0,6); }
 /* the forward itself: returns the draft link and writes the case log; reason is required */
-function fwdCase(c,o){ const p=DIR_PEOPLE.find(x=>x.id===o.pid); if(!p) return {err:"Pick the person from the list"}; if(!o.mbx) return {err:"Pick the shared mailbox"}; if(!String(o.reason||"").trim()) return {err:"The reason is required"};
+function fwdCase(c,o){ const p=DIR_PEOPLE.find(x=>x.id===o.pid); if(!p) return {err:"The person is required: type the name and pick from the list"}; if(!o.mbx||!FWD_BOXES.some(b=>b[0]===o.mbx)) return {err:"The shared mailbox is required"}; if(!String(o.reason||"").trim()) return {err:"The reason is required"};
   const by=csName(CSV.me||"me"), now=Date.now(), subj=String(c.subj||"").replace(/^DEMO\s*\|\s*/i,"");
   const body=[`Attn: ${p.name} (${o.dept})`,"",`Reason: ${o.reason.trim()}`,"",`Forwarded from the pricing shared inbox by ${by}. Case ${c.id}.`,"","----- Original email -----",`From: ${c.from||""}`,`Subject: ${subj}`,"",String(c.body||"").slice(0,1500)].join("\n");
   const href=mailDraft(o.mbx,`FW: ${subj} · Attn: ${p.name}`,body);
@@ -4542,15 +4551,15 @@ function fwdCase(c,o){ const p=DIR_PEOPLE.find(x=>x.id===o.pid); if(!p) return {
   if(CS_PEOPLE.some(x=>x.id===p.id)&&p.id!==c.who){ const was=c.who; c.who=p.id; c.status=c.sub?"submitted":"assigned"; c.ab="Reassigned by "+by; c.log.push([now,(was?"Reassigned from "+csName(was)+" to ":"Assigned to ")+csName(p.id)+" · now counts in "+csName(p.id)+"'s KPIs"]); }
   csStore(); return {href,person:p}; }
 function fwdHtml(c){ if(!c) return ""; const F=(c.fwd||[]).slice(-3).reverse();
-  return `<div class="card fw-card"><h3>Forward or reassign</h3><p class="note">Type a name, pick the person, then the shared mailbox of their department. The reason is required and goes in the case log.</p>
-    <form id="fwF" class="trkform" autocomplete="off"><label class="f grow" style="position:relative">Person<input id="fwQ" placeholder="Start typing a name" aria-autocomplete="list" aria-controls="fwL"><div id="fwL" class="fw-list" role="listbox" hidden></div></label>
-      <label class="f">Department<select id="fwD">${Object.keys(DIR_MBX).map(d=>`<option>${esc(d)}</option>`).join("")}</select></label>
-      <label class="f">Shared mailbox<select id="fwM"></select></label>
+  return `<div class="card fw-card"><h3>Forward or reassign</h3><p class="note">All three are required: the person (type the name and pick), the shared mailbox (Pricing, Operations, Commercial, DP World Freight Forwarding, Air) and the reason. It goes in the case log.</p>
+    <form id="fwF" class="trkform" autocomplete="off"><label class="f grow" style="position:relative">Person (required)<input id="fwQ" required placeholder="Start typing a name" aria-autocomplete="list" aria-controls="fwL"><div id="fwL" class="fw-list" role="listbox" hidden></div></label>
+      <label class="f">Department<select id="fwD">${[...new Set(DIR_PEOPLE.map(p=>p.dept))].map(d=>`<option>${esc(d)}</option>`).join("")}</select></label>
+      <label class="f">Shared mailbox (required)<select id="fwM" required></select></label>
       <label class="f grow">Reason (required)<input id="fwR" maxlength="200" placeholder="e.g. Customs question, not pricing"></label>
       <div class="td-acts"><button class="svc btn primary" type="submit">Forward</button><span class="note warn-t" id="fwMsg" role="status"></span></div></form>
     ${F.map(f=>`<div class="td-chk ok">${esc(new Date(f.at).toLocaleString("en-GB",{timeZone:"Africa/Cairo",dateStyle:"short",timeStyle:"short"}))} · to ${esc(f.to)} for ${esc(f.name)} (${esc(f.dept)}) · ${esc(f.reason)}</div>`).join("")}</div>`; }
 function fwdWire(c){ const q=$("fwQ"); if(!q||!c) return; let pick=null; const L=$("fwL"), D=$("fwD"), M=$("fwM");
-  const fillM=()=>{ M.innerHTML=(DIR_MBX[D.value]||[]).map(m=>`<option>${esc(m)}</option>`).join(""); }; D.onchange=fillM; fillM();
+  const fillM=()=>{ const sug=(DIR_MBX[D.value]||[])[0]||""; M.innerHTML=`<option value="">Choose…</option>`+FWD_BOXES.map(([m,n])=>`<option value="${esc(m)}" ${pick&&m===sug?"selected":""}>${esc(n)} · ${esc(m)}</option>`).join(""); }; D.onchange=fillM; fillM(); /* suggested from the person's department, can be changed */
   const show=()=>{ const R=dirFind(q.value); L.hidden=!R.length; L.innerHTML=R.map(p=>`<button type="button" role="option" data-fp="${esc(p.id)}"><b>${esc(p.name)}</b><small>${esc(p.dept)} · ${esc(p.mail)}</small></button>`).join("");
     L.querySelectorAll("[data-fp]").forEach(b=>b.onclick=()=>{ pick=DIR_PEOPLE.find(x=>x.id===b.dataset.fp); q.value=pick.name; D.value=pick.dept; fillM(); L.hidden=true; $("fwR").focus(); }); };
   q.oninput=()=>{ pick=null; show(); }; q.onfocus=show; q.onkeydown=e=>{ if(e.key==="Escape") L.hidden=true; if(e.key==="ArrowDown"){ const b=L.querySelector("button"); if(b){ e.preventDefault(); b.focus(); } } };
@@ -4571,7 +4580,7 @@ function cycleStats(cases){ const C=(cases||csLoad().cases).filter(c=>c.sub&&c.w
       return {k,name:(CS_MBX.find(x=>x.id===k)||{}).name||k,n:a.length,med:md,team:tmed[k],ratio:r,flag:a.length>=CY_MIN_N&&r!=null?(r>1.5?"slow":r<0.67?"fast":""):""}; });
     const all=Object.values(K).flat(), load=(M[p.id]&&M[p.id].hours)||0, use=load/CY_WEEK_H;
     return {id:p.id,name:p.name,n:all.length,med:med(all),kinds,loadH:load,use,cap:use<0.7?"room":use>1?"over":"ok",training:kinds.filter(x=>x.flag==="slow").map(x=>x.name),good:kinds.filter(x=>x.flag==="fast").map(x=>x.name)}; }); }
-function cycleCard(){ const S=cycleStats(), hrs=m=>m==null?"—":m<60?Math.round(m)+" min":(m/60).toFixed(1)+" h";
+function cycleCard(){ const S=cycleStats().filter(x=>inScope(x.id)), hrs=m=>m==null?"—":m<60?Math.round(m)+" min":(m/60).toFixed(1)+" h";
   return `<div class="card"><h3>Cycle time and capacity <span class="dschip ds-off">Managers only</span></h3>
     <p class="note">Cycle time = email in → first reply (clock time), per kind of work, compared with the team on the same kind. A flag needs at least ${CY_MIN_N} items. Load = the person's responsibilities in hours a week ÷ ${CY_WEEK_H} h.</p>
     <div class="csTblW"><table class="csTbl"><thead><tr><th>Person</th><th class="n">Answered</th><th class="n">Median reply</th><th>By kind of work (person vs team)</th><th class="n">Load</th><th>What it suggests</th></tr></thead><tbody>
@@ -4579,6 +4588,50 @@ function cycleCard(){ const S=cycleStats(), hrs=m=>m==null?"—":m<60?Math.round
       <td class="n">${Math.round(x.use*100)}%<br><small>${x.loadH.toFixed(1)} h/week</small></td>
       <td>${[x.training.length?`Training? ${x.training.join(", ")}`:"",x.good.length?`Good practice to share: ${x.good.join(", ")}`:"",x.cap==="room"?"Has room for more work":x.cap==="over"?"Overloaded: move work or add back-up":""].filter(Boolean).map(t=>`<div>${esc(t)}</div>`).join("")||`<span class="note">Too few items yet</span>`}</td></tr>`).join("")}</tbody></table></div>
     <p class="note">Read with care: a slower time can mean harder requests, waiting for a carrier, or more support work for colleagues. Use it to start a conversation and plan training, never alone for a performance decision. Demo: dummy cases; production: months of real cases. HR and Legal approve before real use.</p></div>`; }
+/* ---------- Org chart, levels and the Executive summary (CEO view). Plain rules, no AI. ----------
+   Level 1 employee: own work. Level 2 manager: every employee screen + team dashboards, data of their own team only.
+   Level 3 Director: everything, all teams, Executive summary of the whole unit. Tool owner (admin): + settings. Dummy org. */
+const ORG={id:"director",name:"Director",title:"Director, Freight Forwarding",teams:[
+  {id:"pricing",name:"Pricing",lead:"manager",leadName:"Pricing Manager",members:["me","nour","mariam"]},
+  {id:"customs",name:"Customs clearance & trucking",lead:"tamer",leadName:"Tamer Saleh",members:["omar"]},
+  {id:"docs",name:"Documentation & systems",lead:"ahmed",leadName:"Ahmed Samir",members:[]},
+  {id:"ops",name:"Operations",lead:"hala",leadName:"Hala Mostafa",members:[]},
+  {id:"sales",name:"Sales",lead:"karim",leadName:"Karim Nabil",members:["dina"]}]};
+function isManagerRole(){ return typeof ROLE!=="undefined"&&ROLE==="manager"; }
+function userLevel(){ if(isAdmin()&&!/[?&]skipLogin=1/.test(location.search)) return 4; if(isDirector()) return 3; if(isManagerRole()) return 2; return 1; }
+function teamScope(){ const L=userLevel(); if(L>=3) return null; /* null = everyone */ if(L===2) return ORG.teams.find(t=>t.lead==="manager").members.slice(); try{ const u=whoAmI(); return [u?u.id:"me"]; }catch(e){ return ["me"]; } }
+function inScope(id){ const S=teamScope(); return !S||S.includes(id); }
+function scopeLabel(){ const L=userLevel(); return L>=3?"All teams":L===2?"Your team: Pricing":"Only you"; }
+function orgChart(){ const S=teamScope(); const box=(name,title,on,cls)=>`<div class="org-b ${cls||""} ${on?"on":""}"><b>${esc(name)}</b><small>${esc(title)}</small></div>`;
+  return `<div class="card"><h3>Organisation <span class="dschip ds-off">${esc(scopeLabel())}</span></h3><div class="org">
+    <div class="org-top">${box(ORG.name,ORG.title,!S,"dir")}</div><div class="org-teams">${ORG.teams.map(t=>`<div class="org-t"><div class="org-tn">${esc(t.name)}</div>${box(t.leadName,"Lead",false,"lead")}${t.members.map(m=>box(uName(m)==="You"?"You":uName(m),"Team member",!S||S.includes(m))).join("")}</div>`).join("")}</div></div>
+    <p class="note">Highlighted = the people whose work you see. Higher levels see more: employee → own work; manager → own team; Director → every team. Dummy organisation.</p></div>`; }
+/* executive numbers from quotes (logged + dummy history) and the live state of the desk */
+function execStats(){ const Q=(QT.items||[]).concat(DATA.qhist||[]).filter(q=>q&&(q.status==="won"||q.status==="lost")&&isFinite(+q.buy)&&isFinite(+q.sell)&&q.created);
+  const months=[...new Set(Q.map(q=>String(q.created).slice(0,7)))].sort().slice(-6);
+  const M=months.map(m=>{ const X=Q.filter(q=>String(q.created).slice(0,7)===m), W=X.filter(q=>q.status==="won"); return {m,n:X.length,won:W.length,hit:X.length?W.length/X.length:0,margin:W.reduce((a,q)=>a+(+q.sell-+q.buy),0)}; });
+  const last=M.slice(-3), prev=M.slice(-6,-3), sum=(A,k)=>A.reduce((a,x)=>a+x[k],0), hit=A=>{ const n=sum(A,"n"); return n?sum(A,"won")/n:0; };
+  const now=Date.now(), C=csLoad().cases.filter(c=>inScope(c.who||"")||(!c.who&&userLevel()>=2)), done=C.filter(c=>c.sub), ontime=done.filter(c=>csState(c,now).st==="ontime").length, late=C.filter(c=>!c.sub&&csState(c,now).st==="breach").length;
+  const open=(DATA.requests||[]).filter(r=>r.st==="open"||r.st==="pending"), cov=open.filter(r=>{ const L=(DATA.lanes||{})[r.port]; return L&&L.min40; }).length;
+  return {M,marg3:sum(last,"margin"),margP:sum(prev,"margin"),hit3:hit(last),hitP:hit(prev),won3:sum(last,"won"),sla:done.length?ontime/done.length:null,late,open:C.filter(c=>!c.sub).length,cov:open.length?cov/open.length:null,openReq:open.length}; }
+function execRisks(){ const R=[], D=[];
+  try{ const M=tkMatrix(); M.single.filter(t=>t.key&&inScope(t.owners[0])).forEach(t=>{ R.push(`Only ${uName(t.owners[0])} can do: ${t.title}`); D.push(`Name and train a back-up for "${t.title}"`); }); M.gaps.forEach(t=>{ R.push(`Nobody owns: ${t.title}`); D.push(`Give "${t.title}" an owner`); }); }catch(e){}
+  try{ const C=cycleStats().filter(x=>inScope(x.id)), over=C.filter(x=>x.cap==="over"), room=C.filter(x=>x.cap==="room"); over.forEach(x=>R.push(`${x.name} is overloaded (${Math.round(x.use*100)}% of a week)`));
+    if(over.length&&room.length) D.push(`Move work from ${over.map(x=>x.name).join(", ")} to ${room.map(x=>x.name).join(", ")}`); C.filter(x=>x.training.length).forEach(x=>D.push(`Plan training for ${x.name}: ${x.training.join(", ")}`)); }catch(e){}
+  try{ const gaps=tdItems().filter(x=>x.tag==="GAP"); if(gaps.length){ R.push(`${gaps.length} asked lane${gaps.length>1?"s":""} without a valid rate`); D.push("Ask carriers for the lanes without a rate (Today → Auto-RFQ)"); } }catch(e){}
+  try{ const t=todayISO(), end=(DATA.rates||[]).filter(r=>isStd(r)&&r.valid&&r.valid>=t&&r.valid<=addDays(t,7)).length; if(end) R.push(`${end} standard rates end within 7 days`); }catch(e){}
+  try{ (GW.watch||[]).filter(w=>/high|red|severe/i.test(String(w.level||""))).slice(0,2).forEach(w=>R.push(`Market: ${w.area||""} ${w.note||""}`.trim())); }catch(e){}
+  try{ const u=tktAll().filter(t=>t.prio==="urgent"&&(t.status==="new"||t.status==="prog")).length; if(u) R.push(`${u} urgent tool ticket${u>1?"s":""} open`); }catch(e){}
+  return {R,D}; }
+function renderExec(){ const p=$("p-exec"); if(!p) return; const S=execStats(), K=execRisks(), pct=v=>v==null?"—":Math.round(v*100)+"%", usd=v=>"USD "+money(Math.round(v));
+  const d=(a,b)=>{ if(!b) return ""; const c=(a-b)/b; return `<small class="${c>=0?"ok-t":"warn-t"}">${c>=0?"▲":"▼"} ${Math.abs(Math.round(c*100))}% vs the 3 months before</small>`; };
+  const maxM=Math.max(1,...S.M.map(x=>x.margin));
+  const finding=S.hit3&&S.hitP?(S.hit3>=S.hitP?`Win rate up to ${pct(S.hit3)}`:`Win rate down to ${pct(S.hit3)}`):"Results";
+  p.innerHTML=`<div class="td-head"><h2>${esc(finding)}${S.late?`, ${S.late} late case${S.late>1?"s":""} today`:""}</h2><p class="note">${esc(scopeLabel())} · last 3 months of closed quotes and today's desk. Dummy history in the demo.</p></div>
+    <div class="td-kpis"><div><span>Margin on won quotes</span><b>${usd(S.marg3)}</b>${d(S.marg3,S.margP)}</div><div><span>Win rate</span><b>${pct(S.hit3)}</b>${d(S.hit3,S.hitP)}</div><div><span>Answered within the SLA</span><b>${pct(S.sla)}</b><small>${S.late} late now · ${S.open} open</small></div><div><span>Asked lanes with a rate</span><b>${pct(S.cov)}</b><small>${S.openReq} open requests</small></div></div>
+    <div class="ex-grid"><div class="card"><h3>Margin won per month</h3>${S.M.map(x=>`<div class="hm-row"><span>${esc(x.m)}</span><div class="hm-bar"><i class="a" style="width:${x.margin/maxM*100}%"></i></div><span>${usd(x.margin)} · ${pct(x.hit)} won</span></div>`).join("")}<p class="note">Per container, on won quotes (sell − buy).</p></div>
+      <div class="card"><h3>Decisions for today</h3>${K.D.length?`<ol class="ex-dec">${K.D.slice(0,5).map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:`<p class="note">No decision needed today.</p>`}<h3 style="margin-top:14px">Risks</h3>${K.R.length?K.R.slice(0,6).map(x=>`<div class="td-chk due">${esc(x)}</div>`).join(""):`<p class="note">No open risk.</p>`}</div></div>
+    ${orgChart()}`; }
 /* settings screens are view only for everyone but the admin */
 { const wrap=(get,set,id,keep)=>{ const o=get(); set(function(){ const r=o.apply(this,arguments); try{ lockPane(id,keep); }catch(e){} return r; }); };
   wrap(()=>renderSrc,f=>renderSrc=f,"p-src"); wrap(()=>dsRender,f=>dsRender=f,"p-dsrc"); wrap(()=>renderApps,f=>renderApps=f,"p-apps"); wrap(()=>renderCmbx,f=>renderCmbx=f,"p-cmbx"); wrap(()=>renderTasks,f=>renderTasks=f,"p-tasks","[data-tkd],[data-tkp],[data-tkm]"); }
@@ -4594,7 +4647,7 @@ setTimeout(()=>{ try{ tdFocusWatch(); }catch(e){} try{ eodWatch(); histSnap(); s
     try{ csTick(); const D=wtDay(csDay(Date.now())); if(D) row=`<tr><td><b>${esc(csName("me"))}</b> (this browser)</td><td>${csTime(D.first)}</td><td>${csTime(D.last)}</td><td class="n">${asDur(D.active)}</td><td class="n">${asDur(D.away)}</td><td class="n">${asDur(D.brk)}</td><td class="n">${asDur(D.off)}</td></tr>`; }catch(e){}
     p.insertAdjacentHTML("beforeend",`<div class="card"><h3>Team working time <span class="dschip ds-off">Managers only</span></h3><p class="note">Active, Away, Break and Off in the tool, per person, today. In this demo each browser keeps only its own log, so only your row shows. On DP World servers every person's log goes to the team database and shows here. Each person sees only their own time. HR and Legal approve before real use.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Person</th><th>First seen</th><th>Last seen</th><th class="n">Active</th><th class="n">Away</th><th class="n">Break</th><th class="n">Off</th></tr></thead><tbody>${row||`<tr><td colspan="7" class="note">No time logged yet today.</td></tr>`}</tbody></table></div></div>`); }; }
-window.__rules = { cycleStats, dirFind, fwdCase, DIR_MBX, isAdmin, tktNew, tktUpd, tktAll, errAdd, adminAlerts, lockPane, tkAll, tkMatrix, tkMark, tkDone, whoAmI, launchFacts, wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
+window.__rules = { teamScope, userLevel, execStats, execRisks, cycleStats, dirFind, fwdCase, DIR_MBX, isAdmin, tktNew, tktUpd, tktAll, errAdd, adminAlerts, lockPane, tkAll, tkMatrix, tkMark, tkDone, whoAmI, launchFacts, wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
 window.__route = route;
 })();
 </script>

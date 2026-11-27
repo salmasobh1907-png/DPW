@@ -200,6 +200,13 @@ Type a name → suggestions with department and email → pick the person; the d
 
 Cycle time = email in → first reply (clock time) per person and per kind of work (mailbox), compared with the team median on the same kind, so hard and easy work are not mixed. Flags need at least 3 items: slower than 1.5 × team = "Training?", faster than 0.67 × team = "Good practice to share". Load = responsibilities in hours a week ÷ 40 h: under 70 % "Has room", over 100 % "Overloaded". Shown with a fairness note: a slower time can mean harder requests or support work; use it to plan training, never alone for performance decisions. HR and Legal approve before real use.
 
+### 5.15 Levels, organisation and the Executive summary
+
+- **Levels**: 1 employee (own work) · 2 manager (every screen employees use, nothing hidden, plus Executive summary and Team dashboard with **only their own team's data**) · 3 Director (everything, all teams) · tool owner (admin: + settings). View as: Pricing / Sales / Manager / Director (switch kept for the tool owner only). Demo person "Pricing Manager"; production: Entra ID groups.
+- **Organisation chart**: Director → team leads → members (dummy); the people whose data you see are highlighted.
+- **Executive summary** (managers and Director open here), written finding first: the headline (win rate trend, late cases), then margin on won quotes and win rate (last 3 months vs the 3 before), answered within the SLA, asked lanes with a valid rate; margin won per month; **Decisions for today** (back-up for one-person work, move work from overloaded to people with room, training, ask carriers for lanes without a rate) and **Risks** (one-person work, nobody owns, overload, lanes without a rate, rates ending, market alerts, urgent tool tickets). Dummy quote history in the demo.
+- **Forward / reassign**: person, shared mailbox (Pricing, Operations, Commercial, DP World Freight Forwarding, Air) and reason are all required.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).

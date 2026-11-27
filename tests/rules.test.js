@@ -424,7 +424,7 @@ test('viewers: Pricing, Sales and Director each get their own menu; only Pricing
       pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id, salesClass: document.body.classList.contains('sales'), mgr: window.__rules.wtMgr ? window.__rules.wtMgr() : null }));
   }
   await pg.close();
-  assert.equal(out.director.pane, 'p-team'); assert.ok(out.director.nav.includes('team')); assert.equal(out.director.salesClass, false);
+  assert.equal(out.director.pane, 'p-exec'); assert.ok(out.director.nav.includes('team') && out.director.nav.includes('cases') && out.director.nav.includes('today')); // managers see every employee screen assert.equal(out.director.salesClass, false);
   assert.ok(!out.sales.nav.includes('team') && !out.sales.nav.includes('today')); assert.equal(out.sales.salesClass, true);
   assert.ok(out.pricing.nav.includes('today') && out.pricing.nav.includes('cases'));
   assert.notDeepEqual(out.director.nav, out.pricing.nav);
@@ -452,11 +452,11 @@ test('sign-in: the app starts on a sign-in screen; picking a user sets the view 
   await pg.goto(PAGE.replace('?skipLogin=1', '')); await pg.waitForSelector('#loginDlg[open]');
   await pg.click('[data-lg="director"]'); await pg.waitForSelector('#launchDlg[open]');
   const facts = await pg.$$eval('#launchDlg li', L => L.map(x => x.textContent));
-  await pg.click('#launchDlg [data-lgo="team"]'); await pg.waitForTimeout(300);
+  await pg.click('#launchDlg [data-lgo="exec"]'); await pg.waitForTimeout(300);
   const st = await pg.evaluate(() => ({ pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id, who: window.__rules.whoAmI().name, dir: window.__rules.isDirector() }));
   await pg.close();
   assert.ok(facts.some(f => /Only Nour Adel can do: Answer tenders/.test(f)));
-  assert.deepEqual(st, { pane: 'p-team', who: 'Director', dir: true });
+  assert.deepEqual(st, { pane: 'p-exec', who: 'Director', dir: true });
 });
 
 test('sign-in: a signed-in person sees only their own view (no Pricing / Sales / Director switch)', async () => {
@@ -509,16 +509,16 @@ test('tickets (screen): the Report button opens the form and Send saves the tick
 
 test('forward / reassign: reason required; draft goes to the department shared mailbox with Attn; teammates also become the owner', async () => {
   const r = await run(() => { const R = window.__rules, L = R.csLoad().cases, c = L.find(x => !x.sub), c2 = L.filter(x => !x.sub)[1], was = c.who;
-    const noReason = R.fwdCase(c, { pid: 'hala', dept: 'Operations', mbx: 'operations.export@demo', reason: ' ' });
-    const ops = R.fwdCase(c, { pid: 'hala', dept: 'Operations', mbx: 'operations.export@demo', reason: 'Booking question for operations' });
-    const tm = R.fwdCase(c2, { pid: 'nour', dept: 'Pricing', mbx: 'pricing.ocean@demo', reason: 'Nour owns this account' });
-    return { find: R.dirFind('ha').map(p => p.name), noReason: noReason.err, href: decodeURIComponent(ops.href), ownerKept: c.who === was,
-             log: c.log[c.log.length - 1][1], c2who: c2.who, mbx: R.DIR_MBX['Customs & trucking'] }; });
+    const noReason = R.fwdCase(c, { pid: 'hala', dept: 'Operations', mbx: 'operations@demo', reason: ' ' }), noBox = R.fwdCase(c, { pid: 'hala', dept: 'Operations', mbx: '', reason: 'x' }), noPerson = R.fwdCase(c, { pid: '', dept: 'Operations', mbx: 'operations@demo', reason: 'x' });
+    const ops = R.fwdCase(c, { pid: 'hala', dept: 'Operations', mbx: 'operations@demo', reason: 'Booking question for operations' });
+    const tm = R.fwdCase(c2, { pid: 'nour', dept: 'Pricing', mbx: 'pricing@demo', reason: 'Nour owns this account' });
+    return { find: R.dirFind('ha').map(p => p.name), noReason: noReason.err, noBox: noBox.err, noPerson: noPerson.err, href: decodeURIComponent(ops.href), ownerKept: c.who === was,
+             log: c.log[c.log.length - 1][1], c2who: c2.who }; });
   assert.ok(r.find.includes('Hala Mostafa'));
-  assert.equal(r.noReason, 'The reason is required');
-  assert.match(r.href, /operations\.export@demo/); assert.match(r.href, /Attn: Hala Mostafa/); assert.match(r.href, /Reason: Booking question for operations/);
-  assert.ok(r.ownerKept); assert.match(r.log, /Forwarded to operations\.export@demo for Hala Mostafa \(Operations\) .* reason: Booking question/);
-  assert.equal(r.c2who, 'nour'); assert.deepEqual(r.mbx, ['customs@demo', 'trucking@demo']);
+  assert.equal(r.noReason, 'The reason is required'); assert.match(r.noBox, /shared mailbox is required/); assert.match(r.noPerson, /person is required/);
+  assert.match(r.href, /operations@demo/); assert.match(r.href, /Attn: Hala Mostafa/); assert.match(r.href, /Reason: Booking question for operations/);
+  assert.ok(r.ownerKept); assert.match(r.log, /Forwarded to operations@demo for Hala Mostafa \(Operations\) .* reason: Booking question/);
+  assert.equal(r.c2who, 'nour');
 });
 
 test('cycle time: compares a person with the team on the same kind of work; flags need 3 items', async () => {
@@ -531,4 +531,18 @@ test('cycle time: compares a person with the team on the same kind of work; flag
   assert.deepEqual(r.nour, [140, ['Ocean requests']]);
   assert.deepEqual(r.mariam, []);                 // one item: no flag
   assert.equal(r.use, 'number');
+});
+
+test('levels: a manager sees every employee screen but only their own team in the dashboards; the Director sees all teams', async () => {
+  const pg = await browser.newPage(); await pg.route(/^https?:\/\//, x => x.abort()); await pg.goto(PAGE); await pg.waitForFunction(() => !!window.__rules);
+  const out = {};
+  for (const role of ['manager', 'director']) { await pg.click('#r-' + role); await pg.waitForTimeout(300);
+    await pg.evaluate(() => document.querySelector('#nav button[data-k="team"]').click()); await pg.waitForTimeout(300);
+    out[role] = await pg.evaluate(() => ({ scope: window.__rules.teamScope(), rows: [...document.querySelectorAll('#p-team table')[0].querySelectorAll('tbody tr')].map(r => r.cells[0].textContent.trim()),
+      nav: [...document.querySelectorAll('#nav button[data-k]')].map(b => b.dataset.k) })); }
+  await pg.close();
+  assert.deepEqual(out.manager.scope, ['me', 'nour', 'mariam']);
+  assert.deepEqual(out.manager.rows, ['You', 'Nour Adel', 'Mariam Hany']);
+  assert.equal(out.director.scope, null); assert.equal(out.director.rows.length, 5);
+  for (const k of ['today', 'cases', 'lane', 'sheet', 'exec', 'team']) assert.ok(out.manager.nav.includes(k), 'manager misses ' + k);
 });
