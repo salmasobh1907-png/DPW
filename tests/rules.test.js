@@ -313,3 +313,25 @@ test('data layer: switching the main source to a JSON link changes every screen;
   assert.deepEqual(r, { ok: true, min: 700, buy: '700', asof: '2026-11-28' });
   await pg.close();
 });
+
+test('quick price: one line is read into Egyptian port, destination, containers and customer', async () => {
+  const r = await run(() => { const P = window.__rules.tdParse;
+    return [P('Sokhna Jeddah 2x40 Gulf Home Retail'), P('3x20 Damietta to Jeddah Nile Valley Foods'), P('Alexandria Valencia 1x40RF'),
+            P('Free time extension for Q-1004 booking'), P('Q2')]; });
+  assert.deepEqual([r[0].egy, r[0].dest, r[0].qty, r[0].eq, r[0].cust], ['Sokhna', 'Jeddah', 2, "40' HC", 'Gulf Home Retail']);
+  assert.deepEqual([r[1].egy, r[1].dest, r[1].qty, r[1].eq, r[1].cust], ['Damietta', 'Jeddah', 3, "20' DC", 'Nile Valley Foods']);
+  assert.equal(r[2].eq, "40' RF");
+  assert.ok(r[3].err || !r[3].egyFound);          // not a lane: no "Price it"
+  assert.equal(r[4].q, 'Q2'); assert.ok(r[4].dest);
+});
+
+test('today: every item has a tag, a title and one action', async () => {
+  const I = await run(() => window.__rules.tdItems().map(x => ({ tag: x.tag, title: x.title, act: x.act, go: typeof x.go })));
+  assert.ok(I.length > 0);
+  assert.ok(I.every(x => x.tag && x.title && x.act && x.go === 'function'));
+});
+
+test('quick price: a foreign port before the Egyptian one is an import, not priced as export', async () => {
+  const r = await run(() => window.__rules.tdParse('Back-to-back rate Jebel Ali to Sokhna 2x20'));
+  assert.equal(r.imp, true); assert.equal(r.dest, 'Jebel Ali'); assert.equal(r.egy, 'Sokhna');
+});

@@ -59,6 +59,7 @@ Full table, one row per sub-screen: `TAB_MAP.csv`. Summary:
 
 | Screen | Takes data from | Shows / does | Feeds |
 | --- | --- | --- | --- |
+| **Today** (Pricing opens here) | Shared inbox cases, quotes, requests, Rate Bank, carrier emails, WhatsApp, market alerts | One list "Needs you", sorted by urgency (LATE, DUE, NEW, F/U, GAP, EXP, OFR, WA, ALR), each with one action button; 4 KPIs; **Quick price**: one line ("Sokhna Jeddah 2x40 Gulf Home" or "Q12") gives carrier, buy, margin, sell, advisor margin and the send checks; `/` opens it from anywhere | Rates & offer, Cases, Offers, Ask carriers, Data sources |
 | Inbox | Test mailbox (or sample emails inside the page) | Carrier offers and customer requests; "Price it"; "Send offer to sales" | Rates & offer, Offers & quotes, Carrier offers |
 | Shared inbox cases (Cases, Team KPIs, Mailboxes & SLA) | Sample emails + routing rules + mailbox list in the page | Case per email, owner, SLA clock in working hours (Sun–Thu, Cairo), reassign with log, work distribution (customer → owner), KPIs by consignee / sales / network request | Overview, manager KPIs |
 | Rates & offer | Rate data + offers added from email + route map data | Map, all carrier rates on the lane, lowest standard 40', buy + profit = sell, checks, offer email and PDF | Offers & quotes, decline log |
