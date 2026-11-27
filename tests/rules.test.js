@@ -457,3 +457,12 @@ test('sign-in: the app starts on a sign-in screen; picking a user sets the view 
   assert.ok(facts.some(f => /Nobody owns: Answer tenders/.test(f)));
   assert.deepEqual(st, { pane: 'p-team', who: 'Director', dir: true });
 });
+
+test('sign-in: a signed-in person sees only their own view (no Pricing / Sales / Director switch)', async () => {
+  const pg = await browser.newPage(); await pg.route(/^https?:\/\//, x => x.abort());
+  await pg.goto(PAGE.replace('?skipLogin=1', '')); await pg.waitForSelector('#loginDlg[open]');
+  await pg.click('[data-lg="me"]'); await pg.waitForSelector('#launchDlg[open]'); await pg.click('#launchDlg [data-lgo=""]');
+  const r = await pg.evaluate(() => ({ sw: document.getElementById('roleSw').hidden, pricing: window.__rules.navItems().flatMap(g => g[1]).some(x => x[0] === 'today') }));
+  await pg.close();
+  assert.deepEqual(r, { sw: true, pricing: true });
+});

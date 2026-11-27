@@ -2886,7 +2886,7 @@ function renderNav(){
   document.querySelectorAll("#nav .gbtn").forEach(b=>b.onclick=()=>{ const g=b.dataset.g; if(b.getAttribute("aria-expanded")==="true") NAVOPEN.delete(g); else NAVOPEN.add(g); renderNav(); });
   $("bnav").innerHTML=groups.flatMap(g=>g[1]).filter(x=>x[0]!=="info").map(([k,t,i])=>btn(k,t,i,true)).join("");
   document.querySelectorAll("#nav button[data-k],#bnav button[data-k]").forEach(b=>b.onclick=()=>openTab(b.dataset.k));
-  const cp=canPricing(); $("roleSw").hidden=!cp; document.body.classList.toggle("sales",!isPricing());
+  const cp=canPricing(); $("roleSw").hidden=!cp||signedIn(); /* signed in: the view comes from the person, no switching */ document.body.classList.toggle("sales",!isPricing());
   $("r-pricing").setAttribute("aria-pressed",String(isPricing()&&!isDirector())); $("r-sales").setAttribute("aria-pressed",String(!isPricing())); $("r-director").setAttribute("aria-pressed",String(isDirector())); document.body.classList.toggle("director",isDirector());
   $("footRole").textContent=isDirector()?"Director view":isPricing()?"Pricing view":"Sales view";
   updateBadges(); try{ plBadge(); }catch(e){}
@@ -4347,6 +4347,7 @@ function renderApps(){ const p=$("p-apps"); if(!p) return; const C=apCfg(), m=ap
 const WHO_KEY="who_v1";
 const USERS=[{id:"me",name:"You",team:"Pricing",role:"pricing"},{id:"nour",name:"Nour Adel",team:"Pricing",role:"pricing"},{id:"omar",name:"Omar Fathy",team:"Customs clearance & trucking",role:"pricing"},
   {id:"mariam",name:"Mariam Hany",team:"Network requests",role:"pricing"},{id:"ahmed",name:"Ahmed Samir",team:"Documentation & systems",role:"pricing"},{id:"karim",name:"Karim Nabil",team:"Sales",role:"sales"},{id:"director",name:"Director",team:"Management",role:"director"}];
+function signedIn(){ if(/[?&]skipLogin=1/.test(location.search)) return false; try{ const w=JSON.parse(localStorage.getItem("who_v1")||"null"); return !!(w&&w.id); }catch(e){ return false; } } /* safe before the sign-in code has loaded */
 function whoAmI(){ const w=lsGet(WHO_KEY,null); return w&&USERS.find(u=>u.id===w.id)||null; }
 function uName(id){ const u=USERS.find(x=>x.id===id); return u?u.name:id; }
 /* ---------- Responsibilities ---------- */
@@ -4438,7 +4439,7 @@ function launchShow(u){ let d=$("launchDlg"); if(d) d.remove(); d=document.creat
   document.body.appendChild(d); d.querySelectorAll("[data-lgo]").forEach(b=>b.onclick=()=>{ d.close(); d.remove(); if(b.dataset.lgo) openTab(b.dataset.lgo); });
   try{ d.showModal(); }catch(e){ d.setAttribute("open",""); } }
 function afterLogin(fresh){ const u=whoAmI(); if(!u){ loginShow(); return; }
-  if(ROLE!==u.role) setRole(u.role); const wb=$("whoBtn"); if(wb){ wb.textContent=u.name.split(" ").map(w=>w[0]).join("").slice(0,2); wb.title="Signed in as "+u.name+" · click to switch user"; }
+  if(ROLE!==u.role) setRole(u.role); else renderNav(); const wb=$("whoBtn"); if(wb){ wb.textContent=u.name.split(" ").map(w=>w[0]).join("").slice(0,2); wb.title="Signed in as "+u.name+" · click to switch user"; }
   let seen=false; try{ seen=sessionStorage.getItem("launch_v1")==="1"; sessionStorage.setItem("launch_v1","1"); }catch(e){}
   if(fresh||!seen) setTimeout(()=>launchShow(u),fresh?50:400); }
 setTimeout(()=>{ try{ if(!/[?&]skipLogin=1/.test(location.search)) afterLogin(false); }catch(e){ console.error(e); } const wb=$("whoBtn"); if(wb) wb.onclick=()=>loginShow(); },600); /* tests open the page with ?skipLogin=1 */
