@@ -4378,7 +4378,7 @@ const TK_SEED=[ /* dummy example of a real split of work; customer names replace
  {id:"t16",title:"Trucking and transportation",cat:"Customs & trucking",freq:"req",min:30,per:15,owners:["omar"]},
  {id:"t17",title:"Documentation and system",cat:"Documentation & systems",freq:"daily",min:60,per:5,owners:["ahmed"]},
  {id:"t18",title:"Network requests from DP World offices abroad",cat:"Network",freq:"req",min:25,per:15,owners:["mariam"]},
- {id:"t19",title:"Answer tenders",cat:"Tenders",freq:"req",min:240,per:1,owners:[]}];
+ {id:"t19",title:"Answer tenders",cat:"Tenders",freq:"req",min:240,per:1,owners:["nour"],key:true}]; /* key: only one person can do it today and no back-up is named */
 function tkAll(){ const t=lsGet(TK_KEY,null); return Array.isArray(t)?t:JSON.parse(JSON.stringify(TK_SEED)); }
 function tkSave(t){ lsSet(TK_KEY,t); }
 function tkWeekH(t){ return (+t.min||0)*(+t.per||0)/60; }  /* estimated hours a week = minutes each × times a week */
@@ -4419,6 +4419,7 @@ function tkTeamCard(){ const M=tkMatrix(), P=M.people, maxH=Math.max(1,...P.map(
   const cell=(t,p)=>(t.owners||[]).includes(p)?`<td class="n" title="Owns it">●</td>`:t.helps===p?`<td class="n" title="Gets support">○</td>`:`<td></td>`;
   return `<div class="card"><h3>Responsibilities: who does what <span class="dschip ds-off">Managers only</span></h3>
     ${M.gaps.length?`<div class="td-chk err">Nobody owns: ${M.gaps.map(t=>esc(t.title)).join(", ")}</div>`:""}
+    ${M.single.filter(t=>t.key).map(t=>`<div class="td-chk err">Only ${esc(uName(t.owners[0]))} can do: ${esc(t.title)}. No back-up named yet: train a second person.</div>`).join("")}
     <div class="tk-load">${P.map(p=>{ const L=M.load[p]; return `<div class="hm-row"><span>${esc(uName(p))}</span><div class="hm-bar"><i class="a" style="width:${L.hours/maxH*100}%"></i></div><span>${L.hours.toFixed(1)} h/week · ${L.tasks} tasks${L.helps?` · supports others in ${L.helps}`:""} · ${L.doneToday} done today</span></div>`; }).join("")}</div>
     <details><summary>Task by task (● owns · ○ gets support)</summary><div class="csTblW"><table class="csTbl"><thead><tr><th>Responsibility</th><th>How often</th>${P.map(p=>`<th class="n">${esc(uName(p).split(" ")[0])}</th>`).join("")}</tr></thead><tbody>
       ${M.T.map(t=>`<tr><td>${esc(t.title)}${!(t.owners||[]).length?` <span class="pill lost">no owner</span>`:(t.owners.length===1?` <span class="pill open">one person</span>`:"")}</td><td>${esc(TK_FREQ[t.freq]||t.freq)}</td>${P.map(p=>cell(t,p)).join("")}</tr>`).join("")}</tbody></table></div></details>
@@ -4432,7 +4433,7 @@ function loginShow(){ let d=$("loginDlg"); if(d) d.remove(); d=document.createEl
   d.querySelectorAll("[data-lg]").forEach(b=>b.onclick=()=>{ const u=USERS.find(x=>x.id===b.dataset.lg); lsSet(WHO_KEY,{id:u.id,at:Date.now()}); d.close(); d.remove(); try{ sessionStorage.removeItem("launch_v1"); }catch(e){} afterLogin(true); });
   try{ d.showModal(); }catch(e){ d.setAttribute("open",""); } }
 function launchFacts(u){ const F=[]; try{ const now=Date.now(), C=csLoad().cases.filter(c=>!c.sub), late=C.filter(c=>csState(c,now).st==="breach").length;
-    if(u.role==="director"){ const M=tkMatrix(), S=teamStats(); F.push(`${Object.values(S.people).reduce((a,x)=>a+x.open,0)} open cases in the team, ${late} past the SLA, ${S.unassigned} not taken yet`); if(M.gaps.length) F.push(`Nobody owns: ${M.gaps.map(t=>t.title).join(", ")}`); F.push(`${M.single.length} responsibilities depend on one person`); }
+    if(u.role==="director"){ const M=tkMatrix(), S=teamStats(); F.push(`${Object.values(S.people).reduce((a,x)=>a+x.open,0)} open cases in the team, ${late} past the SLA, ${S.unassigned} not taken yet`); if(M.gaps.length) F.push(`Nobody owns: ${M.gaps.map(t=>t.title).join(", ")}`); M.single.filter(t=>t.key).forEach(t=>F.push(`Only ${uName(t.owners[0])} can do: ${t.title} (no back-up yet)`)); F.push(`${M.single.length} responsibilities depend on one person`); }
     else if(u.role==="sales"){ F.push("Your offers and quotes are in Offers & feedback"); F.push("Find a rate: type the lane in Rates & offer"); }
     else { const I=asNext(tdItems()), mine=tkAll().filter(t=>(t.owners||[]).includes(u.id)&&t.freq==="daily"); F.push(`${I.length} things need Pricing today, ${late} past the SLA`); if(I[0]) F.push(`First: ${I[0].title}`); F.push(`${mine.length} daily responsibilities to tick`); const end=(DATA.rates||[]).filter(r=>isStd(r)&&r.valid&&r.valid>=todayISO()&&r.valid<=addDays(todayISO(),7)).length; if(end) F.push(`${end} standard rates end this week`); } }catch(e){}
   try{ if(isAdmin()){ const A=adminAlerts(); if(A.newT||A.changes||A.errors) F.unshift(`Tool owner: ${A.newT} new ticket${A.newT===1?"":"s"}, ${A.changes} change${A.changes===1?"":"s"} by others, ${A.errors} error${A.errors===1?"":"s"} recorded`); } }catch(e){}

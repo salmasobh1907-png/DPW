@@ -432,8 +432,9 @@ test('viewers: Pricing, Sales and Director each get their own menu; only Pricing
 
 test('responsibilities: the matrix shows load, shared work, one-person tasks and gaps (tenders)', async () => {
   const r = await run(() => { const M = window.__rules.tkMatrix();
-    return { gaps: M.gaps.map(t => t.title), shared: M.shared.length, single: M.single.length, meH: +M.load.me.hours.toFixed(2), nourH: +M.load.nour.hours.toFixed(2), meHelps: M.load.me.helps }; });
-  assert.deepEqual(r.gaps, ['Answer tenders']);
+    return { tenders: M.single.filter(t => t.key).map(t => [t.title, t.owners]), gaps: M.gaps.map(t => t.title), shared: M.shared.length, single: M.single.length, meH: +M.load.me.hours.toFixed(2), nourH: +M.load.nour.hours.toFixed(2), meHelps: M.load.me.helps }; });
+  assert.deepEqual(r.gaps, []); // tenders have an owner …
+  assert.deepEqual(r.tenders, [['Answer tenders', ['nour']]]); // … but only one person, no back-up
   assert.ok(r.shared >= 5);                   // pricing work shared by the two pricing people
   assert.ok(r.meH > r.nourH);                 // the one who also supports colleagues carries more
   assert.ok(r.meHelps >= 5);
@@ -454,7 +455,7 @@ test('sign-in: the app starts on a sign-in screen; picking a user sets the view 
   await pg.click('#launchDlg [data-lgo="team"]'); await pg.waitForTimeout(300);
   const st = await pg.evaluate(() => ({ pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id, who: window.__rules.whoAmI().name, dir: window.__rules.isDirector() }));
   await pg.close();
-  assert.ok(facts.some(f => /Nobody owns: Answer tenders/.test(f)));
+  assert.ok(facts.some(f => /Only Nour Adel can do: Answer tenders/.test(f)));
   assert.deepEqual(st, { pane: 'p-team', who: 'Director', dir: true });
 });
 
