@@ -157,6 +157,13 @@ Merge rule: the same carrier + POL + POD + contract type + validity month in two
 | Focus mode | Shows only Next up and Quick price; a new LATE case breaks through with a banner and the tab title |
 | End of day | Tasks done with time, time in the tool, what is left for tomorrow. Copy or draft |
 
+### 5.9 Task cycle, leaving alert, daily history, Team dashboard
+
+- **Cycle** (Today → "My open requests: full cycle"): Received → Assigned → Answered → Quote to customer → Won / Lost, with the next step for each request. UNREAD = nobody took it; REPLY = waiting for your reply; OPEN = answered, not closed. A request with a lane closes only at Won / Lost; an answer that needs no quote closes at Answered. The quote is matched by destination and date (production: by request reference number).
+- **Leaving alert**: a pop-up when the working day ends (Mailboxes & SLA hours) with urgent items open (late, due soon or unread), from End of day → "I am leaving now", and the browser's own warning when the tool is closed. The person picks: hand over, finish from home, or leave for tomorrow, with a note. The choice and the open numbers go to today's history.
+- **Daily history** (`dayHist_v1`, 60 days): per person open, late, answered, average reply time; saved every 5 minutes and when the day changes.
+- **Team dashboard** (Reports, managers only, hidden from others): team totals; each person's open, late, answered, average reply (clock time), oldest open, active and away time, end-of-day choice; the last 14 days done vs left; a daily alert text for the Director (copy or draft). Demo: activity time is dummy and each browser holds its own history; production: all from the database. HR and Legal approve before real use.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).

@@ -377,3 +377,27 @@ test('today tools: hand over moves only my open cases and writes it in each case
   assert.equal(r.n, r.mine); assert.ok(r.n > 0); assert.ok(r.allNour); assert.ok(r.othersSame);
   assert.match(r.last, /Handed over by .* to Nour Adel: Waiting for Aurora/);
 });
+
+test('task cycle: a request moves Received → Assigned → Answered → Quote to customer → Won/Lost', async () => {
+  const r = await run(() => { const R = window.__rules, t = Date.now() - 36e5;
+    const c = { subj: 'Rate request 2x40 Sokhna to Jeddah', recv: t };
+    const s0 = R.cyStage(c); c.who = 'me'; const s1 = R.cyStage(c); c.sub = Date.now(); const s2 = R.cyStage(c);
+    const keep = window.__rules.QT.items; window.__rules.QT.items = [{ pod: 'Jeddah', created: new Date().toISOString(), toCust: true, status: 'pending' }];
+    const s3 = R.cyStage(c); window.__rules.QT.items[0].status = 'won'; const s4 = R.cyStage(c);
+    const other = R.cyStage({ subj: 'Free time extension for Q-1004 booking', recv: t, who: 'me', sub: Date.now() });
+    window.__rules.QT.items = keep;
+    return [s0, s1, s2, s3, s4].map(x => [x.i, x.closed]).concat([[other.i, other.closed]]); });
+  assert.deepEqual(r, [[0, false], [1, false], [2, false], [3, false], [4, true], [2, true]]);
+});
+
+test('team: per-person numbers add up to the cases, and the leaving choice goes to the history', async () => {
+  const r = await run(() => { const R = window.__rules, S = R.teamStats(), L = R.csLoad().cases;
+    const sum = Object.values(S.people).reduce((a, x) => ({ open: a.open + x.open, ans: a.ans + x.answered }), { open: 0, ans: 0 });
+    R.histEod('home', 'Waiting for Aurora');
+    const H = JSON.parse(localStorage.getItem('dayHist_v1')), d = Object.keys(H).sort().pop();
+    return { open: sum.open + S.unassigned, ans: sum.ans, casesOpen: L.filter(c => !c.sub).length, casesAns: L.filter(c => c.sub && c.who).length,
+             eod: H[d].eod.me.choice, note: H[d].eod.me.note, snap: !!H[d].people, alert: R.teamAlert(S, H[d].eod.me) }; });
+  assert.equal(r.open, r.casesOpen); assert.equal(r.ans, r.casesAns);
+  assert.equal(r.eod, 'home'); assert.equal(r.note, 'Waiting for Aurora'); assert.ok(r.snap);
+  assert.match(r.alert, /Will finish from home \(Waiting for Aurora\)/);
+});

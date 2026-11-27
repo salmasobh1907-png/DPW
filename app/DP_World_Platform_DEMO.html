@@ -453,6 +453,9 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
 .wt-nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:8px 0}.wt-nums span{display:flex;align-items:center;gap:6px;font-size:12px;opacity:.8}.wt-nums span b{width:10px;height:10px;border-radius:3px;display:inline-block}.wt-nums strong{font-size:18px}.wt-bar{position:relative;height:16px;border-radius:8px;background:rgba(127,127,127,.12);overflow:hidden}.wt-bar i{position:absolute;top:0;bottom:0}.wt-ax{display:flex;justify-content:space-between;font-size:12px;opacity:.7;margin-top:4px}
 .td-tools{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 12px}.td-ph{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px}.td-ph b{font-size:17px}.td-ph span{font-size:13px;opacity:.75}.td-ph .mini{margin-left:auto}.td-pre{white-space:pre-wrap;font:13px/1.55 ui-monospace,monospace;background:rgba(127,127,127,.08);padding:12px;border-radius:10px;margin:0;max-height:360px;overflow:auto}
 .td-focus .td-kpis,.td-focus .td-list,.td-focus .td-wt{display:none}
+.cy-bar{display:inline-flex;gap:3px;vertical-align:middle;margin-right:6px}.cy-bar i{width:16px;height:6px;border-radius:3px;background:rgba(127,127,127,.25)}.cy-bar i.on{background:#18a57b}
+.eod-dlg{max-width:560px;width:calc(100% - 32px);border:0;border-radius:16px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.3)}.eod-dlg::backdrop{background:rgba(10,20,40,.45)}.eod-dlg h3{margin:0 0 10px}.eod-ch{border:0;padding:0;margin:12px 0;display:flex;flex-direction:column;gap:8px}.eod-ch label{display:flex;gap:8px;align-items:center;font-size:14px}
+.hm-row{display:grid;grid-template-columns:96px minmax(0,1fr) 140px;gap:10px;align-items:center;font-size:13px;margin:5px 0}.hm-bar{display:flex;height:12px;border-radius:6px;background:rgba(127,127,127,.12);overflow:hidden}.hm-bar .a{background:#18a57b}.hm-bar .o{background:#e0a23b}
 .dschip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}.ds-ok{background:#d9f2e3;color:#14532d}.ds-due{background:#fde9c8;color:#7c4a03}.ds-err{background:#f9d4d4;color:#7f1d1d}.ds-off,.ds-busy{background:#e5e7eb;color:#374151}.dstbl td{vertical-align:top}
 </style>
 </head>
@@ -666,6 +669,7 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
     <section class="pane" id="p-src" hidden></section>
     <section class="pane" id="p-dsrc" hidden></section>
     <section class="pane" id="p-today" hidden></section>
+    <section class="pane" id="p-team" hidden></section>
     <section class="pane" id="p-ibx" hidden></section>
     <section class="pane" id="p-sheet" hidden></section>
     <section class="pane" id="p-plog" hidden></section>
@@ -2620,6 +2624,7 @@ function csSeed(){ const now=Date.now(); let n=2041; const cases=CS_SEED.map(([m
   return {day:today,cases,act}; }
 let CS=null;
 function csLoad(){ if(CS) return CS; try{ CS=JSON.parse(localStorage.getItem(CS_LS)||"null"); }catch(e){ CS=null; }
+  if(CS&&CS.day&&Array.isArray(CS.cases)&&CS.day!==csDay(Date.now())){ try{ histSnap(CS); }catch(e){} } /* keep yesterday in the history before a new day starts */
   if(!CS||CS.day!==csDay(Date.now())||!Array.isArray(CS.cases)) { CS=csSeed(); csStore(); } return CS; }
 function csStore(){ try{ localStorage.setItem(CS_LS,JSON.stringify(CS)); }catch(e){} }
 
@@ -2807,7 +2812,7 @@ const ICON=n=>`<svg class="ic sm" aria-hidden="true"><use href="#i-${n}"/></svg>
 const NAV={
   pricing:[["Daily work",[["today","Today","check"],["ibx","Inbox","inbox"],["cases","Shared inbox cases","clock"],["lane","Rates & offer","map"],["q","Offers & feedback","file"]],"pricing + sales"],
            ["Rate Bank",[["sheet","Rate Bank","db"],["trk","Trucking rates","truck"]],"pricing"],
-           ["Reports",[["home","Overview","home"]],"managers"],
+           ["Reports",[["home","Overview","home"],["team","Team dashboard","chart"]],"managers"],
            ["Reference",[["svc","Alliance loops","ship"],["info","Help & settings","help"]],"everyone"]],
   sales:[["Daily work",[["ibx","Inbox","inbox"],["lane","Find a rate","map"],["q","My offers & feedback","file"]],"sales"],
          ["Reference",[["trk","Trucking rates","truck"],["svc","Alliance loops","ship"],["info","Help","help"]],"everyone"]]
@@ -2820,17 +2825,17 @@ function navKey(t){ return PAR[t]||t; }
 function renderSub(t){ let bar=$("subsw"); const pk=navKey(t), L=SUBS[pk]; if(!bar){ bar=document.createElement("div"); bar.id="subsw"; bar.className="subsw"; bar.setAttribute("role","group"); bar.setAttribute("aria-label","Part of this page"); const w=$("work"); w.insertBefore(bar,w.firstChild); }
   const ok=L&&(isPricing()||pk!=="info"); bar.hidden=!ok; if(!ok) return; bar.innerHTML=L.map(([k,l])=>`<button type="button" data-sk="${k}" aria-pressed="${k===t}">${esc((!isPricing()&&SUBS_SALES[k])||l)}</button>`).join(""); bar.querySelectorAll("[data-sk]").forEach(x=>x.onclick=()=>openTab(x.dataset.sk)); }
 const NAVOPEN=new Set();
-const PAGE={cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],today:["Today","Everything that needs Pricing now, and Quick price in one line"],dsrc:["Data sources","Rate Bank, carrier emails, online links and files: freshness, order and conflicts"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
+const PAGE={cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],team:["Team dashboard","Each person: open, late, answered, reply time, working time and end-of-day choice · managers only"],today:["Today","Everything that needs Pricing now, and Quick price in one line"],dsrc:["Data sources","Rate Bank, carrier emails, online links and files: freshness, order and conflicts"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
   q:["Offers & quotes","Offers pricing sent to sales, and quotes sales sent to customers"],fb:["Sales feedback","What sales hear from customers, with pricing's replies"],off:["Carrier offers","A carrier email or Excel turned into Rate Bank rows"],
   req:["Ask carriers","Monthly “Rate Idea” emails to the lines"],svc:["Alliance loops","Reference list of liner rotations that call Egypt, 19 Oct 2026"],vol:["Carrier volumes","What we booked with each line, for contract and volume talks"],trk:["Trucking rates","Pickup in Egypt for EXW requests, and cross-border trucks"],hl:["Rate Bank check","Rows in the Rate Bank that are wrong or easy to misread"],gw:["Market alerts","Disruptions, rate-increase notices and the weekly market index"],info:["Help","How the platform works and where the numbers come from"]};
 const PAGE_SALES={ibx:["Inbox","Your customer requests from email · demo with dummy data"],lane:["Find a rate","Route, carrier rates, customer offer and quotation"],q:["My offers & quotes","Pricing's offers to you, your quotes to customers, follow-ups and hit ratio"],fb:["Feedback to pricing","Tell pricing what the customer said and read their answer"]};
-const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",dsrc:"Data",today:"Today",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
+const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",dsrc:"Data",today:"Today",team:"Team",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
 let ROLE=lsGet("rg-role","pricing"), CUR_TAB="lane";
 QT.isOwner=false;
 function canPricing(){ return !QT.shared || QT.isOwner || ((QT.settings&&QT.settings.pricing)||[]).includes(QT.meId); }
 function isPricing(){ return ROLE==="pricing" && canPricing(); }
 function navItems(){ return NAV[isPricing()?"pricing":"sales"]; }
-function allowed(k){ return navItems().some(g=>g[1].some(x=>x[0]===k||(x[0]===PAR[k]&&(isPricing()||(k!=="src"&&k!=="dsrc"))))); }
+function allowed(k){ if(k==="team"&&!wtMgr()) return false; return navItems().some(g=>g[1].some(x=>x[0]===k||(x[0]===PAR[k]&&(isPricing()||(k!=="src"&&k!=="dsrc"))))); }
 function renderNav(){
   const groups=navItems(), btn=(k,t,i,mob)=>`<button role="tab" id="${mob?"b":"t"}-${k}" data-k="${k}" aria-selected="${k===navKey(CUR_TAB)}" title="${esc(t)}"><svg class="ic" aria-hidden="true"><use href="#i-${i}"/></svg><span class="lbl">${esc(mob?(SHORT[k]||t):t)}</span><span class="cnt" data-cnt="${k}" hidden></span></button>`;
   $("nav").innerHTML=groups.map(([g,items,who],gi)=>{ const has=items.some(x=>x[0]===navKey(CUR_TAB)), open=gi===0||has||NAVOPEN.has(g);
@@ -2851,9 +2856,9 @@ function setTitle(t){ const P=(!isPricing()&&PAGE_SALES[t])||PAGE[t]||["",""]; $
 document.addEventListener("click",e=>{ const c=e.target.closest&&e.target.closest(".cmt"); if(!c) return; e.stopPropagation(); c.classList.toggle("open"); c.title=c.classList.contains("open")?"Click to shorten":"Click to read the full note"; },true);
 function openTab(t,quiet){
   if(!allowed(t)) t="lane";
-  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","dsrc","today","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
+  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","dsrc","today","team","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
   panes.forEach(k=>{ const p=$("p-"+k); if(p) p.hidden=k!==t; });
-  { const wasNo=document.body.classList.contains("nomap"); document.body.classList.toggle("nomap",t==="trk"||t==="sheet"||t==="ibx"||t==="cases"||t==="ckpi"||t==="cmbx"||t==="dsrc"||t==="today"); if(wasNo&&t!=="trk"&&t!=="sheet"&&t!=="ibx"&&t!=="cases"&&t!=="ckpi"&&t!=="cmbx"&&t!=="dsrc"&&t!=="today") setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
+  { const wasNo=document.body.classList.contains("nomap"); document.body.classList.toggle("nomap",t==="trk"||t==="sheet"||t==="ibx"||t==="cases"||t==="ckpi"||t==="cmbx"||t==="dsrc"||t==="today"||t==="team"); if(wasNo&&t!=="trk"&&t!=="sheet"&&t!=="ibx"&&t!=="cases"&&t!=="ckpi"&&t!=="cmbx"&&t!=="dsrc"&&t!=="today"&&t!=="team") setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
   document.querySelectorAll("#nav button[data-k],#bnav button[data-k]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.k===navKey(t)))); renderSub(t);
   { const nb=document.querySelector('#nav button[data-k="'+navKey(t)+'"]'); if(nb&&nb.closest(".gi[hidden]")) renderNav(); }
   setTitle(t); $("work").scrollTop=0; if(!quiet) window.scrollTo&&window.scrollTo(0,0);
@@ -2874,6 +2879,7 @@ function openTab(t,quiet){
   if(t==="gw") renderGw();
   if(t==="src") renderSrc();
   if(t==="dsrc") dsRender();
+  if(t==="team") setTimeout(()=>{ try{ renderTeam(); }catch(e){ console.error(e); } },0);
   if(t==="today") setTimeout(()=>{ try{ renderToday(); }catch(e){ console.error(e); } },0); /* after the page finishes loading */
   if(t==="plog") renderPlog();
   if(t==="cases") renderCases(); if(t==="ckpi") renderCkpi(); if(t==="cmbx") renderCmbx();
@@ -4051,11 +4057,13 @@ function renderToday(){ const p=$("p-today"); if(!p||p.hidden) return; const I=t
     ${res}
     <div class="td-kpis"><div><span>Open cases</span><b>${cs.open}</b><small>${cs.late?cs.late+" late":"none late"}</small></div><div><span>Open requests</span><b>${(DATA.requests||[]).filter(r=>r.st==="open"||r.st==="pending").length}</b><small>from the Reference Sheet</small></div>
       <div><span>Hit ratio this month</span><b>${won+lost?Math.round(won/(won+lost)*100)+"%":"—"}</b><small>${won} won of ${won+lost} closed</small></div><div><span>Rates ending in 7 days</span><b>${end7}</b><small>standard rates</small></div></div>
-    <div class="card td-list"><h3>Needs you <span class="dschip ds-off">${I.length}</span></h3>${I.length?I.slice(0,14).map((x,i)=>`<div class="td-it"><span class="td-tag td-${tagC[x.tag]||"new"}">${esc(x.tag)}</span><div class="td-tx"><b>${esc(x.title)}</b><small>${esc(x.sub)}</small></div><button type="button" class="${i===0?"svc btn primary":"mini"}" data-td="${i}">${esc(x.act)}</button></div>`).join(""):`<p class="note">Nothing waiting. New emails, follow-ups and ending rates show up here.</p>`}</div>${(()=>{ try{ csTick(); return `<div class="td-wt">${wtCard("My working time today")}</div>`; }catch(e){ return ""; } })()}`;
+    <div class="card td-list"><h3>Needs you <span class="dschip ds-off">${I.length}</span></h3>${I.length?I.slice(0,14).map((x,i)=>`<div class="td-it"><span class="td-tag td-${tagC[x.tag]||"new"}">${esc(x.tag)}</span><div class="td-tx"><b>${esc(x.title)}</b><small>${esc(x.sub)}</small></div><button type="button" class="${i===0?"svc btn primary":"mini"}" data-td="${i}">${esc(x.act)}</button></div>`).join(""):`<p class="note">Nothing waiting. New emails, follow-ups and ending rates show up here.</p>`}</div>${(()=>{ try{ csTick(); return cyCard()+`<div class="td-wt">${wtCard("My working time today")}</div>`; }catch(e){ return ""; } })()}`;
   asWire(I); p.classList.toggle("td-focus",tdFocus()); TD.flash="";
   p.querySelectorAll("[data-tp]").forEach(b=>b.onclick=()=>{ TD.panel={k:b.dataset.tp}; renderToday(); });
   $("tdFoc").onclick=()=>{ lsSet("tdFocus_v1",!tdFocus()); tdFocusWatch(); renderToday(); };
-  tdWirePanel();
+  tdWirePanel(); histSnap();
+  p.querySelectorAll("[data-cyo]").forEach(b=>b.onclick=()=>{ CSV.open=b.dataset.cyo; CSV.f="all"; openTab("cases"); });
+  const lv=$("eodLeave"); if(lv) lv.onclick=()=>eodModal(true);
   $("tdForm").onsubmit=e=>{ e.preventDefault(); tdQuick($("tdQ").value); };
   p.querySelectorAll("[data-td]").forEach(b=>b.onclick=()=>{ const x=I[+b.dataset.td]; if(x&&x.go) x.go(); });
   const o=$("tdOpen"); if(o) o.onclick=()=>openTab("lane"); const rq=$("tdRfq"); if(rq&&R&&R.P) rq.onclick=()=>{ TD.panel={k:"rfq",pod:R.P.dest,eq:R.P.eq}; renderToday(); }; const c=$("tdClr"); if(c) c.onclick=()=>{ TD.res=null; TD.q=""; renderToday(); };
@@ -4147,7 +4155,7 @@ function tdPanel(){ const P=TD.panel; if(!P) return "";
       <div class="td-acts"><button type="button" class="svc btn primary" id="rfqLog">Log ${R.length} request${R.length===1?"":"s"} as asked</button><span class="note" id="rfqMsg"></span></div></div>`; }
   if(P.k==="brief"||P.k==="eod"){ const txt=P.k==="brief"?briefText():eodText(), su=(P.k==="brief"?"Pricing morning brief ":"End of day ")+fmtDate(todayISO());
     return `<div class="td-res">${head(P.k==="brief"?"Morning brief":"End of day",P.k==="brief"?"For the team and the manager":"What you did and what is left")}<pre class="td-pre">${esc(txt)}</pre>
-      <div class="td-acts"><button type="button" class="svc btn primary" id="tdCopy">Copy</button><a class="mini" href="mailto:?subject=${encodeURIComponent(su)}&body=${encodeURIComponent(txt)}">Open as email draft</a><span class="note" id="tdCopyMsg"></span></div></div>`; }
+      <div class="td-acts"><button type="button" class="svc btn primary" id="tdCopy">Copy</button><a class="mini" href="mailto:?subject=${encodeURIComponent(su)}&body=${encodeURIComponent(txt)}">Open as email draft</a>${P.k==="eod"?`<button type="button" class="mini ok" id="eodLeave">I am leaving now</button>`:""}<span class="note" id="tdCopyMsg"></span></div></div>`; }
   if(P.k==="hand"){ const n=csLoad().cases.filter(c=>!c.sub&&c.who==="me").length;
     return `<div class="td-res">${head("Hand over my open cases",n+" open case"+(n===1?"":"s")+" assigned to you")}
       <form id="hoForm" class="trkform"><label class="f">To<select id="hoTo">${CS_PEOPLE.filter(x=>x.id!=="me").map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("")}</select></label>
@@ -4163,12 +4171,81 @@ function tdFocus(){ return !!lsGet("tdFocus_v1",false); }
 function tdFocusWatch(){ clearInterval(tdFocusWatch.t); if(!tdFocus()) return; const late0=new Set(tdItems().filter(x=>x.tag==="LATE").map(asKey));
   tdFocusWatch.t=setInterval(()=>{ if(!tdFocus()){ clearInterval(tdFocusWatch.t); return; } const nw=tdItems().filter(x=>x.tag==="LATE"&&!late0.has(asKey(x)));
     if(nw.length){ nw.forEach(x=>late0.add(asKey(x))); TD.flash="New LATE: "+nw[0].title; try{ document.title="● LATE · "+document.title.replace(/^● LATE · /,""); }catch(e){} if(CUR_TAB==="today") renderToday(); } },60000); }
-setTimeout(()=>{ try{ tdFocusWatch(); }catch(e){} },0);
+/* ---------- Task cycle, leaving alert, daily history and the Team dashboard (managers only). Plain rules, no AI. ----------
+   Cycle of a request: Received → Assigned → Answered → Quote to customer → Won / Lost. A request is closed only at Won / Lost
+   (or when the answer needs no quote). History: one snapshot per day per person (open, late, answered, average reply time),
+   saved through the day and when the day rolls over. In the demo it lives in this browser; on DP World servers in the database. */
+const CY_STEPS=["Received","Assigned","Answered","Quote to customer","Won / Lost"];
+function cyQuoteFor(c){ const L=tdParse(c.subj||""); if(!L||L.err) return null; const t0=new Date(c.recv).toISOString();
+  return (QT.items||[]).filter(q=>lc(q.pod||"")===lc(L.dest)&&String(q.created||"")>=t0).sort((a,b)=>String(b.created).localeCompare(String(a.created)))[0]||null; }
+function cyStage(c){ const q=cyQuoteFor(c), lane=(()=>{ const L=tdParse(c.subj||""); return L&&!L.err&&L.egyFound; })();
+  let i=0; if(c.who) i=1; if(c.sub) i=2; if(q&&q.toCust) i=3; if(q&&(q.status==="won"||q.status==="lost")) i=4;
+  const closed=i===4||(i>=2&&!lane);   /* an answer that needs no quote closes the case */
+  const next=closed?"Closed":["Assign an owner","Reply to the customer / sales","Log the quote and mark it sent to the customer","Ask sales for won / lost and the reason"][i];
+  return {i,closed,next,q}; }
+function cyBar(st){ return `<span class="cy-bar" aria-label="Step ${st.i+1} of 5: ${CY_STEPS[st.i]}">${CY_STEPS.map((s,k)=>`<i class="${k<=st.i?"on":""}" title="${s}"></i>`).join("")}</span>`; }
+/* per-person numbers from the cases (and dummy activity in the demo) */
+function teamStats(CSx){ const D=CSx||csLoad(), now=Date.now(), P={};
+  CS_PEOPLE.forEach(p=>P[p.id]={id:p.id,name:p.name,open:0,late:0,answered:0,replyMin:[],oldest:null,active:(D.act&&D.act[p.id]&&D.act[p.id].active)||0,away:(D.act&&D.act[p.id]&&D.act[p.id].away)||0});
+  let unassigned=0; D.cases.forEach(c=>{ if(!c.who){ if(!c.sub) unassigned++; return; } const x=P[c.who]; if(!x) return;
+    if(c.sub){ x.answered++; x.replyMin.push(Math.max(0,c.sub-c.recv)/6e4); } else { x.open++; if(csState(c,now).st==="breach") x.late++; if(!x.oldest||c.recv<x.oldest) x.oldest=c.recv; } });
+  Object.values(P).forEach(x=>{ x.avg=x.replyMin.length?Math.round(x.replyMin.reduce((a,b)=>a+b,0)/x.replyMin.length):null; delete x.replyMin; });
+  return {day:D.day,people:P,unassigned}; }
+const HIST_KEY="dayHist_v1";
+function histSnap(CSx){ try{ const S=teamStats(CSx), H=lsGet(HIST_KEY,{}), old=H[S.day]||{}; H[S.day]={...old,people:S.people,unassigned:S.unassigned,at:Date.now()};
+  const days=Object.keys(H).sort(); while(days.length>60) delete H[days.shift()]; lsSet(HIST_KEY,H); }catch(e){} }
+function histEod(choice,note){ const H=lsGet(HIST_KEY,{}), d=csDay(Date.now()), mine=csLoad().cases.filter(c=>!c.sub&&c.who==="me");
+  H[d]=H[d]||{}; H[d].eod=H[d].eod||{}; H[d].eod.me={choice,note:note||"",at:Date.now(),open:mine.length,late:mine.filter(c=>csState(c).st==="breach").length}; lsSet(HIST_KEY,H); histSnap(); }
+function eodToday(){ const H=lsGet(HIST_KEY,{}), d=csDay(Date.now()); return H[d]&&H[d].eod&&H[d].eod.me||null; }
+/* my urgent open work: late or due cases I own, unassigned cases, quotes waiting */
+function myUrgent(){ const now=Date.now(); return csLoad().cases.filter(c=>!c.sub&&(c.who==="me"||!c.who)).map(c=>({c,s:csState(c,now)})).filter(x=>x.s.st==="breach"||x.s.st==="soon"||!x.c.who); }
+const EOD_CH={handover:"Handed over to a colleague",home:"Will finish from home",tomorrow:"Left for tomorrow"};
+function eodModal(force){ const U=myUrgent(); if(!U.length&&!force) return false; let dlg=$("eodDlg"); if(dlg) dlg.remove();
+  dlg=document.createElement("dialog"); dlg.id="eodDlg"; dlg.className="eod-dlg";
+  dlg.innerHTML=`<form method="dialog" id="eodF"><h3>${U.length?`You still have ${U.length} urgent item${U.length>1?"s":""} open`:"Before you go"}</h3>
+    ${U.slice(0,6).map(x=>`<div class="td-it"><span class="td-tag td-${x.s.st==="breach"?"err":!x.c.who?"new":"due"}">${x.s.st==="breach"?"LATE":!x.c.who?"UNREAD":"DUE"}</span><div class="td-tx"><b>${esc(String(x.c.subj||"").replace(/^DEMO\\s*\\|\\s*/i,""))}</b><small>${x.c.who?"Yours":"Nobody took it yet"} · answer by ${csTime(x.s.due)}</small></div></div>`).join("")}
+    <fieldset class="eod-ch"><legend>What happens to them?</legend>
+      <label><input type="radio" name="eodc" value="handover" checked> Hand over to a colleague</label>
+      <label><input type="radio" name="eodc" value="home"> I will finish them from home</label>
+      <label><input type="radio" name="eodc" value="tomorrow"> Leave them for tomorrow</label></fieldset>
+    <label class="f">Note for your manager (optional)<input id="eodN" maxlength="200" placeholder="e.g. Waiting for carrier rates"></label>
+    <p class="note">Your choice and the open numbers go to today's history, seen by you and your manager.</p>
+    <div class="td-acts"><button class="svc btn primary" value="ok">Save</button><button class="mini" value="cancel" formnovalidate>Not now</button></div></form>`;
+  document.body.appendChild(dlg);
+  dlg.addEventListener("close",()=>{ if(dlg.returnValue!=="ok") return; const ch=(dlg.querySelector('input[name="eodc"]:checked')||{}).value||"tomorrow", note=dlg.querySelector("#eodN").value.trim();
+    histEod(ch,note); if(ch==="handover"){ TD.panel={k:"hand"}; openTab("today"); } TD.flash="Saved: "+EOD_CH[ch]+"."; if(CUR_TAB==="today") renderToday(); });
+  try{ dlg.showModal(); }catch(e){ dlg.setAttribute("open",""); } return true; }
+/* alert at the end of working hours (once a day) and when closing the tool */
+function eodWatch(){ setInterval(()=>{ try{ const S=csSet(), d=csDay(Date.now()), k="eodAsked_v1"; if(lsGet(k,"")===d||eodToday()) return;
+    const h=+new Date().toLocaleString("en-GB",{timeZone:"Africa/Cairo",hour:"2-digit",hour12:false}); if(h>=S.end-0.5&&h<S.end+3&&myUrgent().length){ lsSet(k,d); eodModal(); } }catch(e){} },60000);
+  window.addEventListener("beforeunload",e=>{ try{ histSnap(); if(!eodToday()&&myUrgent().some(x=>x.s.st==="breach"||x.c.who==="me")){ e.preventDefault(); e.returnValue=""; } }catch(x){} }); }
+/* Today card: my open requests with their cycle step, unread first */
+function cyCard(){ const L=csLoad().cases.filter(c=>!c.sub&&(c.who==="me"||!c.who)).concat(csLoad().cases.filter(c=>c.sub&&c.who==="me")).map(c=>({c,st:cyStage(c)})).filter(x=>!x.st.closed);
+  const unread=L.filter(x=>!x.c.who).length, pend=L.filter(x=>x.c.who&&!x.c.sub).length, follow=L.filter(x=>x.c.sub).length;
+  return `<div class="card td-cy"><h3>My open requests: full cycle</h3><p class="note">${unread} unread (nobody took it) · ${pend} waiting for your reply · ${follow} answered but not closed. A request closes at Won / Lost.</p>
+    ${L.slice(0,10).map(x=>`<div class="td-it"><span class="td-tag td-${!x.c.who?"new":x.c.sub?"due":"err"}">${!x.c.who?"UNREAD":x.c.sub?"OPEN":"REPLY"}</span><div class="td-tx"><b>${esc(String(x.c.subj||"").replace(/^DEMO\s*\|\s*/i,""))}</b><small>${cyBar(x.st)} Step ${x.st.i+1} of 5 · next: ${esc(x.st.next)}</small></div><button type="button" class="mini" data-cyo="${esc(x.c.id)}">Open case</button></div>`).join("")||`<p class="note">All your requests are closed.</p>`}</div>`; }
+/* ---------- Team dashboard (managers only) ---------- */
+function renderTeam(){ const p=$("p-team"); if(!p) return; if(!wtMgr()){ p.innerHTML=`<div class="card"><p class="note">Managers only.</p></div>`; return; }
+  histSnap(); const S=teamStats(), P=Object.values(S.people), H=lsGet(HIST_KEY,{}), days=Object.keys(H).sort().slice(-14), me=eodToday();
+  const tot=P.reduce((a,x)=>({open:a.open+x.open,late:a.late+x.late,ans:a.ans+x.answered}),{open:0,late:0,ans:0});
+  const hrs=m=>m==null?"—":m<60?m+" min":(m/60).toFixed(1)+" h";
+  const maxD=Math.max(1,...days.map(d=>Object.values(H[d].people||{}).reduce((a,x)=>a+x.answered+x.open,0)));
+  p.innerHTML=`<div class="td-kpis"><div><span>Open now</span><b>${tot.open}</b><small>${S.unassigned} not taken yet</small></div><div><span>Past the SLA</span><b>${tot.late}</b><small>open cases</small></div><div><span>Answered today</span><b>${tot.ans}</b><small>replies sent</small></div><div><span>Team members</span><b>${P.length}</b><small>in the shared inbox</small></div></div>
+    <div class="card"><h3>Each person today <span class="dschip ds-off">Managers only</span></h3><div class="csTblW"><table class="csTbl"><thead><tr><th>Person</th><th class="n">Open</th><th class="n">Late</th><th class="n">Answered</th><th class="n">Avg reply (clock)</th><th>Oldest open</th><th class="n">Active</th><th class="n">Away</th><th>End of day</th></tr></thead><tbody>
+      ${P.map(x=>{ const e=x.id==="me"?me:(H[S.day]&&H[S.day].eod&&H[S.day].eod[x.id]); return `<tr><td><b>${esc(x.name)}</b></td><td class="n">${x.open}</td><td class="n">${x.late?`<span class="warn-t">${x.late}</span>`:0}</td><td class="n">${x.answered}</td><td class="n">${hrs(x.avg)}</td><td>${x.oldest?csTime(x.oldest):"—"}</td><td class="n">${asDur(x.active)}</td><td class="n">${asDur(x.away)}</td><td>${e?esc(EOD_CH[e.choice]||e.choice)+(e.note?` · <small>${esc(e.note)}</small>`:""):"—"}</td></tr>`; }).join("")}</tbody></table></div>
+      <p class="note">Open, late, answered and reply time come from the shared inbox cases. Active and away time: dummy numbers in the demo; on DP World servers each person's time log. HR and Legal approve before real use.</p></div>
+    <div class="card"><h3>Last ${days.length} day${days.length===1?"":"s"}: answered and left open</h3>${days.map(d=>{ const X=Object.values(H[d].people||{}), a=X.reduce((s,x)=>s+x.answered,0), o=X.reduce((s,x)=>s+x.open,0);
+      return `<div class="hm-row"><span>${esc(d)}</span><div class="hm-bar"><i class="a" style="width:${a/maxD*100}%"></i><i class="o" style="width:${o/maxD*100}%"></i></div><span>${a} done · ${o} left</span></div>`; }).join("")}<p class="note">Saved through the day and at day change. Green = answered, amber = left open.</p></div>
+    <div class="card"><h3>Daily alert for the Director</h3><pre class="td-pre" id="tmTxt">${esc(teamAlert(S,me))}</pre><div class="td-acts"><button type="button" class="svc btn primary" id="tmCopy">Copy</button><a class="mini" href="mailto:?subject=${encodeURIComponent("Pricing team: open work "+fmtDate(todayISO()))}&body=${encodeURIComponent(teamAlert(S,me))}">Open as email draft</a><span class="note" id="tmMsg"></span></div></div>`;
+  const c=$("tmCopy"); if(c) c.onclick=async()=>{ try{ await navigator.clipboard.writeText($("tmTxt").textContent); $("tmMsg").textContent="Copied."; }catch(e){ $("tmMsg").textContent="Select the text and copy it."; } }; }
+function teamAlert(S,me){ const P=Object.values(S.people).sort((a,b)=>b.late-a.late||b.open-a.open);
+  return [`Pricing team · ${fmtDate(todayISO())} · open work`,"",`Not taken yet: ${S.unassigned}`,...P.map(x=>`${x.name}: ${x.answered} answered, ${x.open} open${x.late?`, ${x.late} past the SLA`:""}${x.id==="me"&&me?` · ${EOD_CH[me.choice]}${me.note?" ("+me.note+")":""}`:""}`),"","From the DP World Platform (dummy data in the demo)."].join("\n"); }
+setTimeout(()=>{ try{ tdFocusWatch(); }catch(e){} try{ eodWatch(); histSnap(); setInterval(histSnap,300000); }catch(e){} },0);
 { const _rk=renderCkpi; renderCkpi=function(){ _rk.apply(this,arguments); const p=$("p-ckpi"); if(!p||!wtMgr()) return; let row="";
     try{ csTick(); const D=wtDay(csDay(Date.now())); if(D) row=`<tr><td><b>${esc(csName("me"))}</b> (this browser)</td><td>${csTime(D.first)}</td><td>${csTime(D.last)}</td><td class="n">${asDur(D.active)}</td><td class="n">${asDur(D.away)}</td><td class="n">${asDur(D.brk)}</td><td class="n">${asDur(D.off)}</td></tr>`; }catch(e){}
     p.insertAdjacentHTML("beforeend",`<div class="card"><h3>Team working time <span class="dschip ds-off">Managers only</span></h3><p class="note">Active, Away, Break and Off in the tool, per person, today. In this demo each browser keeps only its own log, so only your row shows. On DP World servers every person's log goes to the team database and shows here. Each person sees only their own time. HR and Legal approve before real use.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Person</th><th>First seen</th><th>Last seen</th><th class="n">Active</th><th class="n">Away</th><th class="n">Break</th><th class="n">Off</th></tr></thead><tbody>${row||`<tr><td colspan="7" class="note">No time logged yet today.</td></tr>`}</tbody></table></div></div>`); }; }
-window.__rules = { csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
+window.__rules = { QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
 window.__route = route;
 })();
 </script>
