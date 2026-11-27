@@ -424,7 +424,7 @@ test('viewers: Pricing, Sales and Director each get their own menu; only Pricing
       pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id, salesClass: document.body.classList.contains('sales'), mgr: window.__rules.wtMgr ? window.__rules.wtMgr() : null }));
   }
   await pg.close();
-  assert.equal(out.director.pane, 'p-exec'); assert.ok(out.director.nav.includes('team') && out.director.nav.includes('cases') && out.director.nav.includes('today')); // managers see every employee screen assert.equal(out.director.salesClass, false);
+  assert.equal(out.director.pane, 'p-cockpit'); assert.ok(out.director.nav.includes('team') && out.director.nav.includes('cases') && out.director.nav.includes('today')); // managers see every employee screen assert.equal(out.director.salesClass, false);
   assert.ok(!out.sales.nav.includes('team') && !out.sales.nav.includes('today')); assert.equal(out.sales.salesClass, true);
   assert.ok(out.pricing.nav.includes('today') && out.pricing.nav.includes('cases'));
   assert.notDeepEqual(out.director.nav, out.pricing.nav);
@@ -452,11 +452,11 @@ test('sign-in: the app starts on a sign-in screen; picking a user sets the view 
   await pg.goto(PAGE.replace('?skipLogin=1', '')); await pg.waitForSelector('#loginDlg[open]');
   await pg.click('[data-lg="director"]'); await pg.waitForSelector('#launchDlg[open]');
   const facts = await pg.$$eval('#launchDlg li', L => L.map(x => x.textContent));
-  await pg.click('#launchDlg [data-lgo="exec"]'); await pg.waitForTimeout(300);
+  await pg.click('#launchDlg [data-lgo="cockpit"]'); await pg.waitForTimeout(300);
   const st = await pg.evaluate(() => ({ pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id, who: window.__rules.whoAmI().name, dir: window.__rules.isDirector() }));
   await pg.close();
   assert.ok(facts.some(f => /Only Nour Adel can do: Answer tenders/.test(f)));
-  assert.deepEqual(st, { pane: 'p-exec', who: 'Director', dir: true });
+  assert.deepEqual(st, { pane: 'p-cockpit', who: 'Director', dir: true });
 });
 
 test('sign-in: a signed-in person sees only their own view (no Pricing / Sales / Director switch)', async () => {
@@ -612,11 +612,12 @@ test('department health: a department head sees only their department; the CEO s
   await pg.goto(PAGE.replace('?skipLogin=1', '')); await pg.waitForSelector('#loginDlg[open]');
   await pg.click('[data-lg="hala"]'); await pg.waitForSelector('#launchDlg[open]'); await pg.evaluate(() => { const d = document.getElementById('launchDlg'); d.close(); d.remove(); document.querySelector('#nav button[data-k="health"]').click(); }); await pg.waitForTimeout(300);
   const hala = await pg.evaluate(() => [...document.querySelectorAll('#p-health .card h3')].map(h => h.textContent.split(' ')[0]));
-  await pg.click('#whoBtn'); await pg.waitForSelector('#loginDlg[open]'); await pg.click('[data-lg="ceo"]'); await pg.waitForSelector('#launchDlg[open]'); await pg.click('#launchDlg [data-lgo="health"]'); await pg.waitForTimeout(300);
+  await pg.click('#whoBtn'); await pg.waitForSelector('#loginDlg[open]'); await pg.click('[data-lg="ceo"]'); await pg.waitForSelector('#launchDlg[open]'); await pg.click('#launchDlg [data-lgo="cockpit"]'); await pg.waitForTimeout(300); const landed = await pg.evaluate(() => [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id);
+  await pg.evaluate(() => document.querySelector('#nav button[data-k="health"]').click()); await pg.waitForTimeout(300);
   const ceo = await pg.evaluate(() => ({ pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id, head: document.querySelector('#p-health h2').textContent, rows: document.querySelectorAll('#p-health table tbody tr').length }));
   await pg.close();
   assert.deepEqual(hala, ['Operations']);
-  assert.equal(ceo.pane, 'p-health'); assert.match(ceo.head, /Biggest pain: .*USD/); assert.equal(ceo.rows, 5);
+  assert.equal(landed, 'p-cockpit'); assert.equal(ceo.pane, 'p-health'); assert.match(ceo.head, /Biggest pain: .*USD/); assert.equal(ceo.rows, 5);
 });
 
 test('CEO view sees buy rates (not treated as Sales)', async () => {
@@ -659,4 +660,24 @@ test('smart request: target read from the email; special rate for this customer,
   assert.deepEqual(r.spot, [['Aurora Lines', 560]]);
   assert.ok(r.ask.includes('Aurora Lines'));
   assert.deepEqual(r.m, [['rule', 105, 955], ['target', 50, 900], ['none', 0, 850]]);
+});
+
+test('cockpit: KPIs, pains, decisions (recorded), top customers with a falling one flagged, forecast; a department head sees only their department', async () => {
+  const pg = await browser.newPage(); await pg.route(/^https?:\/\//, x => x.abort()); await pg.goto(PAGE); await pg.waitForFunction(() => !!window.__rules);
+  await pg.evaluate(() => localStorage.removeItem('decisions_v1')); await pg.click('#r-ceo'); await pg.waitForTimeout(400);
+  const a = await pg.evaluate(() => ({ pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id, k: document.querySelectorAll('#p-cockpit .ck-k .ck-c').length, sample: document.querySelectorAll('#p-cockpit .ck-c .pill').length, cust: document.querySelectorAll('#p-cockpit table tbody tr').length, dec: document.querySelectorAll('#p-cockpit [data-dec]').length }));
+  await pg.click('#p-cockpit [data-dec][data-v="approved"]'); await pg.waitForTimeout(200);
+  const d = await pg.evaluate(() => JSON.parse(localStorage.getItem('decisions_v1') || '[]').map(x => x.status));
+  const c = await pg.evaluate(() => window.__rules.ckCustomers()); await pg.close();
+  assert.equal(a.pane, 'p-cockpit'); assert.ok(a.k >= 6); assert.equal(a.sample, 2); assert.ok(a.cust > 0 && a.cust <= 10); assert.ok(a.dec >= 2);
+  assert.deepEqual(d, ['approved']);
+  assert.ok(c.every((x, i) => i === 0 || c[i - 1].teu >= x.teu));
+});
+
+test('cockpit: a customer is flagged "down" only on complete months (the current half month never counts)', async () => {
+  const r = await run(() => { const keep = DATA.requests, now = new Date(), cm = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'), d = n => { const x = new Date(now.getFullYear(), now.getMonth() - n, 10); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-10'; };
+    DATA.requests = [{ c: 'Steady', teu: 10, rec: d(4) }, { c: 'Steady', teu: 10, rec: d(3) }, { c: 'Steady', teu: 10, rec: d(2) }, { c: 'Steady', teu: 10, rec: d(1) }, { c: 'Steady', teu: 1, rec: cm + '-01' },
+                     { c: 'Falling', teu: 20, rec: d(4) }, { c: 'Falling', teu: 20, rec: d(3) }, { c: 'Falling', teu: 2, rec: d(2) }, { c: 'Falling', teu: 2, rec: d(1) }];
+    const C = window.__rules.ckCustomers(); DATA.requests = keep; return Object.fromEntries(C.map(x => [x.c, x.down])); });
+  assert.deepEqual(r, { Steady: false, Falling: true });
 });
