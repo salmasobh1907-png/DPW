@@ -119,3 +119,33 @@ test('rule: a line suspended to Jebel Ali is never shown as an option there', as
   assert.ok(r.jea.includes('OK Line'));
   assert.ok(r.jed.includes('Demo Suspended Line')); // other lanes are not affected
 });
+
+test('rule 4: no dearer carrier -> reuse the newest margin quoted on this lane (option B)', async () => {
+  const r = await run(() => { const R = window.__rules; R.setCargo('dry');
+    Object.assign(R.quote, { dir: 'exp', dest: 'Jeddah' });
+    R.setOptRows([{ car: 'Only Line', r40: 800, ok: true }]);
+    const keep = R.QT.items; R.QT.items = [
+      { dir: 'exp', pod: 'Jeddah', eq: "40' HC", buy: 750, sell: 820, created: '2026-10-01' },
+      { dir: 'exp', pod: 'Jeddah', eq: "40' HC", buy: 760, sell: 845, created: '2026-11-10' }, // newest -> 85
+      { dir: 'exp', pod: 'Jeddah', eq: "20' DC", buy: 500, sell: 540, created: '2026-11-20' }, // other size
+      { dir: 'imp', pod: 'Jeddah', eq: "40' HC", buy: 700, sell: 900, created: '2026-11-25' }, // other direction
+    ];
+    const g = R.gapInfo(800, false), m = R.ruleMargin(false, 800);
+    R.QT.items = keep; R.setOptRows([]); return { g, m }; });
+  assert.equal(r.m, 85);
+  assert.equal(r.g.src, 'hist');
+  assert.match(r.g.why, /last margin used on this lane, USD 85/);
+});
+
+test('rule 4: no dearer carrier and no past quote -> no flat number, margin must be typed (option A)', async () => {
+  const r = await run(() => { const R = window.__rules; R.setCargo('dry');
+    Object.assign(R.quote, { dir: 'exp', dest: 'Jeddah' });
+    R.setOptRows([{ car: 'Only Line', r40: 800, ok: true }]);
+    const keep = R.QT.items; R.QT.items = [];
+    const m = R.ruleMargin(false, 800), g = R.gapInfo(800, false), noBuy = R.ruleMargin(false);
+    R.QT.items = keep; R.setOptRows([]); return { m: String(m), noBuy: String(noBuy), src: g.src, shown: R.money(800 + m) }; });
+  assert.equal(r.m, 'NaN');
+  assert.equal(r.noBuy, 'NaN');
+  assert.equal(r.src, 'none');
+  assert.equal(r.shown, '—'); // a sell price is never shown as the bare buy rate
+});

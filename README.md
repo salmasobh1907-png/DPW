@@ -109,7 +109,7 @@ In production the cases must move to the database (see section 9).
 1. "Lowest 40'" uses standard dry rates only. Rows with a Contract Type (special, spot, reefer, DG, named customer, volume) are left out.
 2. A rate with no validity date is valid to the end of its month.
 3. Profit on ocean freight only. THC, B/L, telex and local charges pass at cost.
-4. Profit: China dry export ports fixed USD 25 per 20' and USD 50 per 40'. Other lanes: suggested from the gap to the next carrier and the market level; pricing can edit it.
+4. Profit: China dry export ports fixed USD 25 per 20' and USD 50 per 40'. Other lanes: suggested from the gap to the next carrier and the market level; pricing can edit it. When no carrier on the lane is dearer, the tool reuses the newest margin quoted on the same lane (same direction, size and cargo) and says so; with no past quote the margin box stays empty and the offer is stopped until pricing types a margin. No flat default.
 5. Offer vs quote: an offer goes to sales; it becomes a quote (and counts in hit ratio) only when sales mark it sent to the customer.
 6. Checks before sending: stop on expired rate, suspended line, zero profit, offer valid after the carrier's validity. Warn when a rate ends within 3 days or a cheaper line exists.
 7. Suspended carriers can be set per lane, with an end date, in Help & settings.
