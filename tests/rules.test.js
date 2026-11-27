@@ -638,3 +638,11 @@ test('dictionary feeds: unknown ports from emails / WhatsApp / sources are liste
   assert.deepEqual(r.a, [4, 2]); assert.deepEqual(r.b, [1, 1]);
   assert.equal(r.p, 'Jeddah'); assert.equal(r.q, 'Jebel Ali');
 });
+
+test('carrier spot rates: the pasted page is read by the recipe keywords, with where each value came from', async () => {
+  const page = `Instant Quote  Sokhna (EGSOK) to Jeddah (SAJED)\nVessel: DEMO STAR / 046E   ETD 02 Dec 2026\nTransit time 4 days\nContainer   Price\n20' Dry Standard   USD 1,150\n40' High Cube   USD 1,690.00\nOffer valid until 30/11/2026  Currency USD`;
+  const r = await run(t => { const R = window.__rules; return R.spRead(t, R.spRecipe('Aurora Lines').keys); }, page);
+  assert.equal(r.val.r20, 1150); assert.equal(r.val.r40, 1690); assert.equal(r.val.valid, '2026-11-30');
+  assert.equal(r.val.vessel, 'DEMO STAR / 046E'); assert.equal(r.val.etd, '2026-12-02'); assert.equal(r.val.tt, 4); assert.equal(r.val.cur, 'USD');
+  assert.match(r.from.r40, /40' High Cube/);
+});

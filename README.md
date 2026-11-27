@@ -231,6 +231,10 @@ Departments: Pricing, Sales / Commercial, Operations, Customs clearance & trucki
 - **Status**: Controlled = all KPIs on target; Watch = off target but within 10 % or improving; Out of control = off target and getting worse.
 - **Who sees what**: a department head sees only their department (demo heads: Pricing Manager, Hala Mostafa for Operations, Tamer Saleh for Customs & trucking); the Director and the **CEO** (new view, opens here) see the company view: every department, its status, loss in the last 3 months, the main issue and the data source, headed by the biggest pain.
 
+### 5.20 Carrier spot rates (Rate Bank → Carrier spot rates)
+
+A **recipe** per carrier site, saved by the tool owner: the site link, your steps (one per line) and the words that come before each value on that site (20' rate, 40' rate, valid until, vessel / voyage, ETD, transit days, currency; sensible defaults). Daily use: **Open the site** (you log in yourself: no passwords in the tool, no bot), copy the result page (Ctrl+A, Ctrl+C), paste it, **Read the rates**: each value is shown with the sentence it came from, editable. **Add** puts it in the tool as a **Spot** rate (this sailing only, never the lowest), opens an email draft to the consignee or sales with the rates, vessel, ETD and validity, and adds a row to the **Spot rates log** (download as Excel). Why not automatic: browsers do not let a page read another site, and logging in for you would need stored passwords and is usually against the carriers' terms. Fully automatic later: carrier APIs under contract, or an IT robot (Power Automate / RPA) on a company account with the carrier's consent.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).
