@@ -211,6 +211,10 @@ Cycle time = email in → first reply (clock time) per person and per kind of wo
 
 A chat-style panel with a fixed help list (`GUIDE`, about 20 questions) matched by keywords; no AI and no made-up answers. Suggested questions follow the current screen; each answer has steps, "Take me there", "Ask for a session" (training request: topic and preferred time, sent to the tool owner as a request in Support) and "Not helpful" / "Ask the tool owner" (sends the question as an idea ticket so the answer is added in a next update). Add or change answers in `GUIDE` in the page.
 
+### 5.17 Dictionary (Help & settings → Dictionary)
+
+The words the tool understands, used by Quick price, the Guide and message reading: ports (names, codes, Arabic spellings), equipment (40HQ = 40 high cube = 40' HC, 40 قدم), work words in English, Egyptian Arabic and Franco (rate = سعر = se3r = as3ar …), filler words to skip (3ayz, عايز, mn, l …). Arabic digits are read as numbers. One letter off or two letters swapped is accepted for port names (Jedah, Valencai). Quick price reads the line as typed first, then through the dictionary. The Guide ranks answers with **BM25** (a fixed ranking formula from classic search engines). "Words the tool did not understand" (from Quick price and the Guide) are listed with a count; the tool owner adds them in one click (`kb_v1`, `kbMiss_v1`; changes go to the change log). "Try it" shows how a line is read. Not AI: nothing is added without the owner.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).

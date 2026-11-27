@@ -559,3 +559,22 @@ test('guide: asking for a training session sends a request to the tool owner', a
   assert.equal(r.q, 'Can I get a training session?');
   assert.deepEqual(r.t, ['req', 'Training session: Quick price and margins', 'owner', true]);
 });
+
+test('dictionary: Franco, Egyptian Arabic, codes and one-letter typos are understood', async () => {
+  const r = await run(() => { const P = window.__rules.tdParse, x = p => [p.egy, p.dest, p.qty, p.eq];
+    return { franco: x(P('3ayz se3r 2x40hq mn el sokhna l jedah')), arabic: x(P('سعر ٢x40 من السخنة الى جدة')), code: x(P('Sokhna JEA 1x20')), typo: x(P('Damietta Valencai 3x40')),
+             norm: window.__rules.kbNorm('3ayz as3ar 40hq') }; });
+  assert.deepEqual(r.franco, ['Sokhna', 'Jeddah', 2, "40' HC"]);
+  assert.deepEqual(r.arabic, ['Sokhna', 'Jeddah', 2, "40' HC"]);
+  assert.deepEqual(r.code, ['Sokhna', 'Jebel Ali', 1, "20' DC"]);
+  assert.deepEqual(r.typo, ['Damietta', 'Valencia', 3, "40' HC"]);
+  assert.equal(r.norm, 'rate 40hc');
+});
+
+test('dictionary: the owner adds a word; unknown words are listed for review', async () => {
+  const r = await run(() => { const R = window.__rules; ['kb_v1', 'kbMiss_v1'].forEach(k => localStorage.removeItem(k));
+    const before = R.tdParse('Sokhna jdh 1x40'); R.kbMissAdd('jdh', 'Quick price'); const miss = JSON.parse(localStorage.getItem('kbMiss_v1')).map(x => x.w);
+    R.kbAdd('port', 'jeddah', 'jdh'); const after = R.tdParse('Sokhna jdh 1x40'); const missAfter = JSON.parse(localStorage.getItem('kbMiss_v1')).map(x => x.w);
+    localStorage.removeItem('kb_v1'); return { before: !!before.err, miss, after: after.dest, missAfter }; });
+  assert.equal(r.before, true); assert.deepEqual(r.miss, ['jdh']); assert.equal(r.after, 'Jeddah'); assert.deepEqual(r.missAfter, []);
+});

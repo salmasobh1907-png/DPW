@@ -474,6 +474,7 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
 .gd-bot{align-self:flex-start;max-width:92%;background:var(--surface,#fff);border:1px solid var(--line,#e3e8ef);padding:10px 12px;border-radius:14px 14px 14px 4px;font-size:14px}.gd-bot ol{margin:6px 0;padding-left:18px}.gd-bot small{display:block;margin-top:6px}
 .gd-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.gd-chip{border:1px solid var(--line-2,#cfd8e3);background:var(--surface,#fff);color:inherit;border-radius:999px;padding:5px 10px;font-size:12px;cursor:pointer;margin:2px 0}.gd-chip:hover{border-color:var(--accent);background:var(--accent-soft)}
 .gd-f{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line,#e3e8ef)}.gd-f input{flex:1;min-width:0;font-size:16px;padding:8px 10px;border-radius:10px;border:1px solid var(--line-2,#cfd8e3)}.gd-l{position:absolute;left:-9999px}
+.kb-w{display:inline-block;font-size:12px;padding:2px 8px;border-radius:8px;background:var(--surface-2,#f1f4f8);border:1px solid var(--line,#e3e8ef);margin:2px 0}.kb-w.kb-new{background:#d9f2e3;border-color:#a7dcbc}
 .dschip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}.ds-ok{background:#d9f2e3;color:#14532d}.ds-due{background:#fde9c8;color:#7c4a03}.ds-err{background:#f9d4d4;color:#7f1d1d}.ds-off,.ds-busy{background:#e5e7eb;color:#374151}.dstbl td{vertical-align:top}
 /* ===== New look: a layer on top of the classic tokens; body.nl switches it ===== */
 body.nl{--bg:#f4f6fa;--surface:#ffffff;--surface-2:#f7f9fc;--line:#e3e8ef;--line-2:#cfd8e3;--ink:#0f1b2d;--muted:#55657a;--faint:#8492a6;--accent:#1d5bd8;--accent-ink:#ffffff;--accent-soft:#e8f0fd;--focus:#1d5bd8;--nav:#0b1a33;--nav-2:#14294b;--nav-ink:#eaf0f8;--nav-muted:#93a6c0;--shadow:0 1px 2px rgba(15,27,45,.05),0 8px 24px rgba(15,27,45,.06)}
@@ -724,6 +725,7 @@ body.nl .side,body.nl .rail,body.nl nav.side{background:linear-gradient(180deg,#
     <section class="pane" id="p-tasks" hidden></section>
     <section class="pane" id="p-support" hidden></section>
     <section class="pane" id="p-exec" hidden></section>
+    <section class="pane" id="p-dict" hidden></section>
     <section class="pane" id="p-ibx" hidden></section>
     <section class="pane" id="p-sheet" hidden></section>
     <section class="pane" id="p-plog" hidden></section>
@@ -2880,25 +2882,25 @@ const NAV={
   const rest=NAV.pricing.map(([g,items,sub])=>[g,items.filter(x=>!keep.has(x[0])),sub]).filter(g=>g[1].length);
   NAV.director=[["Management",mgmt,"all teams"],...rest]; NAV.manager=[["Team management",mgmt,"your team"],...rest]; } /* nothing employees use is hidden from managers */
 // merged tabs: one nav item, a small switch on top of the page
-const SUBS={cases:[["cases","Cases"],["ckpi","Team KPIs"],["cmbx","Mailboxes & SLA"]],q:[["q","Offers & quotes"],["fb","Sales feedback"]],sheet:[["sheet","Rate Data Base"],["off","Carrier offers"],["req","Ask carriers"],["plog","Pricing log"],["hl","Rate check"]],home:[["home","Overview"],["dem","Customer requests"],["gw","Market alerts"],["vol","Carrier volumes"]],info:[["info","Help"],["src","Settings & sources"],["dsrc","Data sources"]]};
+const SUBS={cases:[["cases","Cases"],["ckpi","Team KPIs"],["cmbx","Mailboxes & SLA"]],q:[["q","Offers & quotes"],["fb","Sales feedback"]],sheet:[["sheet","Rate Data Base"],["off","Carrier offers"],["req","Ask carriers"],["plog","Pricing log"],["hl","Rate check"]],home:[["home","Overview"],["dem","Customer requests"],["gw","Market alerts"],["vol","Carrier volumes"]],info:[["info","Help"],["src","Settings & sources"],["dsrc","Data sources"],["dict","Dictionary"]]};
 const SUBS_SALES={q:"My offers & quotes",fb:"Feedback to pricing"};
 const PAR={}; Object.keys(SUBS).forEach(k=>SUBS[k].forEach(([c])=>PAR[c]=k));
 function navKey(t){ return PAR[t]||t; }
 function renderSub(t){ let bar=$("subsw"); const pk=navKey(t), L=SUBS[pk]; if(!bar){ bar=document.createElement("div"); bar.id="subsw"; bar.className="subsw"; bar.setAttribute("role","group"); bar.setAttribute("aria-label","Part of this page"); const w=$("work"); w.insertBefore(bar,w.firstChild); }
   const ok=L&&(isPricing()||pk!=="info"); bar.hidden=!ok; if(!ok) return; bar.innerHTML=L.map(([k,l])=>`<button type="button" data-sk="${k}" aria-pressed="${k===t}">${esc((!isPricing()&&SUBS_SALES[k])||l)}</button>`).join(""); bar.querySelectorAll("[data-sk]").forEach(x=>x.onclick=()=>openTab(x.dataset.sk)); }
 const NAVOPEN=new Set();
-const PAGE={cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],exec:["Executive summary","Results, risks and the decisions for today · managers and Director"],support:["Support","Report a problem, ask for a change or share an idea; answers and status"],tasks:["My responsibilities","The work you do, ticked or counted each day, as your manager sees it"],apps:["Apps hub","Outlook, Teams, files, DP World systems and carrier sites in one place, with one-click email, chat, call and meeting"],team:["Team dashboard","Each person: open, late, answered, reply time, working time and end-of-day choice · managers only"],today:["Today","Everything that needs Pricing now, and Quick price in one line"],dsrc:["Data sources","Rate Bank, carrier emails, online links and files: freshness, order and conflicts"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
+const PAGE={cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],dict:["Dictionary","Ports, equipment and work words in English, Arabic and Franco; words the tool did not understand"],exec:["Executive summary","Results, risks and the decisions for today · managers and Director"],support:["Support","Report a problem, ask for a change or share an idea; answers and status"],tasks:["My responsibilities","The work you do, ticked or counted each day, as your manager sees it"],apps:["Apps hub","Outlook, Teams, files, DP World systems and carrier sites in one place, with one-click email, chat, call and meeting"],team:["Team dashboard","Each person: open, late, answered, reply time, working time and end-of-day choice · managers only"],today:["Today","Everything that needs Pricing now, and Quick price in one line"],dsrc:["Data sources","Rate Bank, carrier emails, online links and files: freshness, order and conflicts"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
   q:["Offers & quotes","Offers pricing sent to sales, and quotes sales sent to customers"],fb:["Sales feedback","What sales hear from customers, with pricing's replies"],off:["Carrier offers","A carrier email or Excel turned into Rate Bank rows"],
   req:["Ask carriers","Monthly “Rate Idea” emails to the lines"],svc:["Alliance loops","Reference list of liner rotations that call Egypt, 19 Oct 2026"],vol:["Carrier volumes","What we booked with each line, for contract and volume talks"],trk:["Trucking rates","Pickup in Egypt for EXW requests, and cross-border trucks"],hl:["Rate Bank check","Rows in the Rate Bank that are wrong or easy to misread"],gw:["Market alerts","Disruptions, rate-increase notices and the weekly market index"],info:["Help","How the platform works and where the numbers come from"]};
 const PAGE_SALES={ibx:["Inbox","Your customer requests from email · demo with dummy data"],lane:["Find a rate","Route, carrier rates, customer offer and quotation"],q:["My offers & quotes","Pricing's offers to you, your quotes to customers, follow-ups and hit ratio"],fb:["Feedback to pricing","Tell pricing what the customer said and read their answer"]};
-const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",dsrc:"Data",today:"Today",team:"Team",apps:"Apps",tasks:"Tasks",support:"Support",exec:"Exec",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
+const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",dsrc:"Data",today:"Today",team:"Team",apps:"Apps",tasks:"Tasks",support:"Support",exec:"Exec",dict:"Words",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
 let ROLE=lsGet("rg-role","pricing"), CUR_TAB="lane";
 QT.isOwner=false;
 function canPricing(){ return !QT.shared || QT.isOwner || ((QT.settings&&QT.settings.pricing)||[]).includes(QT.meId); }
 function isPricing(){ return (ROLE==="pricing"||ROLE==="director"||ROLE==="manager") && canPricing(); } /* the Director sees buy rates and margins too */
 function isDirector(){ return ROLE==="director" && canPricing(); }
 function navItems(){ return NAV[isDirector()?"director":(ROLE==="manager"&&canPricing())?"manager":isPricing()?"pricing":"sales"]; }
-function allowed(k){ if((k==="team"||k==="exec")&&!wtMgr()) return false; return navItems().some(g=>g[1].some(x=>x[0]===k||(x[0]===PAR[k]&&(isPricing()||(k!=="src"&&k!=="dsrc"))))); }
+function allowed(k){ if((k==="team"||k==="exec")&&!wtMgr()) return false; return navItems().some(g=>g[1].some(x=>x[0]===k||(x[0]===PAR[k]&&(isPricing()||(k!=="src"&&k!=="dsrc"&&k!=="dict"))))); }
 function renderNav(){
   const groups=navItems(), btn=(k,t,i,mob)=>`<button role="tab" id="${mob?"b":"t"}-${k}" data-k="${k}" aria-selected="${k===navKey(CUR_TAB)}" title="${esc(t)}"><svg class="ic" aria-hidden="true"><use href="#i-${i}"/></svg><span class="lbl">${esc(mob?(SHORT[k]||t):t)}</span><span class="cnt" data-cnt="${k}" hidden></span></button>`;
   $("nav").innerHTML=groups.map(([g,items,who],gi)=>{ const has=items.some(x=>x[0]===navKey(CUR_TAB)), open=gi===0||has||NAVOPEN.has(g);
@@ -2919,7 +2921,7 @@ function setTitle(t){ const P=(!isPricing()&&PAGE_SALES[t])||PAGE[t]||["",""]; $
 document.addEventListener("click",e=>{ const c=e.target.closest&&e.target.closest(".cmt"); if(!c) return; e.stopPropagation(); c.classList.toggle("open"); c.title=c.classList.contains("open")?"Click to shorten":"Click to read the full note"; },true);
 function openTab(t,quiet){
   if(!allowed(t)) t="lane";
-  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","dsrc","today","team","apps","tasks","support","exec","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
+  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","dsrc","today","team","apps","tasks","support","exec","dict","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
   panes.forEach(k=>{ const p=$("p-"+k); if(p) p.hidden=k!==t; });
   { const wasNo=document.body.classList.contains("nomap"); document.body.classList.toggle("nomap",t==="trk"||t==="sheet"||t==="ibx"||t==="cases"||t==="ckpi"||t==="cmbx"||t==="dsrc"||t==="today"||t==="team"||t==="apps"||t==="tasks"||t==="support"||t==="exec"); if(wasNo&&t!=="trk"&&t!=="sheet"&&t!=="ibx"&&t!=="cases"&&t!=="ckpi"&&t!=="cmbx"&&t!=="dsrc"&&t!=="today"&&t!=="team"&&t!=="apps"&&t!=="tasks"&&t!=="support"&&t!=="exec") setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
   document.querySelectorAll("#nav button[data-k],#bnav button[data-k]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.k===navKey(t)))); renderSub(t);
@@ -2942,6 +2944,7 @@ function openTab(t,quiet){
   if(t==="gw") renderGw();
   if(t==="src") renderSrc();
   if(t==="dsrc") dsRender();
+  if(t==="dict") setTimeout(()=>{ try{ renderDict(); }catch(e){ console.error(e); } },0);
   if(t==="exec") setTimeout(()=>{ try{ renderExec(); }catch(e){ console.error(e); } },0);
   if(t==="support") setTimeout(()=>{ try{ renderSupport(); }catch(e){ console.error(e); } },0);
   if(t==="tasks") setTimeout(()=>{ try{ renderTasks(); }catch(e){ console.error(e); } },0);
@@ -4071,13 +4074,14 @@ function tdParse(text){ const T=String(text||"").trim(); if(!T) return null; con
   let W=s.split(/[\s,→>\-–]+/).filter(Boolean); const used=new Set();
   const GEN=/^(port|said|east|west|el|al|new|the|to|from|for|and|of)$/i;
   for(let n=1;n<=3&&!out.egy;n++) for(let i=0;i+n<=W.length;i++){ const ws=W.slice(i,i+n); if(n===1&&GEN.test(ws[0])) continue; const e=egyPort(ws.join(" ")); if(e&&EG.includes(e)){ out.egy=e; out.egyFound=true; out.egyAt=i; for(let k=i;k<i+n;k++) used.add(k); break; } }
-  const destOf=g=>{ const t=lc(g); return ALLDEST.find(k=>lc(k)===t)||(t.length>=4?ALLDEST.find(k=>lc(k).startsWith(t)):null)||null; };
+  const destOf=g=>{ const t=lc(g); return ALLDEST.find(k=>lc(k)===t)||(t.length>=4?ALLDEST.find(k=>lc(k).startsWith(t)):null)||(typeof kbPort==="function"?kbPort(t):null)||null; };
   for(let n=3;n>=1&&!out.dest;n--) for(let i=0;i+n<=W.length;i++){ if([...Array(n).keys()].some(k=>used.has(i+k))) continue; const ws=W.slice(i,i+n); if(GEN.test(ws[0])) continue;
     const d=destOf(ws.join(" ")); if(d&&!EG.includes(d)){ out.dest=d; out.destAt=i; for(let k=i;k<i+n;k++) used.add(k); break; } }
   if(out.egyFound&&out.destAt!=null&&out.destAt<out.egyAt) out.imp=true; /* "Jebel Ali to Sokhna": import */
   out.cust=W.filter((w,i)=>!used.has(i)&&!/^(to|from|ex)$/i.test(w)).join(" ").trim();
   if(!out.dest) return {err:"Could not find the destination port. Try: Sokhna Jeddah 2x40 Customer name"}; if(!out.egy) out.egy=$("from").value||EG[0]; return out; }
 async function tdQuick(text){ const P=tdParse(text); TD.q=text; if(!P||P.err){ TD.res={err:P?P.err:"Type a lane, e.g. Sokhna Jeddah 2x40"}; renderToday(); return; }
+  if(P&&P.err){ try{ const K=kbAll(), st=new Set(K.stop); kbNorm(text).split(/\s+/).filter(w=>w.length>2&&!/\d/.test(w)&&!st.has(w)&&!kbPort(w)&&!egyPort(w)).forEach(w=>kbMissAdd(w,"Quick price")); }catch(e){} }
   if(P.imp){ TD.res={err:`${P.dest} → ${P.egy} is an import. Quick price does export for now: open Rates & offer and pick Import.`}; renderToday(); return; }
   try{ DIR="exp"; }catch(e){}
   $("from").value=P.egy; $("from").dispatchEvent(new Event("change")); $("q-eq").value=P.eq; $("q-eq").dispatchEvent(new Event("change"));
@@ -4481,7 +4485,7 @@ window.addEventListener("error",e=>errAdd(e.message,(e.filename||"").split("/").
 window.addEventListener("unhandledrejection",e=>errAdd("Promise: "+(e.reason&&e.reason.message||e.reason),""));
 { const ce=console.error.bind(console); console.error=function(...a){ try{ errAdd(a.map(x=>x&&x.message||String(x)).join(" "),"console"); }catch(e){} ce(...a); }; }
 /* change log: who changed which setting and when */
-const AUD_KEY="audit_v1", AUD_WATCH={apps_v1:"Apps hub links and mail setting",dsSources_v1:"Data sources",dataSrc_v1:"Main data source",tkTasks_v1:"Responsibilities list",csSet_v1:"Mailboxes, SLA, routing and working hours",newLook_v1:"Look of the tool"};
+const AUD_KEY="audit_v1", AUD_WATCH={kb_v1:"Dictionary",apps_v1:"Apps hub links and mail setting",dsSources_v1:"Data sources",dataSrc_v1:"Main data source",tkTasks_v1:"Responsibilities list",csSet_v1:"Mailboxes, SLA, routing and working hours",newLook_v1:"Look of the tool"};
 function audAdd(key){ try{ const L=lsGet(AUD_KEY,[]), u=meNow(); L.push({at:new Date().toISOString(),what:AUD_WATCH[key]||key,who:u.name,admin:isAdmin()}); while(L.length>300) L.shift(); localStorage.setItem(AUD_KEY,JSON.stringify(L)); }catch(e){} }
 { const _ls=lsSet; lsSet=function(k,v){ const r=_ls(k,v); if(AUD_WATCH[k]) audAdd(k); return r; }; const _cs=csSave; csSave=function(o){ const r=_cs(o); audAdd("csSet_v1"); return r; }; }
 /* tickets */
@@ -4684,6 +4688,7 @@ function gRender(){ const p=$("guideP"); if(!p) return;
     try{ tktNew({type:"idea",title:"Guide: no good answer for \""+q.slice(0,90)+"\"",text:"Question asked in the Guide: "+q+(m&&m.e?"\nAnswer shown: "+m.e.q:""),prio:"low",to:"owner"}); }catch(e){}
     GD.log.push({who:"bot",txt:"Thanks. The tool owner got your question and will add the answer in a next update."}); gRender(); }); }
 function gSend(q){ q=String(q||"").trim(); if(!q) return; GD.log.push({who:"me",txt:q}); const R=gAsk(q);
+  if(!R.length) try{ kbMissAdd(q.slice(0,60),"Guide question"); }catch(e){}
   GD.log.push(R.length?{who:"bot",e:R[0],more:R.slice(1)}:{who:"bot",txt:"I do not have this answer yet.",miss:true,sug:true}); gRender(); }
 function gOpen(){ let p=$("guideP"); if(p){ p.hidden=!p.hidden; if(!p.hidden){ gRender(); p.querySelector("input").focus(); } return; }
   p=document.createElement("section"); p.id="guideP"; p.className="gd-panel"; p.setAttribute("aria-label","Guide");
@@ -4692,9 +4697,59 @@ function gOpen(){ let p=$("guideP"); if(p){ p.hidden=!p.hidden; if(!p.hidden){ g
   document.body.appendChild(p); $("gdX").onclick=()=>{ p.hidden=true; $("fabGuide").focus(); };
   $("gdF").onsubmit=e=>{ e.preventDefault(); const i=$("gdQ"); gSend(i.value); i.value=""; }; gRender(); $("gdQ").focus(); }
 setTimeout(()=>{ const g=$("fabGuide"); if(g) g.onclick=()=>gOpen(); },0);
+/* ---------- Dictionary (knowledge base): words the tool understands, used by Quick price, the Guide and message reading ----------
+   Built-in entries + entries the tool owner adds. Words the tool did not understand are listed so the owner can add them.
+   Search ranking: BM25 (a fixed formula from classic search engines) with one-letter typo tolerance. No AI. */
+const KB_BASE={
+  port:{"jebel ali":["jea","dubai","jebelali","جبل علي","دبي"],"jeddah":["jed","jedda","jiddah","جدة","جده"],"sokhna":["ain sokhna","el sokhna","sokna","السخنة","العين السخنة"],"alexandria":["alex","aly","الاسكندرية","اسكندرية"],
+    "damietta":["dam","دمياط"],"port said west":["psw","بورسعيد"],"shanghai":["sha","شنغهاي"],"dammam":["dmm","الدمام"],"mombasa":["mba","ممباسا"],"hamad":["doha","hamad port","حمد","الدوحة"],"umm qasr":["umq","ام قصر"],"valencia":["vlc","فالنسيا"]},
+  equip:{"40' HC":["40hc","40hq","40 hc","40 hq","40 high cube","40'hc","40 قدم","٤٠ قدم"],"40' DC":["40dc","40gp","40 dv","40 dry"],"20' DC":["20dc","20gp","20 dv","20 dry","20 قدم","٢٠ قدم"],"40' RF":["40rf","40rh","40 reefer","40 ريفر"],"20' RF":["20rf","20 reefer"]},
+  term:{"rate":["price","prices","rates","offer","quotation","quote","سعر","اسعار","أسعار","se3r","as3ar","asaar","asaer","t2sira","تسعيرة"],"booking":["book","bkg","حجز","7agz","hagz"],"shipment":["shipping","شحنة","شحنه","sha7na"],
+    "container":["cntr","ctr","حاوية","كونتينر","kontainer"],"forward":["fwd","fw","reassign","transfer","حول","7awel"],"urgent":["asap","مستعجل","urgentt","msta3gel"],"tender":["tenders","مناقصة","mona2sa"],"follow":["followup","follow-up","متابعة","mtab3a"],"cancel":["cancelled","الغاء","elgha2"]},
+  stop:["3ayz","3awz","3ayza","3awza","عايز","عايزة","محتاج","please","pls","plz","kindly","law","lw","men","mn","min","l","ll","ila","to","from","for","ya","the","a","an"]};
+const KB_KEY="kb_v1", KB_MISS="kbMiss_v1";
+function kbAll(){ const add=lsGet(KB_KEY,{port:{},equip:{},term:{},stop:[]}), B=JSON.parse(JSON.stringify(KB_BASE));
+  ["port","equip","term"].forEach(s=>Object.entries(add[s]||{}).forEach(([k,v])=>{ B[s][k]=[...new Set([...(B[s][k]||[]),...v])]; })); B.stop=[...new Set([...B.stop,...(add.stop||[])])]; return B; }
+function kbAdd(sec,means,alias){ const a=lc(String(alias||"").trim()), m=String(means||"").trim(); if(!a||!m||!["port","equip","term","stop"].includes(sec)) return false;
+  const A=lsGet(KB_KEY,{port:{},equip:{},term:{},stop:[]}); if(sec==="stop") A.stop=[...new Set([...(A.stop||[]),a])]; else { A[sec]=A[sec]||{}; A[sec][m]=[...new Set([...(A[sec][m]||[]),a])]; }
+  lsSet(KB_KEY,A); lsSet(KB_MISS,lsGet(KB_MISS,[]).filter(x=>lc(x.w)!==a)); return true; }
+function kbMissAdd(w,where){ w=lc(String(w||"").trim()); if(!w||w.length<3||/^\d+$/.test(w)) return; const L=lsGet(KB_MISS,[]), x=L.find(z=>z.w===w); if(x){ x.n++; x.last=new Date().toISOString(); } else L.push({w,n:1,where,last:new Date().toISOString()}); while(L.length>100) L.shift(); lsSet(KB_MISS,L); }
+const AR_DIG={"٠":"0","١":"1","٢":"2","٣":"3","٤":"4","٥":"5","٦":"6","٧":"7","٨":"8","٩":"9"};
+function lev1(a,b){ if(a.length===b.length&&a!==b){ const d=[...a].map((c,i)=>c!==b[i]?i:-1).filter(i=>i>=0); if(d.length===2&&d[1]===d[0]+1&&a[d[0]]===b[d[1]]&&a[d[1]]===b[d[0]]) return true; } /* two letters swapped */ if(Math.abs(a.length-b.length)>1) return false; let i=0,j=0,d=0; while(i<a.length&&j<b.length){ if(a[i]===b[j]){ i++; j++; continue; } if(++d>1) return false; if(a.length>b.length) i++; else if(b.length>a.length) j++; else { i++; j++; } } return d+(a.length-i)+(b.length-j)<=1; }
+/* turn a free line (English, Egyptian Arabic, Franco) into the words the rules know */
+function kbNorm(text){ const K=kbAll(); let s=" "+String(text||"").replace(/[٠-٩]/g,d=>AR_DIG[d]).toLowerCase().replace(/[,;!?؟]/g," ")+" ";
+  const swap=(sec,fmt)=>{ const pairs=[]; Object.entries(K[sec]).forEach(([m,al])=>al.forEach(a=>pairs.push([a,m]))); pairs.sort((x,y)=>y[0].length-x[0].length);
+    pairs.forEach(([a,m])=>{ const re=new RegExp("(^|[\\s(])"+a.replace(/[.*+?^${}()|[\]\\\/']/g,"\\$&")+"(?=$|[\\s).])","gi"); s=s.replace(re,"$1"+fmt(m)); }); };
+  swap("equip",m=>m.replace(/'/g,"").replace(/\s+/g,"").toLowerCase()); swap("port",m=>m); swap("term",m=>m);
+  const stop=new Set(K.stop); return s.split(/\s+/).filter(w=>w&&!stop.has(w)).join(" ").trim(); }
+/* fuzzy port: exact, alias, or one letter off (Jedah → Jeddah) */
+function kbPort(word){ const w=lc(String(word||"").trim()); if(w.length<3) return null; const K=kbAll();
+  for(const [m,al] of Object.entries(K.port)) if(m===w||al.includes(w)) return ALLDEST.find(d=>lc(d)===m)||null;
+  if(w.length>=5){ const hit=ALLDEST.find(d=>lev1(lc(d),w)); if(hit) return hit; } return null; }
+/* BM25 over the Guide (question + keywords), with synonyms and typo tolerance */
+function bm25Rank(q,docs){ const tok=t=>kbNorm(t).split(/\s+/).filter(w=>w.length>2), D=docs.map(d=>tok(d)), N=D.length, avg=D.reduce((a,d)=>a+d.length,0)/Math.max(1,N), k1=1.2, b=0.75;
+  const df={}; D.forEach(d=>new Set(d).forEach(w=>df[w]=(df[w]||0)+1)); const Q=tok(q);
+  return D.map((d,i)=>{ let s=0; Q.forEach(qw=>{ const hits=d.filter(w=>w===qw||(qw.length>=5&&lev1(w,qw))||(qw.length>=4&&w.startsWith(qw))).length; if(!hits) return; const n=df[qw]||1, idf=Math.log(1+(N-n+0.5)/(n+0.5)); s+=idf*hits*(k1+1)/(hits+k1*(1-b+b*d.length/avg)); }); return {i,s}; }).sort((x,y)=>y.s-x.s); }
+function renderDict(){ const p=$("p-dict"); if(!p) return; const K=kbAll(), add=lsGet(KB_KEY,{port:{},equip:{},term:{},stop:[]}), M=lsGet(KB_MISS,[]).slice().sort((a,b)=>b.n-a.n), adm=isAdmin();
+  const sec=(s,title,note)=>`<div class="card"><h3>${esc(title)}</h3><p class="note">${esc(note)}</p><div class="csTblW"><table class="csTbl"><thead><tr><th>Means</th><th>Also written as</th></tr></thead><tbody>${Object.entries(K[s]).map(([m,al])=>`<tr><td><b>${esc(m)}</b></td><td>${al.map(a=>`<span class="kb-w${(add[s]&&add[s][m]||[]).includes(a)?" kb-new":""}">${esc(a)}</span>`).join(" ")}</td></tr>`).join("")}</tbody></table></div></div>`;
+  p.innerHTML=`<div class="card"><h3>Try it</h3><p class="note">Type a line the way people write it: English, Egyptian Arabic or Franco. The tool shows what it understood.</p><form id="kbTry" class="trkform"><label class="f grow">Line<input id="kbT" value="3ayz se3r 2x40hq mn el sokhna l jedah" maxlength="200"></label><button class="mini ok" type="submit">Read it</button></form><div id="kbOut" class="td-pre" style="margin-top:8px"></div></div>
+    <div class="card"><h3>Words the tool did not understand <span class="dschip ds-off">${M.length}</span></h3><p class="note">From Quick price and the Guide. Add a word to the dictionary and the tool understands it next time.</p>
+      ${M.length?M.slice(0,20).map((x,i)=>`<form class="td-it kb-miss" data-kbm="${esc(x.w)}"><span class="td-tag td-due">${x.n}×</span><div class="td-tx"><b>${esc(x.w)}</b><small>${esc(x.where)} · last ${esc(new Date(x.last).toLocaleString("en-GB",{timeZone:"Africa/Cairo",dateStyle:"short",timeStyle:"short"}))}</small></div><span class="ap-acts"><select data-s><option value="port">is a port</option><option value="term">is a word for</option><option value="equip">is equipment</option><option value="stop">ignore it</option></select><input data-m placeholder="e.g. Jeddah / rate" maxlength="40" style="width:140px"><button class="mini ok" type="submit">Add</button></span></form>`).join(""):`<p class="note">Nothing yet.</p>`}</div>
+    <div class="card"><h3>Add to the dictionary</h3><form id="kbAddF" class="trkform"><label class="f">Section<select id="kbS"><option value="port">Port</option><option value="equip">Equipment</option><option value="term">Word</option><option value="stop">Ignore (filler word)</option></select></label><label class="f">Means<input id="kbM" maxlength="40" placeholder="e.g. Jeddah"></label><label class="f">Also written as<input id="kbA" maxlength="40" placeholder="e.g. jdh"></label><button class="mini ok" type="submit">Add</button><span class="note" id="kbMsg"></span></form></div>
+    ${sec("port","Ports","Names, codes and Arabic spellings. One letter off is also understood (Jedah → Jeddah).")}${sec("equip","Equipment","Container types and the ways people write them.")}${sec("term","Words","Work words in English, Arabic and Franco. Green = added by the tool owner.")}
+    <div class="card"><h3>Filler words</h3><p class="note">Skipped when reading a line.</p>${K.stop.map(w=>`<span class="kb-w">${esc(w)}</span>`).join(" ")}</div>`;
+  const run=()=>{ const t=$("kbT").value, n=kbNorm(t), P=tdParse(t); $("kbOut").textContent=`Read as: ${n}\n`+(P&&!P.err?`Egyptian port: ${P.egy||"—"} · Destination: ${P.dest||"—"} · ${P.qty} × ${P.eq}${P.cust?" · Customer: "+P.cust:""}`:"Lane: "+(P&&P.err||"not found")); };
+  $("kbTry").onsubmit=e=>{ e.preventDefault(); run(); }; run();
+  $("kbAddF").onsubmit=e=>{ e.preventDefault(); const s=$("kbS").value; const ok=kbAdd(s,s==="stop"?"stop":$("kbM").value,$("kbA").value); if(!ok){ $("kbMsg").textContent="Fill both boxes"; return; } renderDict(); };
+  p.querySelectorAll(".kb-miss").forEach(f=>f.onsubmit=e=>{ e.preventDefault(); const s=f.querySelector("[data-s]").value, m=f.querySelector("[data-m]").value.trim(); if(s!=="stop"&&!m){ f.querySelector("[data-m]").focus(); return; } kbAdd(s,s==="stop"?"stop":m,f.dataset.kbm); renderDict(); }); }
+/* Quick price reads the line as typed first, then through the dictionary (Arabic, Franco, codes, typos) */
+{ const _tp=tdParse; tdParse=function(text){ const P=_tp(text); if(P&&!P.err&&P.egyFound) return P; let N=null; try{ N=_tp(kbNorm(text)); }catch(e){}
+    if(N&&!N.err){ if(N.cust) N.cust=N.cust.replace(/\b\w/g,c=>c.toUpperCase()); N.viaDict=true; return N; } return P; }; }
+/* Guide ranks answers with BM25 */
+gAsk=function(q){ const R=bm25Rank(q,GUIDE.map(e=>e.q+" "+e.k)).filter(x=>x.s>=1.2); return R.slice(0,3).map(x=>GUIDE[x.i]); };
 /* settings screens are view only for everyone but the admin */
 { const wrap=(get,set,id,keep)=>{ const o=get(); set(function(){ const r=o.apply(this,arguments); try{ lockPane(id,keep); }catch(e){} return r; }); };
-  wrap(()=>renderSrc,f=>renderSrc=f,"p-src"); wrap(()=>dsRender,f=>dsRender=f,"p-dsrc"); wrap(()=>renderApps,f=>renderApps=f,"p-apps"); wrap(()=>renderCmbx,f=>renderCmbx=f,"p-cmbx"); wrap(()=>renderTasks,f=>renderTasks=f,"p-tasks","[data-tkd],[data-tkp],[data-tkm]"); }
+  wrap(()=>renderSrc,f=>renderSrc=f,"p-src"); wrap(()=>dsRender,f=>dsRender=f,"p-dsrc"); wrap(()=>renderApps,f=>renderApps=f,"p-apps"); wrap(()=>renderDict,f=>renderDict=f,"p-dict","#kbT,#kbTry button"); wrap(()=>renderCmbx,f=>renderCmbx=f,"p-cmbx"); wrap(()=>renderTasks,f=>renderTasks=f,"p-tasks","[data-tkd],[data-tkp],[data-tkm]"); }
 /* the bell tells the admin about new tickets, changes by others and errors */
 { const _ub=updateBadges; updateBadges=function(){ _ub.apply(this,arguments); try{ if(!isAdmin()) return; const A=adminAlerts(), k=A.newT+A.changes, b=$("bellN"); if(k){ const n=(+b.textContent||0)+k; b.hidden=false; b.textContent=n; } }catch(e){} };
   const _rn=renderNtf; renderNtf=function(){ _rn.apply(this,arguments); try{ if(!isAdmin()) return; const A=adminAlerts(), T=tktAll().filter(t=>t.status==="new").slice(-3).reverse();
@@ -4707,7 +4762,7 @@ setTimeout(()=>{ try{ tdFocusWatch(); }catch(e){} try{ eodWatch(); histSnap(); s
     try{ csTick(); const D=wtDay(csDay(Date.now())); if(D) row=`<tr><td><b>${esc(csName("me"))}</b> (this browser)</td><td>${csTime(D.first)}</td><td>${csTime(D.last)}</td><td class="n">${asDur(D.active)}</td><td class="n">${asDur(D.away)}</td><td class="n">${asDur(D.brk)}</td><td class="n">${asDur(D.off)}</td></tr>`; }catch(e){}
     p.insertAdjacentHTML("beforeend",`<div class="card"><h3>Team working time <span class="dschip ds-off">Managers only</span></h3><p class="note">Active, Away, Break and Off in the tool, per person, today. In this demo each browser keeps only its own log, so only your row shows. On DP World servers every person's log goes to the team database and shows here. Each person sees only their own time. HR and Legal approve before real use.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Person</th><th>First seen</th><th>Last seen</th><th class="n">Active</th><th class="n">Away</th><th class="n">Break</th><th class="n">Off</th></tr></thead><tbody>${row||`<tr><td colspan="7" class="note">No time logged yet today.</td></tr>`}</tbody></table></div></div>`); }; }
-window.__rules = { gTraining, gAsk, GUIDE, teamScope, userLevel, execStats, execRisks, cycleStats, dirFind, fwdCase, DIR_MBX, isAdmin, tktNew, tktUpd, tktAll, errAdd, adminAlerts, lockPane, tkAll, tkMatrix, tkMark, tkDone, whoAmI, launchFacts, wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
+window.__rules = { kbNorm, kbPort, kbAdd, kbAll, bm25Rank, kbMissAdd, gTraining, gAsk, GUIDE, teamScope, userLevel, execStats, execRisks, cycleStats, dirFind, fwdCase, DIR_MBX, isAdmin, tktNew, tktUpd, tktAll, errAdd, adminAlerts, lockPane, tkAll, tkMatrix, tkMark, tkDone, whoAmI, launchFacts, wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
 window.__route = route;
 })();
 </script>
