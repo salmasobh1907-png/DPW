@@ -207,6 +207,10 @@ Cycle time = email in → first reply (clock time) per person and per kind of wo
 - **Executive summary** (managers and Director open here), written finding first: the headline (win rate trend, late cases), then margin on won quotes and win rate (last 3 months vs the 3 before), answered within the SLA, asked lanes with a valid rate; margin won per month; **Decisions for today** (back-up for one-person work, move work from overloaded to people with room, training, ask carriers for lanes without a rate) and **Risks** (one-person work, nobody owns, overload, lanes without a rate, rates ending, market alerts, urgent tool tickets). Dummy quote history in the demo.
 - **Forward / reassign**: person, shared mailbox (Pricing, Operations, Commercial, DP World Freight Forwarding, Air) and reason are all required.
 
+### 5.16 Guide ("Ask the guide", every screen)
+
+A chat-style panel with a fixed help list (`GUIDE`, about 20 questions) matched by keywords; no AI and no made-up answers. Suggested questions follow the current screen; each answer has steps, "Take me there", "Ask for a session" (training request: topic and preferred time, sent to the tool owner as a request in Support) and "Not helpful" / "Ask the tool owner" (sends the question as an idea ticket so the answer is added in a next update). Add or change answers in `GUIDE` in the page.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).

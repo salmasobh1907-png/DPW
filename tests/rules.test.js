@@ -546,3 +546,16 @@ test('levels: a manager sees every employee screen but only their own team in th
   assert.equal(out.director.scope, null); assert.equal(out.director.rows.length, 5);
   for (const k of ['today', 'cases', 'lane', 'sheet', 'exec', 'team']) assert.ok(out.manager.nav.includes(k), 'manager misses ' + k);
 });
+
+test('guide: questions find the right answer by keywords; unknown questions get no made-up answer', async () => {
+  const r = await run(() => { const A = q => (window.__rules.gAsk(q)[0] || {}).q || null;
+    return [A('how do i forward an email to operations'), A('whatsapp rates'), A('why is spot not the lowest'), A('report a bug'), A('weather in cairo')]; });
+  assert.deepEqual(r, ['How do I forward or reassign an email?', 'How do I add a WhatsApp rate?', 'Why is a cheaper rate not the lowest?', 'How do I report a problem?', null]);
+});
+
+test('guide: asking for a training session sends a request to the tool owner', async () => {
+  const r = await run(() => { localStorage.removeItem('tickets_v1'); const t = window.__rules.gTraining('Quick price and margins', 'Sunday morning');
+    return { q: (window.__rules.gAsk('can i get a workshop to learn')[0] || {}).q, t: [t.type, t.title, t.to, /Sunday morning/.test(t.text)] }; });
+  assert.equal(r.q, 'Can I get a training session?');
+  assert.deepEqual(r.t, ['req', 'Training session: Quick price and margins', 'owner', true]);
+});
