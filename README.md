@@ -119,9 +119,22 @@ Built for the tool, not a copy of the team Rate Bank. Dummy data only.
 
 Load it: `python3 scripts/pricing_rate_bank_to_data.py "data/DPW Pricing Rate Bank (dummy).xlsx" data/demo_data.json`, then `inject_data.py`. The script reads only Rates, Suspensions, Margin Rules and Contacts, never writes to the workbook, and lists every row problem (duplicate Rate ID, 40' below 20', spot without sailing, Sokhna without terminal, dates, currency). Rebuild the dummy workbook: `scripts/build_pricing_rate_bank.py`. In production the same columns can be a SharePoint List or a database table; the screens do not change.
 
+### 5.5 Data sources screen (Help & settings → Data sources)
+
+One list of every place rates come from, in priority order: 1 Pricing Rate Bank (built in), 2 carrier emails (Carrier offers), then sources added on the screen:
+
+| Type | How it updates | Notes |
+| --- | --- | --- |
+| Online link (CSV, JSON or Excel) | By itself every 15 min / hour / 6 h / day while the tool is open, or on "Refresh" | Direct download links only (SharePoint `?download=1`, internal API, carrier tariff file). Production: scheduled job on a service account |
+| Excel / CSV file | When Pricing uploads a new version | Any sheet, any column order; sheets named like credential or password are never opened |
+| WhatsApp chat (.txt from "Export chat") | When Pricing uploads a new export | Rate lines become rates marked `wa` (offer check warns "confirm by email"); GRI, surcharge, suspension, blank sailing, delay messages listed as announcements. Production option: WhatsApp Business Platform on a DP World number |
+
+Column names read (any order): Carrier/Line, POL/Port of Loading, POD/Destination, 20', 40' (HC), 20' RF, 40' RF, Currency, Valid From, Valid To/Validity, Contract Type, Customer, Transit days, Via, Free Time, POL Terminal, Spot Sailing, Rate ID, Direction, Comment.
+Merge rule: the same carrier + POL + POD + contract type + validity month in two sources → the higher source is used and the other is listed as a conflict; exact duplicates are skipped.
+
 ### 5.3 Browser-only storage (per user)
 
-Shared inbox cases and their settings (`csState_v1`, `csSet_v1`, `csMy_v1`), theme, last screen, view (pricing / sales).
+Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), theme, last screen, view (pricing / sales).
 In production the cases must move to the database (see section 9).
 
 ## 6. Business rules built in

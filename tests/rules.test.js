@@ -219,3 +219,36 @@ test('rule 1 (screen): the default buy rate on a lane is the lowest STANDARD rat
   assert.equal(+r.buy, +r.min);
   await pg.close();
 });
+
+test('data sources: any table with Carrier, POL, POD and a rate column is read; contract type kept', async () => {
+  const r = await run(() => window.__rules.dsNormalize([
+    ['Rates for December (dummy)'], [],
+    ['Line', 'Port of Loading', 'Destination', "40'HC", "20'", 'Validity', 'Contract Type', 'Remarks'],
+    ['Zeta Line', 'Sokhna', 'Jeddah', '1,200', 800, '2026-12-31', '', 'ok'],
+    ['Zeta Line', 'Sokhna', 'Jeddah', 900, 600, '', 'Spot', ''],
+    ['', 'Sokhna', 'Jeddah', 900, 600, '', '', ''],
+  ]));
+  assert.equal(r.rates.length, 2); assert.equal(r.skip, 1);
+  assert.equal(r.rates[0].r40, 1200); assert.equal(r.rates[0].valid, '2026-12-31'); assert.ok(!r.rates[0].type);
+  assert.equal(r.rates[1].type, 'Spot'); assert.ok(r.rates[1].validAssumed);
+});
+
+test('data sources: WhatsApp chat export -> rates (marked) and announcements', async () => {
+  const txt = fs.readFileSync(path.resolve(__dirname, '../data/Demo WhatsApp chat (dummy).txt'), 'utf8');
+  const r = await run(t => window.__rules.dsWhatsApp(t, ''), txt);
+  assert.equal(r.msgs, 6);
+  assert.deepEqual(r.rates.map(x => [x.car, x.pod, x.r20, x.r40, x.valid, x.wa]),
+    [['Aurora Lines', 'Jeddah', 600, 780, '2026-12-31', true], ['Aurora Lines', 'Jebel Ali', 900, 1300, '2026-12-31', true]]);
+  assert.deepEqual(r.news.map(n => n.tag).sort(), ['BLANK SAILING', 'GRI']);
+  assert.equal(r.nocar, 1); // "Zeta NVOCC" is not a known carrier: rate not used
+});
+
+test('data sources: a higher source wins on the same carrier, lane, type and month', async () => {
+  const r = await run(() => { const R = window.__rules, D = R.DS, keep = [D.list, D.rows];
+    D.list = [{ id: 't1', name: 'Test link', kind: 'url', on: true }];
+    D.rows = { t1: { rates: [{ car: 'Sahara Feeder', pol: 'Sokhna', pod: 'Jeddah', r20: 600, r40: 800, cur: 'USD', valid: '2026-12-20' },
+                             { car: 'New Line', pol: 'Sokhna', pod: 'Jeddah', r20: 500, r40: 700, cur: 'USD', valid: '2099-12-31' }], imports: [] } };
+    R.dsApply(); const used = DATA.rates.filter(x => x.src === 'Test link').map(x => x.car), conf = D.conf.length;
+    D.list = keep[0]; D.rows = keep[1]; R.dsApply(); return { used, conf, after: DATA.rates.some(x => x.src === 'Test link') }; });
+  assert.deepEqual(r.used, ['New Line']); assert.equal(r.conf, 1); assert.equal(r.after, false);
+});

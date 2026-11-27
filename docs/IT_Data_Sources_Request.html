@@ -67,6 +67,8 @@ hr{border:0;border-top:1px solid var(--rule);margin:0}
     <div class="mr" role="row"><div class="src"><b>Entra ID security groups <span class="now">first</span></b><span>Pricing, Sales, Leads, Network</span></div><div class="arr">→</div><div class="how"><b>Single sign-on</b><span>Roles come from groups, not from the email address</span></div><div class="arr">→</div><div class="use">Every screen<span>Sales never get buy rates</span></div></div>
     <div class="mr" role="row"><div class="src"><b>Team database <span class="now">first</span></b><span>Quotes, feedback, cases, logs, edits</span></div><div class="arr">→</div><div class="how"><b>SharePoint Lists or Azure SQL</b><span>With an audit log of who changed what</span></div><div class="arr">→</div><div class="use">Offers &amp; feedback, KPIs, Help &amp; settings</div></div>
     <div class="mr" role="row"><div class="src"><b>Trucking rates</b><span>Pickup in Egypt (EXW), cross-border trucks</span></div><div class="arr">→</div><div class="how"><b>Owner to confirm</b><span>File on SharePoint or entered in the tool</span></div><div class="arr">→</div><div class="use">Trucking rates, EXW part of the offer</div></div>
+    <div class="mr" role="row"><div class="src"><b>Carrier links and files</b><span>Tariff files, CSV or Excel links, an internal API</span></div><div class="arr">→</div><div class="how"><b>Data sources screen</b><span>Direct download links refresh on a schedule; uploads by Pricing. IT confirms which hosts the tool may read</span></div><div class="arr">→</div><div class="use">Rates &amp; offer<span>Rate Bank wins on conflicts</span></div></div>
+    <div class="mr" role="row"><div class="src"><b>WhatsApp from carriers and NVOCCs</b><span>Rate lines and announcements</span></div><div class="arr">→</div><div class="how"><b>Today: chat export (.txt) upload</b><span>Later: official WhatsApp Business Platform on a DP World number (IT, Legal, Meta approval)</span></div><div class="arr">→</div><div class="use">Rates (marked "confirm by email"), announcements</div></div>
     <div class="mr" role="row"><div class="src"><b>NPM (Network Pricing Manager) <span class="later">later</span></b><span>Global rates</span></div><div class="arr">→</div><div class="how"><b>API, to agree with the NPM team</b><span>Replaces the Excel source; screens stay the same</span></div><div class="arr">→</div><div class="use">Rates &amp; offer</div></div>
     <div class="mr" role="row"><div class="src"><b>CARGOES bookings, market index <span class="later">later</span></b><span>Booking volumes, market rate level</span></div><div class="arr">→</div><div class="how"><b>To agree with each owner</b></div><div class="arr">→</div><div class="use">Carrier volumes, Market alerts, margin advice</div></div>
   </div>
@@ -121,6 +123,9 @@ hr{border:0;border-top:1px solid var(--rule);margin:0}
       <li><b>Service account</b> for the refresh job and the mail job.</li>
       <li><b>Security review</b> before any real data enters the tool.</li>
       <li><b>HR and Legal</b> view on the "My shift" time tracking.</li>
+      <li><b>New shared mailboxes:</b> IT creates them in Microsoft 365 (for example a reefer box); Pricing then adds them in the tool with SLA, access and routing words.</li>
+      <li><b>WhatsApp:</b> whether DP World opens a WhatsApp Business Platform number for carriers. The tool never reads a personal WhatsApp.</li>
+      <li><b>Allowed link hosts</b> for the Data sources screen (SharePoint, carrier portals, internal APIs).</li>
     </ol>
   </div>
 </div></section>
