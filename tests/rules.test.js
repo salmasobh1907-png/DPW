@@ -646,3 +646,17 @@ test('carrier spot rates: the pasted page is read by the recipe keywords, with w
   assert.equal(r.val.vessel, 'DEMO STAR / 046E'); assert.equal(r.val.etd, '2026-12-02'); assert.equal(r.val.tt, 4); assert.equal(r.val.cur, 'USD');
   assert.match(r.from.r40, /40' High Cube/);
 });
+
+test('smart request: target read from the email; special rate for this customer, cheaper spot and carriers to ask; margin choices', async () => {
+  const r = await run(() => { const R = window.__rules;
+    const t = [R.smTarget('Please quote 2x40 Sokhna to Jeddah, target USD 1,000'), R.smTarget('our target rate: 950$'), R.smTarget('no number here')];
+    const v = R.tdParse('Alexandria Valencia 1x40 Horus Auto Parts'), ov = R.smOpts(v, { buy: 950 }), ov2 = R.smOpts(v, { buy: 875 });
+    const j = R.tdParse('Sokhna Jeddah 2x40'), oj = R.smOpts(j, { buy: 850 });
+    const m = R.smMargins(850, 900, 105).map(o => [o.k, o.m, o.sell]);
+    return { t, special: ov.special.map(x => [x.car, x.r40, x.cust]), special2: ov2.special.length, spot: oj.spot.map(x => [x.car, x.r40]), ask: oj.ask, m }; });
+  assert.deepEqual(r.t, [1000, 950, null]);
+  assert.deepEqual(r.special, [['Delta Marine', 900, 'Horus Auto Parts']]); assert.equal(r.special2, 0); // only when cheaper than the best standard
+  assert.deepEqual(r.spot, [['Aurora Lines', 560]]);
+  assert.ok(r.ask.includes('Aurora Lines'));
+  assert.deepEqual(r.m, [['rule', 105, 955], ['target', 50, 900], ['none', 0, 850]]);
+});
