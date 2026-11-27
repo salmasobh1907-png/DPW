@@ -142,9 +142,14 @@ One list of every place rates come from, in priority order: 1 Pricing Rate Bank 
 Column names read (any order): Carrier/Line, POL/Port of Loading, POD/Destination, 20', 40' (HC), 20' RF, 40' RF, Currency, Valid From, Valid To/Validity, Contract Type, Customer, Transit days, Via, Free Time, POL Terminal, Spot Sailing, Rate ID, Direction, Comment.
 Merge rule: the same carrier + POL + POD + contract type + validity month in two sources → the higher source is used and the other is listed as a conflict; exact duplicates are skipped.
 
+### 5.7 Desk assistant ("Next up") and working time
+
+- **Next up** (top of Today): every Needs-you item gets a score: type of work (LATE 90, DUE 60, market alert 50, no rate 45, new 40, ending rate 35, follow-up 30, carrier offers 20, WhatsApp 15) + SLA urgency (over the SLA +100, under 30 min +60, under 2 h +30) + key account +15 + assigned to you +10. The top item shows with its reasons. Start (runs its action and a timer), Done (logs the time), Snooze 30 min. Plain rules, no AI.
+- **Working time**: the existing shift clock now keeps a log per day of Active / Away / Break / Off with a timeline and the last 7 days. Off = computer asleep, locked, shut down or the tool closed (a gap of more than 90 s). It measures the tool only (mouse and keys in the tool, tab open), not other programs. Shown to the person (Today) and to managers (Team KPIs, "Managers only"). In the demo each browser holds only its own log. **Before real use: HR and Legal approval, and every person told what is recorded.** For presence across the whole PC, Teams presence through Microsoft Graph (Presence.Read.All) is the existing option.
+
 ### 5.3 Browser-only storage (per user)
 
-Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), theme, last screen, view (pricing / sales).
+Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).
 In production the cases must move to the database (see section 9).
 
 ## 6. Business rules built in

@@ -449,6 +449,8 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
 .td-chk{font-size:13px;padding:7px 10px;border-radius:8px;margin:4px 0}.td-chk.err{background:#f9d4d4;color:#7f1d1d}.td-chk.due{background:#fde9c8;color:#7c4a03}.td-chk.ok{background:#d9f2e3;color:#14532d}.td-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .td-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}.td-kpis>div{background:var(--card,#fff);border:1px solid rgba(127,127,127,.25);border-radius:14px;padding:12px 14px}.td-kpis span{display:block;font-size:12px;opacity:.75}.td-kpis b{font-size:24px;display:block;margin:2px 0}.td-kpis small{font-size:12px;opacity:.75}
 .td-it{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 4px;border-top:1px solid rgba(127,127,127,.18)}.td-tx b{display:block;font-size:14px}.td-tx small{font-size:12px;opacity:.75}.td-tag{font:700 11px/1 system-ui;padding:7px 8px;border-radius:8px;min-width:38px;text-align:center}.td-err{background:#f9d4d4;color:#7f1d1d}.td-due{background:#fde9c8;color:#7c4a03}.td-new{background:#dbe7fb;color:#1e3a8a}
+.as-card{display:flex;flex-direction:column;gap:6px;border-left:0}.as-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.as-lab{font-size:12px;font-weight:700;letter-spacing:.02em;opacity:.7}.as-tt{font-size:18px;line-height:1.3}.as-why{margin:4px 0 0;padding-left:18px;font-size:13px;opacity:.85}.as-clock{font:600 16px system-ui;font-variant-numeric:tabular-nums}.as-run{box-shadow:inset 0 0 0 2px var(--accent,#3b5bdb)}
+.wt-nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:8px 0}.wt-nums span{display:flex;align-items:center;gap:6px;font-size:12px;opacity:.8}.wt-nums span b{width:10px;height:10px;border-radius:3px;display:inline-block}.wt-nums strong{font-size:18px}.wt-bar{position:relative;height:16px;border-radius:8px;background:rgba(127,127,127,.12);overflow:hidden}.wt-bar i{position:absolute;top:0;bottom:0}.wt-ax{display:flex;justify-content:space-between;font-size:12px;opacity:.7;margin-top:4px}
 .dschip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}.ds-ok{background:#d9f2e3;color:#14532d}.ds-due{background:#fde9c8;color:#7c4a03}.ds-err{background:#f9d4d4;color:#7f1d1d}.ds-off,.ds-busy{background:#e5e7eb;color:#374151}.dstbl td{vertical-align:top}
 </style>
 </head>
@@ -2633,11 +2635,12 @@ function csPill(c){ const s=csState(c);
 function csMy(){ let m=null; try{ m=JSON.parse(localStorage.getItem(CS_MYK)||"null"); }catch(e){} const d=csDay(Date.now());
   if(!m||m.day!==d) m={day:d,start:Date.now(),last:Date.now(),active:0,away:0,brk:0,mode:"work",lastInput:Date.now(),awayNow:false}; return m; }
 function csMySave(m){ try{ localStorage.setItem(CS_MYK,JSON.stringify(m)); }catch(e){} }
-function csTick(){ const m=csMy(), now=Date.now(), dt=now-m.last, S=csSet(); m.last=now;
-  if(dt>0){ if(dt>90e3) m.away+=dt; // laptop closed / locked / page closed
-    else if(m.mode==="break") m.brk+=dt;
-    else if(document.hidden||now-m.lastInput>S.idle*6e4){ m.away+=dt; m.awayNow=true; }
-    else { m.active+=dt; m.awayNow=false; } }
+function csTick(){ const m=csMy(), now=Date.now(), dt=now-m.last, S=csSet(), from=m.last; m.last=now; let st="";
+  if(dt>0){ if(dt>90e3){ m.away+=dt; st="off"; } // laptop asleep / locked / shut down / page closed
+    else if(m.mode==="break"){ m.brk+=dt; st="brk"; }
+    else if(document.hidden||now-m.lastInput>S.idle*6e4){ m.away+=dt; m.awayNow=true; st="away"; }
+    else { m.active+=dt; m.awayNow=false; st="active"; } }
+  if(st){ try{ wtSeg(from,now,st); }catch(e){} }
   csMySave(m); return m; }
 let CS_TIMER=null;
 function csStartTimer(){ if(CS_TIMER) return; const mark=()=>{ const m=csMy(); if(now0()-m.lastInput>2e3){ m.lastInput=now0(); csMySave(m); } };
@@ -4009,7 +4012,7 @@ async function tdQuick(text){ const P=tdParse(text); TD.q=text; if(!P||P.err){ T
   TD.res={P,car:$("q-car").value,buy:parseFloat($("q-buy").value),mrg:parseFloat($("q-mrg").value),sell:$("q-sell").textContent,adv:S,checks}; renderToday(); }
 function tdItems(){ const t=todayISO(), I=[], add=(o)=>I.push(o);
   try{ const now=Date.now(); csLoad().cases.filter(c=>!c.sub).forEach(c=>{ const s=csState(c,now), lane0=tdParse(c.subj||""), lane=lane0&&!lane0.err&&lane0.egyFound&&!lane0.imp?lane0:null, tag=s.st==="breach"?"LATE":s.st==="soon"?"DUE":"NEW";
-      add({pri:tag==="LATE"?0:tag==="DUE"?1:3,tag,title:String(c.subj||"").replace(/^DEMO\s*\|\s*/i,""),sub:`${csMbx(c.mbx).name} · ${c.who?csName(c.who):"not assigned"} · answer by ${csTime(s.due)}`,
+      add({pri:tag==="LATE"?0:tag==="DUE"?1:3,due:s.due,key:c.mbx==="kam",mine:c.who==="me",tag,title:String(c.subj||"").replace(/^DEMO\s*\|\s*/i,""),sub:`${csMbx(c.mbx).name} · ${c.who?csName(c.who):"not assigned"} · answer by ${csTime(s.due)}`,
         act:lane?"Price it":"Open case",go:lane?()=>{ $("tdQ").value=c.subj; tdQuick(c.subj); }:()=>openTab("cases")}); }); }catch(e){}
   try{ (QT.items||[]).filter(q=>q.status==="pending"&&q.followUp&&q.followUp<=t).slice(0,4).forEach(q=>add({pri:2,tag:"F/U",title:`${q.customer||"Quote"} · ${q.pol||""} → ${q.pod||""}`,sub:`No answer since ${fmtDate(String(q.day||q.created||"").slice(0,10))}: ask ${q.seller||"sales"} for won or lost and the reason`,act:"Open",go:()=>openTab("q")})); }catch(e){}
   const openReq=(DATA.requests||[]).filter(r=>r.st==="open"||r.st==="pending");
@@ -4036,12 +4039,15 @@ function renderToday(){ const p=$("p-today"); if(!p||p.hidden) return; const I=t
       ${A&&A.rec!=null&&isFinite(R.mrg)&&A.rec!==R.mrg?`<p class="note">Margin advisor suggests USD ${money(A.rec)} (${esc(A.conf)} confidence).</p>`:""}
       ${stop.map(c=>`<div class="td-chk err">Stop: ${c.txt}</div>`).join("")}${warn.map(c=>`<div class="td-chk due">Check: ${c.txt}</div>`).join("")}${!stop.length&&!warn.length&&isFinite(R.buy)?`<div class="td-chk ok">All checks passed</div>`:""}
       <div class="td-acts"><button type="button" class="svc btn primary" id="tdOpen">Open the offer</button>${A&&A.rec!=null&&isFinite(R.mrg)&&A.rec!==R.mrg?`<button type="button" class="mini ok" id="tdAdv">Use USD ${money(A.rec)}</button>`:""}<button type="button" class="mini" id="tdClr">Clear</button></div></div>`; }
+  const asHtml=asCard(I);
   p.innerHTML=`<div class="td-head"><h2>${hi}. ${I.length} thing${I.length===1?"":"s"} need${I.length===1?"s":""} you today</h2></div>
+    ${asHtml}
     <form id="tdForm" class="td-quick" autocomplete="off"><label for="tdQ" class="td-ql">Quick price</label><input id="tdQ" value="${esc(TD.q)}" placeholder="Sokhna Jeddah 2x40 Gulf Home   or   Q12"><button class="svc btn primary" type="submit">Price it</button><span class="td-kbd" aria-hidden="true">/</span></form>
     ${res}
     <div class="td-kpis"><div><span>Open cases</span><b>${cs.open}</b><small>${cs.late?cs.late+" late":"none late"}</small></div><div><span>Open requests</span><b>${(DATA.requests||[]).filter(r=>r.st==="open"||r.st==="pending").length}</b><small>from the Reference Sheet</small></div>
       <div><span>Hit ratio this month</span><b>${won+lost?Math.round(won/(won+lost)*100)+"%":"—"}</b><small>${won} won of ${won+lost} closed</small></div><div><span>Rates ending in 7 days</span><b>${end7}</b><small>standard rates</small></div></div>
-    <div class="card"><h3>Needs you <span class="dschip ds-off">${I.length}</span></h3>${I.length?I.slice(0,14).map((x,i)=>`<div class="td-it"><span class="td-tag td-${tagC[x.tag]||"new"}">${esc(x.tag)}</span><div class="td-tx"><b>${esc(x.title)}</b><small>${esc(x.sub)}</small></div><button type="button" class="${i===0?"svc btn primary":"mini"}" data-td="${i}">${esc(x.act)}</button></div>`).join(""):`<p class="note">Nothing waiting. New emails, follow-ups and ending rates show up here.</p>`}</div>`;
+    <div class="card"><h3>Needs you <span class="dschip ds-off">${I.length}</span></h3>${I.length?I.slice(0,14).map((x,i)=>`<div class="td-it"><span class="td-tag td-${tagC[x.tag]||"new"}">${esc(x.tag)}</span><div class="td-tx"><b>${esc(x.title)}</b><small>${esc(x.sub)}</small></div><button type="button" class="${i===0?"svc btn primary":"mini"}" data-td="${i}">${esc(x.act)}</button></div>`).join(""):`<p class="note">Nothing waiting. New emails, follow-ups and ending rates show up here.</p>`}</div>${(()=>{ try{ csTick(); return wtCard("My working time today"); }catch(e){ return ""; } })()}`;
+  asWire(I);
   $("tdForm").onsubmit=e=>{ e.preventDefault(); tdQuick($("tdQ").value); };
   p.querySelectorAll("[data-td]").forEach(b=>b.onclick=()=>{ const x=I[+b.dataset.td]; if(x&&x.go) x.go(); });
   const o=$("tdOpen"); if(o) o.onclick=()=>openTab("lane"); const c=$("tdClr"); if(c) c.onclick=()=>{ TD.res=null; TD.q=""; renderToday(); };
@@ -4049,7 +4055,62 @@ function renderToday(){ const p=$("p-today"); if(!p||p.hidden) return; const I=t
 /* "/" jumps to Quick price from anywhere (not while typing in a field) */
 document.addEventListener("keydown",e=>{ if(e.key!=="/"||e.ctrlKey||e.metaKey||e.altKey) return; const tg=e.target, tn=tg&&tg.tagName; if(tn==="INPUT"||tn==="TEXTAREA"||tn==="SELECT"||(tg&&tg.isContentEditable)) return;
   if(!isPricing()) return; e.preventDefault(); openTab("today"); setTimeout(()=>{ const q=$("tdQ"); if(q){ q.focus(); q.select(); } },50); });
-window.__rules = { tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
+/* ---------- Desk assistant ("Next up") + working-time log. Plain rules, no AI. ----------
+   Next up: every Needs-you item gets a score (urgency of its SLA, type of work, key account) and the reasons are shown.
+   Start / Done / Snooze keep a timer per task (this browser).
+   Working time: the tool records Active / Away / Break / Off (computer asleep, locked, shut down or tool closed) from
+   the tool's own activity: mouse and keys inside the tool, the tab being open. It cannot see other programs.
+   Visible to the person and to managers only (HR and Legal to approve before real use). */
+const AS_BASE={LATE:90,DUE:60,ALR:50,GAP:45,NEW:40,EXP:35,"F/U":30,OFR:20,WA:15};
+const AS_WHY={LATE:"The SLA is already broken",DUE:"The SLA ends soon",ALR:"A market risk touches open requests",GAP:"Customers wait and we have no valid rate",NEW:"New request in the queue",EXP:"A rate in use ends in 3 days","F/U":"A quote waits for won / lost",OFR:"New carrier rates to check",WA:"WhatsApp rates need email confirmation"};
+function asScore(x){ let s=AS_BASE[x.tag]||10; const why=[AS_WHY[x.tag]||""];
+  if(x.due){ const m=(x.due-Date.now())/6e4; if(m<0){ s+=100; why.push(`${asDur(-m*6e4)} over the SLA`); } else if(m<30){ s+=60; why.push(`${Math.round(m)} min left`); } else if(m<120){ s+=30; why.push(`${Math.round(m)} min left`); } }
+  if(x.key){ s+=15; why.push("Key account"); } if(x.mine){ s+=10; why.push("Assigned to you"); }
+  return {s,why:why.filter(Boolean)}; }
+function asKey(x){ return x.tag+"|"+x.title; }
+function asGet(k,d){ return lsGet(k,d); }
+function asNext(I){ const sn=asGet("tdSnooze_v1",{}), now=Date.now();
+  return I.filter(x=>!(sn[asKey(x)]>now)).map(x=>({...x,...asScore(x)})).sort((a,b)=>b.s-a.s); }
+function asTask(){ return asGet("tdTask_v1",null); }
+function asStart(x){ lsSet("tdTask_v1",{key:asKey(x),title:x.title,tag:x.tag,start:Date.now()}); }
+function asDone(){ const t=asTask(); if(!t) return; const L=asGet("tdDone_v1",[]).filter(d=>d.day===todayISO()); L.push({day:todayISO(),title:t.title,tag:t.tag,ms:Date.now()-t.start,at:new Date().toISOString()}); lsSet("tdDone_v1",L); lsSet("tdTask_v1",null);
+  const sn=asGet("tdSnooze_v1",{}); sn[t.key]=Date.now()+8*36e5; lsSet("tdSnooze_v1",sn); }
+function asSnooze(x,min){ const sn=asGet("tdSnooze_v1",{}); sn[asKey(x)]=Date.now()+min*6e4; lsSet("tdSnooze_v1",sn); }
+function asDur(ms){ const m=Math.max(0,Math.round(ms/6e4)); return m<60?m+" min":Math.floor(m/60)+" h "+String(m%60).padStart(2,"0")+" min"; }
+/* working-time log: one entry per day with segments [from, to, state] */
+const WT_KEY="wtLog_v1";
+function wtSeg(from,to,st){ if(!(to>from)) return; const L=lsGet(WT_KEY,{}), d=csDay(from), D=L[d]||(L[d]={segs:[],first:from});
+  const s=D.segs, last=s[s.length-1]; if(last&&last[2]===st&&from-last[1]<2000) last[1]=to; else s.push([from,to,st]); D.last=to;
+  const days=Object.keys(L).sort(); while(days.length>31) delete L[days.shift()]; lsSet(WT_KEY,L); }
+function wtDay(d){ const D=(lsGet(WT_KEY,{})||{})[d]; if(!D) return null; const t={active:0,away:0,brk:0,off:0}; D.segs.forEach(([a,b,st])=>{ t[st]=(t[st]||0)+(b-a); }); return {...t,first:D.first,last:D.last,segs:D.segs}; }
+function wtMgr(){ const me=CS_PEOPLE.find(p=>p.id==="me"); return !!(QT.isOwner||(me&&/@lead\./.test(me.mail))); }
+function wtCard(title){ const t=todayISO(), D=wtDay(csDay(Date.now())); if(!D) return "";
+  const span=Math.max(1,(D.last||Date.now())-D.first), col={active:"#18a57b",away:"#e0a23b",brk:"#7c83db",off:"#c3cad4"}, lab={active:"Active",away:"Away",brk:"Break",off:"Off (asleep, locked or closed)"};
+  const bar=D.segs.map(([a,b,st])=>`<i title="${lab[st]} ${csTime(a)}–${csTime(b)}" style="left:${((a-D.first)/span*100).toFixed(2)}%;width:${Math.max(.3,(b-a)/span*100).toFixed(2)}%;background:${col[st]}"></i>`).join("");
+  const days=Object.keys(lsGet(WT_KEY,{})||{}).sort().reverse().slice(0,7);
+  return `<div class="card"><h3>${esc(title)}</h3><p class="note">Time in the tool: mouse or keys in the last minutes = Active; tab hidden or no activity = Away; computer asleep, locked, shut down or the tool closed = Off. Only you${wtMgr()?" and managers":" and your manager"} see this.</p>
+    <div class="wt-nums">${["active","away","brk","off"].map(k=>`<div><span><b style="background:${col[k]}"></b>${lab[k].split(" (")[0]}</span><strong>${asDur(D[k]||0)}</strong></div>`).join("")}<div><span>First seen</span><strong>${csTime(D.first)}</strong></div></div>
+    <div class="wt-bar" role="img" aria-label="Today's timeline from ${csTime(D.first)} to ${csTime(D.last)}">${bar}</div><div class="wt-ax"><span>${csTime(D.first)}</span><span>${csTime(D.last)}</span></div>
+    ${days.length>1?`<details><summary>Last ${days.length} days</summary><div class="scroll"><table class="tbl"><thead><tr><th>Day</th><th>First seen</th><th>Last seen</th><th class="n">Active</th><th class="n">Away</th><th class="n">Break</th><th class="n">Off</th></tr></thead><tbody>${days.map(d=>{ const x=wtDay(d); return x?`<tr><td>${esc(d)}</td><td>${csTime(x.first)}</td><td>${csTime(x.last)}</td><td class="n">${asDur(x.active)}</td><td class="n">${asDur(x.away)}</td><td class="n">${asDur(x.brk)}</td><td class="n">${asDur(x.off)}</td></tr>`:""; }).join("")}</tbody></table></div></details>`:""}</div>`; }
+function asCard(I){ const N=asNext(I), T=asTask(), done=asGet("tdDone_v1",[]).filter(d=>d.day===todayISO());
+  const doneLine=done.length?`<p class="note">Done today: ${done.length} task${done.length>1?"s":""} · ${asDur(done.reduce((a,d)=>a+d.ms,0))}</p>`:"";
+  if(T) return `<div class="card as-card as-run"><div class="as-top"><span class="as-lab">Working on</span><span class="as-clock" id="asClock">${asDur(Date.now()-T.start)}</span></div><b class="as-tt">${esc(T.title)}</b>
+    <div class="td-acts"><button type="button" class="svc btn primary" id="asDone">Done</button><button type="button" class="mini" id="asStop">Stop the timer</button></div>${doneLine}</div>`;
+  const x=N[0]; if(!x) return `<div class="card as-card"><span class="as-lab">Next up</span><b class="as-tt">Nothing waiting. Good time to ask carriers for next month's rates.</b>${doneLine}</div>`;
+  return `<div class="card as-card"><div class="as-top"><span class="as-lab">Next up</span><span class="td-tag td-${x.tag==="LATE"||x.tag==="GAP"||x.tag==="ALR"?"err":x.tag==="NEW"||x.tag==="OFR"||x.tag==="WA"?"new":"due"}">${esc(x.tag)}</span></div>
+    <b class="as-tt">${esc(x.title)}</b><small>${esc(x.sub)}</small><ul class="as-why">${x.why.map(w=>`<li>${esc(w)}</li>`).join("")}</ul>
+    <div class="td-acts"><button type="button" class="svc btn primary" id="asGo">Start: ${esc(x.act)}</button><button type="button" class="mini" id="asSn">Snooze 30 min</button>${N[1]?`<span class="note">Then: ${esc(N[1].title)}</span>`:""}</div>${doneLine}</div>`; }
+function asWire(I){ const N=asNext(I), x=N[0];
+  const g=$("asGo"); if(g&&x) g.onclick=()=>{ asStart(x); x.go&&x.go(); renderToday(); };
+  const sn=$("asSn"); if(sn&&x) sn.onclick=()=>{ asSnooze(x,30); renderToday(); };
+  const d=$("asDone"); if(d) d.onclick=()=>{ asDone(); renderToday(); };
+  const st=$("asStop"); if(st) st.onclick=()=>{ lsSet("tdTask_v1",null); renderToday(); };
+  clearInterval(asWire.t); asWire.t=setInterval(()=>{ const c=$("asClock"), T=asTask(); if(!c||!T){ clearInterval(asWire.t); return; } c.textContent=asDur(Date.now()-T.start); },15e3); }
+{ const _rk=renderCkpi; renderCkpi=function(){ _rk.apply(this,arguments); const p=$("p-ckpi"); if(!p||!wtMgr()) return; let row="";
+    try{ csTick(); const D=wtDay(csDay(Date.now())); if(D) row=`<tr><td><b>${esc(csName("me"))}</b> (this browser)</td><td>${csTime(D.first)}</td><td>${csTime(D.last)}</td><td class="n">${asDur(D.active)}</td><td class="n">${asDur(D.away)}</td><td class="n">${asDur(D.brk)}</td><td class="n">${asDur(D.off)}</td></tr>`; }catch(e){}
+    p.insertAdjacentHTML("beforeend",`<div class="card"><h3>Team working time <span class="dschip ds-off">Managers only</span></h3><p class="note">Active, Away, Break and Off in the tool, per person, today. In this demo each browser keeps only its own log, so only your row shows. On DP World servers every person's log goes to the team database and shows here. Each person sees only their own time. HR and Legal approve before real use.</p>
+      <div class="scroll"><table class="tbl"><thead><tr><th>Person</th><th>First seen</th><th>Last seen</th><th class="n">Active</th><th class="n">Away</th><th class="n">Break</th><th class="n">Off</th></tr></thead><tbody>${row||`<tr><td colspan="7" class="note">No time logged yet today.</td></tr>`}</tbody></table></div></div>`); }; }
+window.__rules = { asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
 window.__route = route;
 })();
 </script>

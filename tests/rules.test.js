@@ -335,3 +335,23 @@ test('quick price: a foreign port before the Egyptian one is an import, not pric
   const r = await run(() => window.__rules.tdParse('Back-to-back rate Jebel Ali to Sokhna 2x20'));
   assert.equal(r.imp, true); assert.equal(r.dest, 'Jebel Ali'); assert.equal(r.egy, 'Sokhna');
 });
+
+test('assistant: the most urgent item comes first, with its reasons', async () => {
+  const r = await run(() => { const now = Date.now(), A = window.__rules.asNext([
+      { tag: 'OFR', title: 'offers', sub: '' },
+      { tag: 'NEW', title: 'new key account request', sub: '', due: now + 20 * 6e4, key: true },
+      { tag: 'LATE', title: 'late case', sub: '', due: now - 30 * 6e4 },
+      { tag: 'GAP', title: 'no rate', sub: '' }]);
+    return A.map(x => [x.title, x.why.join(' / ')]); });
+  assert.deepEqual(r.map(x => x[0]), ['late case', 'new key account request', 'no rate', 'offers']);
+  assert.match(r[0][1], /30 min over the SLA/); assert.match(r[1][1], /Key account/);
+});
+
+test('working time: segments are stored per day and add up by state', async () => {
+  const r = await run(() => { const R = window.__rules, k = 'wtLog_v1', keep = localStorage.getItem(k); localStorage.removeItem(k);
+    const t0 = new Date(2026, 10, 25, 9, 0).getTime(), m = 6e4;
+    R.wtSeg(t0, t0 + 30 * m, 'active'); R.wtSeg(t0 + 30 * m, t0 + 40 * m, 'away'); R.wtSeg(t0 + 40 * m, t0 + 100 * m, 'off'); R.wtSeg(t0 + 100 * m, t0 + 130 * m, 'active');
+    const D = R.wtDay('2026-11-25'); if (keep) localStorage.setItem(k, keep); else localStorage.removeItem(k);
+    return [D.active / m, D.away / m, D.off / m, D.segs.length]; });
+  assert.deepEqual(r, [60, 10, 60, 4]);
+});
