@@ -36,7 +36,9 @@ One pricing desk for export and import requests:
 5. The offer goes to the sales person; sales send the quote to the customer.
 6. Sales record won or lost and feedback; managers see KPIs and reports.
 
-Two views: **Pricing** (sees buy rates and profit) and **Sales** (sell rates only).
+Three views (switch "View as" at the top): **Pricing** (daily work, sees buy rates and profit), **Sales** (sell rates only, no Today, no Team dashboard) and **Director** (opens on the Team dashboard; menu: Team dashboard, Overview, Today, Offers & feedback, Rates & offer, Rate Bank, Apps hub; sees buy rates and margins). In production the view comes from Entra ID groups (Pricing, Sales, Leads, Director), not from a switch.
+
+**New look**: a style layer on top of the classic design (DP World navy side menu, light background, blue actions, rounder cards, smooth tab change). On by default; the sun button at the top switches back to the classic look (`newLook_v1`). No screen logic changes.
 
 ## 3. Architecture
 

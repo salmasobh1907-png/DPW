@@ -458,6 +458,36 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
 .hm-row{display:grid;grid-template-columns:96px minmax(0,1fr) 140px;gap:10px;align-items:center;font-size:13px;margin:5px 0}.hm-bar{display:flex;height:12px;border-radius:6px;background:rgba(127,127,127,.12);overflow:hidden}.hm-bar .a{background:#18a57b}.hm-bar .o{background:#e0a23b}
 .ap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}.ap-tile{display:flex;align-items:center;gap:8px;border:1px solid rgba(127,127,127,.25);border-radius:12px;padding:10px 12px}.ap-tile>a,.ap-tile>span{flex:1;min-width:0;text-decoration:none;color:inherit}.ap-tile b{display:block;font-size:14px}.ap-tile small{display:block;font-size:12px;opacity:.7;overflow-wrap:anywhere}.ap-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.ap-seg{display:flex;gap:6px;flex-wrap:wrap}.ap-ed{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;padding:8px 0 12px;border-bottom:1px dashed rgba(127,127,127,.3)}
 .dschip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}.ds-ok{background:#d9f2e3;color:#14532d}.ds-due{background:#fde9c8;color:#7c4a03}.ds-err{background:#f9d4d4;color:#7f1d1d}.ds-off,.ds-busy{background:#e5e7eb;color:#374151}.dstbl td{vertical-align:top}
+/* ===== New look: a layer on top of the classic tokens; body.nl switches it ===== */
+body.nl{--bg:#f4f6fa;--surface:#ffffff;--surface-2:#f7f9fc;--line:#e3e8ef;--line-2:#cfd8e3;--ink:#0f1b2d;--muted:#55657a;--faint:#8492a6;--accent:#1d5bd8;--accent-ink:#ffffff;--accent-soft:#e8f0fd;--focus:#1d5bd8;--nav:#0b1a33;--nav-2:#14294b;--nav-ink:#eaf0f8;--nav-muted:#93a6c0;--shadow:0 1px 2px rgba(15,27,45,.05),0 8px 24px rgba(15,27,45,.06)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body.nl{--bg:#0a1220;--surface:#111b2b;--surface-2:#0e1726;--line:#223149;--line-2:#2d405d;--ink:#e8eef6;--muted:#9fb0c5;--accent:#6b9bf2;--accent-ink:#071224;--accent-soft:#16294a;--focus:#8db1ff;--nav:#070e1a;--nav-2:#122340;--shadow:none}}
+:root[data-theme="dark"] body.nl{--bg:#0a1220;--surface:#111b2b;--surface-2:#0e1726;--line:#223149;--line-2:#2d405d;--ink:#e8eef6;--muted:#9fb0c5;--accent:#6b9bf2;--accent-ink:#071224;--accent-soft:#16294a;--focus:#8db1ff;--nav:#070e1a;--nav-2:#122340;--shadow:none}
+body.nl .card{border-radius:16px;padding:18px 20px}
+body.nl .card h3{font-size:16px;font-weight:650;letter-spacing:-.01em}
+body.nl .subsw{border-radius:12px!important;padding:4px!important;background:var(--surface-2)!important;border:1px solid var(--line)!important}
+body.nl .subsw button{border-radius:9px!important;transition:background .18s ease,color .18s ease}
+body.nl .subsw button[aria-pressed="true"]{background:var(--surface)!important;color:var(--ink)!important;box-shadow:0 1px 3px rgba(15,27,45,.12)}
+body.nl .mini{border-radius:10px;min-height:34px;padding:6px 12px;transition:background .15s ease,border-color .15s ease,transform .15s ease}
+body.nl .mini:hover{border-color:var(--accent);background:var(--accent-soft)}
+body.nl .mini:active,body.nl .svc.btn.primary:active{transform:translateY(1px)}
+body.nl .mini.ok,body.nl .svc.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);border-radius:10px}
+body.nl .mini.ok:hover,body.nl .svc.btn.primary:hover{filter:brightness(1.08)}
+body.nl #nav button[data-k]{border-radius:10px;transition:background .15s ease}
+body.nl #nav button[data-k][aria-selected="true"]{box-shadow:inset 3px 0 0 #5fb0ff}
+body.nl input,body.nl select,body.nl textarea{border-radius:10px}
+body.nl .pill,body.nl .td-tag{border-radius:8px}
+body.nl .td-kpis>div,body.nl .td-res,body.nl .td-quick{border-radius:16px;box-shadow:var(--shadow);border-color:var(--line)}
+body.nl .td-kpis b{font-size:28px;letter-spacing:-.02em}
+body.nl .td-head h2{font-size:28px;font-weight:700;letter-spacing:-.02em}
+body.nl .pane:not([hidden]){animation:nlIn .22s ease both}
+@keyframes nlIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){body.nl .pane:not([hidden]){animation:none}body.nl .mini,body.nl .subsw button{transition:none}}
+.role button#r-director[aria-pressed="true"]{color:var(--accent)}
+/* new look: calm DP World navy instead of the purple washes of the classic look */
+body.nl{background:radial-gradient(900px 480px at 85% -10%,rgba(29,91,216,.08),transparent 70%),var(--bg)!important}
+body.nl .side,body.nl .rail,body.nl nav.side{background:linear-gradient(180deg,#0f2142 0%,#0b1a33 60%,#091529 100%)!important}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body.nl{background:var(--bg)!important}}
+:root[data-theme="dark"] body.nl{background:var(--bg)!important}
 </style>
 </head>
 <body>
@@ -497,7 +527,8 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
   </nav>
   <header class="top">
     <div class="ttl"><h1 id="pgTitle">Rates &amp; offer</h1><div class="sub" id="pgSub"></div></div>
-    <div class="role" id="roleSw" role="group" aria-label="View as" hidden><span class="lbl">View as</span><button id="r-pricing" aria-pressed="true"><svg class="ic sm"><use href="#i-chart"/></svg>Pricing</button><button id="r-sales" aria-pressed="false"><svg class="ic sm"><use href="#i-bag"/></svg>Sales</button></div>
+    <div class="role" id="roleSw" role="group" aria-label="View as" hidden><span class="lbl">View as</span><button id="r-pricing" aria-pressed="true"><svg class="ic sm"><use href="#i-chart"/></svg>Pricing</button><button id="r-sales" aria-pressed="false"><svg class="ic sm"><use href="#i-bag"/></svg>Sales</button><button id="r-director" aria-pressed="false"><svg class="ic sm"><use href="#i-home"/></svg>Director</button></div>
+    <button class="iconbtn" id="lookBtn" aria-pressed="true" aria-label="New look on or off" title="New look on or off"><svg class="ic"><use href="#i-sun"/></svg></button>
     <span class="chipd" title="Source: Rate Bank Export / Import on SharePoint"><span class="dot"></span>Rate Bank · <span id="asof3"></span></span>
     <button class="iconbtn" id="noteBtn" aria-pressed="false" aria-label="Show or hide the explanations" title="Show or hide the explanations"><svg class="ic"><use href="#i-help"/></svg></button>
     <button class="iconbtn" id="bell" aria-label="Notifications"><svg class="ic"><use href="#i-bell"/></svg><span class="n" id="bellN" hidden></span></button>
@@ -2816,6 +2847,9 @@ const NAV={
            ["Rate Bank",[["sheet","Rate Bank","db"],["trk","Trucking rates","truck"]],"pricing"],
            ["Reports",[["home","Overview","home"],["team","Team dashboard","chart"]],"managers"],
            ["Reference",[["svc","Alliance loops","ship"],["info","Help & settings","help"]],"everyone"]],
+  director:[["Management",[["team","Team dashboard","chart"],["home","Overview","home"],["today","Today","check"]],"director"],
+            ["Pricing",[["q","Offers & feedback","file"],["lane","Rates & offer","map"],["sheet","Rate Bank","db"]],"read and check"],
+            ["Reference",[["apps","Apps hub","box"],["svc","Alliance loops","ship"],["info","Help & settings","help"]],"everyone"]],
   sales:[["Daily work",[["ibx","Inbox","inbox"],["lane","Find a rate","map"],["q","My offers & feedback","file"]],"sales"],
          ["Reference",[["trk","Trucking rates","truck"],["svc","Alliance loops","ship"],["info","Help","help"]],"everyone"]]
 };
@@ -2835,8 +2869,9 @@ const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",pl
 let ROLE=lsGet("rg-role","pricing"), CUR_TAB="lane";
 QT.isOwner=false;
 function canPricing(){ return !QT.shared || QT.isOwner || ((QT.settings&&QT.settings.pricing)||[]).includes(QT.meId); }
-function isPricing(){ return ROLE==="pricing" && canPricing(); }
-function navItems(){ return NAV[isPricing()?"pricing":"sales"]; }
+function isPricing(){ return (ROLE==="pricing"||ROLE==="director") && canPricing(); } /* the Director sees buy rates and margins too */
+function isDirector(){ return ROLE==="director" && canPricing(); }
+function navItems(){ return NAV[isDirector()?"director":isPricing()?"pricing":"sales"]; }
 function allowed(k){ if(k==="team"&&!wtMgr()) return false; return navItems().some(g=>g[1].some(x=>x[0]===k||(x[0]===PAR[k]&&(isPricing()||(k!=="src"&&k!=="dsrc"))))); }
 function renderNav(){
   const groups=navItems(), btn=(k,t,i,mob)=>`<button role="tab" id="${mob?"b":"t"}-${k}" data-k="${k}" aria-selected="${k===navKey(CUR_TAB)}" title="${esc(t)}"><svg class="ic" aria-hidden="true"><use href="#i-${i}"/></svg><span class="lbl">${esc(mob?(SHORT[k]||t):t)}</span><span class="cnt" data-cnt="${k}" hidden></span></button>`;
@@ -2847,11 +2882,11 @@ function renderNav(){
   $("bnav").innerHTML=groups.flatMap(g=>g[1]).filter(x=>x[0]!=="info").map(([k,t,i])=>btn(k,t,i,true)).join("");
   document.querySelectorAll("#nav button[data-k],#bnav button[data-k]").forEach(b=>b.onclick=()=>openTab(b.dataset.k));
   const cp=canPricing(); $("roleSw").hidden=!cp; document.body.classList.toggle("sales",!isPricing());
-  $("r-pricing").setAttribute("aria-pressed",String(isPricing())); $("r-sales").setAttribute("aria-pressed",String(!isPricing()));
-  $("footRole").textContent=isPricing()?"Pricing view":"Sales view";
+  $("r-pricing").setAttribute("aria-pressed",String(isPricing()&&!isDirector())); $("r-sales").setAttribute("aria-pressed",String(!isPricing())); $("r-director").setAttribute("aria-pressed",String(isDirector())); document.body.classList.toggle("director",isDirector());
+  $("footRole").textContent=isDirector()?"Director view":isPricing()?"Pricing view":"Sales view";
   updateBadges(); try{ plBadge(); }catch(e){}
 }
-function setRole(r){ IBX.open=null; try{ $("q-me").value=r==="sales"?DEMO_SP:(QT.meName||"Pricing team"); }catch(e){} ROLE=r; lsSet("rg-role",r); MRG_MANUAL=false; renderNav(); if(!allowed(CUR_TAB)) openTab("lane"); else openTab(CUR_TAB,true); if(CUR_TAB!=="lane"){ updateLane(false); } renderOffer(); renderQ(); renderFbLane(); renderFbAll(); renderFbSend(); if(CUR_TAB==="ibx") renderIbx(); }
+function setRole(r){ IBX.open=null; try{ $("q-me").value=r==="sales"?DEMO_SP:(QT.meName||"Pricing team"); }catch(e){} ROLE=r; lsSet("rg-role",r); MRG_MANUAL=false; renderNav(); if(r==="director") openTab("team"); else if(!allowed(CUR_TAB)) openTab(r==="director"?"team":"lane"); else openTab(CUR_TAB,true); if(CUR_TAB!=="lane"){ updateLane(false); } renderOffer(); renderQ(); renderFbLane(); renderFbAll(); renderFbSend(); if(CUR_TAB==="ibx") renderIbx(); }
 let _roleWas=null;
 function applyRole(){ renderNav(); if(!allowed(CUR_TAB)) openTab("lane"); else setTitle(CUR_TAB); const now=isPricing(); if(_roleWas!==null&&_roleWas!==now){ rerenderOptions(); buildQuote(); renderOffer(); if(DIR==="exp"&&quote.dest) renderTruck(quote.dest,quote.sea||quote.dest); renderFbSend(); if(CUR_TAB==="trk") renderTrk(); } _roleWas=now; }
 function setTitle(t){ const P=(!isPricing()&&PAGE_SALES[t])||PAGE[t]||["",""]; $("pgTitle").textContent=P[0]; $("pgSub").textContent=P[1]+(t==="home"?` · Rate Bank ${DATA.asof}`:""); document.title="DP World Platform Demo"; }
@@ -3708,10 +3743,11 @@ function initShell(){
   setTheme(lsGet("rg-theme","light")); loadColors();
   $("themeBtn").onclick=()=>{ setTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark"); };
   $("asof3").textContent=DATA.asof;
-  $("r-pricing").onclick=()=>setRole("pricing"); $("r-sales").onclick=()=>setRole("sales");
+  { const on=lsGet("newLook_v1",true); document.body.classList.toggle("nl",!!on); const lb=$("lookBtn"); if(lb){ lb.setAttribute("aria-pressed",String(!!on)); lb.onclick=()=>{ const v=!document.body.classList.contains("nl"); document.body.classList.toggle("nl",v); lsSet("newLook_v1",v); lb.setAttribute("aria-pressed",String(v)); }; } }
+$("r-director").onclick=()=>setRole("director"); $("r-pricing").onclick=()=>setRole("pricing"); $("r-sales").onclick=()=>setRole("sales");
   $("bell").onclick=openDrawer; $("drawerX").onclick=closeDrawer; $("scrim").onclick=closeDrawer;
   document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("drawer").hidden) closeDrawer(); });
-  const st=lsGet("rg-tab",isPricing()?"today":"lane"); CUR_TAB=st; renderNav(); syncEqCtl();
+  const st=lsGet("rg-tab",isDirector()?"team":isPricing()?"today":"lane"); CUR_TAB=st; renderNav(); syncEqCtl();
 }
 
 // ---------- boot ----------
@@ -4102,7 +4138,7 @@ function wtSeg(from,to,st){ if(!(to>from)) return; const L=lsGet(WT_KEY,{}), d=c
   const s=D.segs, last=s[s.length-1]; if(last&&last[2]===st&&from-last[1]<2000) last[1]=to; else s.push([from,to,st]); D.last=to;
   const days=Object.keys(L).sort(); while(days.length>31) delete L[days.shift()]; lsSet(WT_KEY,L); }
 function wtDay(d){ const D=(lsGet(WT_KEY,{})||{})[d]; if(!D) return null; const t={active:0,away:0,brk:0,off:0}; D.segs.forEach(([a,b,st])=>{ t[st]=(t[st]||0)+(b-a); }); return {...t,first:D.first,last:D.last,segs:D.segs}; }
-function wtMgr(){ const me=CS_PEOPLE.find(p=>p.id==="me"); return !!(QT.isOwner||(me&&/@lead\./.test(me.mail))); }
+function wtMgr(){ const me=CS_PEOPLE.find(p=>p.id==="me"); return !!(isDirector()||QT.isOwner||(me&&/@lead\./.test(me.mail))); }
 function wtCard(title){ const t=todayISO(), D=wtDay(csDay(Date.now())); if(!D) return "";
   const span=Math.max(1,(D.last||Date.now())-D.first), col={active:"#18a57b",away:"#e0a23b",brk:"#7c83db",off:"#c3cad4"}, lab={active:"Active",away:"Away",brk:"Break",off:"Off (asleep, locked or closed)"};
   const bar=D.segs.map(([a,b,st])=>`<i title="${lab[st]} ${csTime(a)}–${csTime(b)}" style="left:${((a-D.first)/span*100).toFixed(2)}%;width:${Math.max(.3,(b-a)/span*100).toFixed(2)}%;background:${col[st]}"></i>`).join("");
@@ -4304,7 +4340,7 @@ setTimeout(()=>{ try{ tdFocusWatch(); }catch(e){} try{ eodWatch(); histSnap(); s
     try{ csTick(); const D=wtDay(csDay(Date.now())); if(D) row=`<tr><td><b>${esc(csName("me"))}</b> (this browser)</td><td>${csTime(D.first)}</td><td>${csTime(D.last)}</td><td class="n">${asDur(D.active)}</td><td class="n">${asDur(D.away)}</td><td class="n">${asDur(D.brk)}</td><td class="n">${asDur(D.off)}</td></tr>`; }catch(e){}
     p.insertAdjacentHTML("beforeend",`<div class="card"><h3>Team working time <span class="dschip ds-off">Managers only</span></h3><p class="note">Active, Away, Break and Off in the tool, per person, today. In this demo each browser keeps only its own log, so only your row shows. On DP World servers every person's log goes to the team database and shows here. Each person sees only their own time. HR and Legal approve before real use.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Person</th><th>First seen</th><th>Last seen</th><th class="n">Active</th><th class="n">Away</th><th class="n">Break</th><th class="n">Off</th></tr></thead><tbody>${row||`<tr><td colspan="7" class="note">No time logged yet today.</td></tr>`}</tbody></table></div></div>`); }; }
-window.__rules = { mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
+window.__rules = { wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
 window.__route = route;
 })();
 </script>

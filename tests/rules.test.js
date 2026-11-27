@@ -414,3 +414,18 @@ test('apps hub: one setting decides where every email draft opens; Teams and pho
   assert.match(r.meet, /^https:\/\/teams\.microsoft\.com\/l\/meeting\/new\?subject=Pricing&attendees=a%40x\.example/);
   assert.equal(r.tel, 'tel:+201000000000');
 });
+
+test('viewers: Pricing, Sales and Director each get their own menu; only Pricing and Director see buy rates and the Team dashboard', async () => {
+  const pg = await browser.newPage(); await pg.route(/^https?:\/\//, x => x.abort()); await pg.goto(PAGE); await pg.waitForFunction(() => !!window.__rules);
+  const out = {};
+  for (const role of ['director', 'sales', 'pricing']) {
+    await pg.click('#r-' + role); await pg.waitForTimeout(300);
+    out[role] = await pg.evaluate(() => ({ nav: [...document.querySelectorAll('#nav button[data-k]')].map(b => b.dataset.k),
+      pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id, salesClass: document.body.classList.contains('sales'), mgr: window.__rules.wtMgr ? window.__rules.wtMgr() : null }));
+  }
+  await pg.close();
+  assert.equal(out.director.pane, 'p-team'); assert.ok(out.director.nav.includes('team')); assert.equal(out.director.salesClass, false);
+  assert.ok(!out.sales.nav.includes('team') && !out.sales.nav.includes('today')); assert.equal(out.sales.salesClass, true);
+  assert.ok(out.pricing.nav.includes('today') && out.pricing.nav.includes('cases'));
+  assert.notDeepEqual(out.director.nav, out.pricing.nav);
+});
