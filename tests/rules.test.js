@@ -587,3 +587,12 @@ test('quotation check: the code matches only the document the tool sent; a chang
   assert.ok(r.fmt && r.diff && r.ok);
   assert.match(r.rate, /855 is not in the quotation/); assert.match(r.code, /does not match/); assert.match(r.none, /No quotation/);
 });
+
+test('brand: the platform name and an uploaded logo show in the side menu and the page title', async () => {
+  const r = await run(() => { const R = window.__rules, keep = ['appName_v1', 'brandLogo_v1'].map(k => localStorage.getItem(k));
+    const px = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+    localStorage.setItem('appName_v1', JSON.stringify('DP World Egypt Platform')); localStorage.setItem('brandLogo_v1', JSON.stringify(px)); R.applyBrand();
+    const out = { name: document.getElementById('brandName').textContent, title: document.title, img: !document.getElementById('brandImg').hidden };
+    ['appName_v1', 'brandLogo_v1'].forEach((k, i) => keep[i] == null ? localStorage.removeItem(k) : localStorage.setItem(k, keep[i])); R.applyBrand(); return out; });
+  assert.deepEqual(r, { name: 'DP World Egypt Platform', title: 'DP World Egypt Platform', img: true });
+});
