@@ -506,3 +506,17 @@ test('tickets (screen): the Report button opens the form and Send saves the tick
   const r = await pg.evaluate(() => ({ n: JSON.parse(localStorage.getItem('tickets_v1') || '[]').length, pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id }));
   await pg.close(); assert.deepEqual(r, { n: 1, pane: 'p-support' });
 });
+
+test('forward / reassign: reason required; draft goes to the department shared mailbox with Attn; teammates also become the owner', async () => {
+  const r = await run(() => { const R = window.__rules, L = R.csLoad().cases, c = L.find(x => !x.sub), c2 = L.filter(x => !x.sub)[1], was = c.who;
+    const noReason = R.fwdCase(c, { pid: 'hala', dept: 'Operations', mbx: 'operations.export@demo', reason: ' ' });
+    const ops = R.fwdCase(c, { pid: 'hala', dept: 'Operations', mbx: 'operations.export@demo', reason: 'Booking question for operations' });
+    const tm = R.fwdCase(c2, { pid: 'nour', dept: 'Pricing', mbx: 'pricing.ocean@demo', reason: 'Nour owns this account' });
+    return { find: R.dirFind('ha').map(p => p.name), noReason: noReason.err, href: decodeURIComponent(ops.href), ownerKept: c.who === was,
+             log: c.log[c.log.length - 1][1], c2who: c2.who, mbx: R.DIR_MBX['Customs & trucking'] }; });
+  assert.ok(r.find.includes('Hala Mostafa'));
+  assert.equal(r.noReason, 'The reason is required');
+  assert.match(r.href, /operations\.export@demo/); assert.match(r.href, /Attn: Hala Mostafa/); assert.match(r.href, /Reason: Booking question for operations/);
+  assert.ok(r.ownerKept); assert.match(r.log, /Forwarded to operations\.export@demo for Hala Mostafa \(Operations\) .* reason: Booking question/);
+  assert.equal(r.c2who, 'nour'); assert.deepEqual(r.mbx, ['customs@demo', 'trucking@demo']);
+});

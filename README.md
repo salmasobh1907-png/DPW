@@ -192,6 +192,10 @@ One page with the apps the team uses: Outlook, calendar, Teams, the Gmail test b
 - **Change log**: who changed which setting and when. **Error log**: every script error with time, screen, person and view, kept even when nobody reports it (200 entries).
 - Storage in the demo: `tickets_v1`, `audit_v1`, `errLog_v1`, `admSeen_v1` (this browser). Production: database, and a mail or Teams alert to the owner and IT.
 
+### 5.13 Forward or reassign an email (Shared inbox cases → open a case)
+
+Type a name → suggestions with department and email → pick the person; the department fills in and lists only its shared mailboxes; pick one; the **reason is required**. Forward opens a draft to that shared mailbox, subject "FW: … · Attn: name", body with Attn, reason, case number and the original email. The case log keeps who forwarded, to which mailbox, for whom and why. If the person is in the pricing shared inbox they also become the case owner (it counts in their KPIs); for another department the owner stays and the case shows the forward. Directory and mailboxes are dummy (`DIR_PEOPLE`, `DIR_MBX`); production: the DP World address book (Graph) and the real shared mailboxes.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).
