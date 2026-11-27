@@ -196,6 +196,10 @@ One page with the apps the team uses: Outlook, calendar, Teams, the Gmail test b
 
 Type a name → suggestions with department and email → pick the person; the department fills in and lists only its shared mailboxes; pick one; the **reason is required**. Forward opens a draft to that shared mailbox, subject "FW: … · Attn: name", body with Attn, reason, case number and the original email. The case log keeps who forwarded, to which mailbox, for whom and why. If the person is in the pricing shared inbox they also become the case owner (it counts in their KPIs); for another department the owner stays and the case shows the forward. Directory and mailboxes are dummy (`DIR_PEOPLE`, `DIR_MBX`); production: the DP World address book (Graph) and the real shared mailboxes.
 
+### 5.14 Cycle time and capacity (Team dashboard, managers only)
+
+Cycle time = email in → first reply (clock time) per person and per kind of work (mailbox), compared with the team median on the same kind, so hard and easy work are not mixed. Flags need at least 3 items: slower than 1.5 × team = "Training?", faster than 0.67 × team = "Good practice to share". Load = responsibilities in hours a week ÷ 40 h: under 70 % "Has room", over 100 % "Overloaded". Shown with a fairness note: a slower time can mean harder requests or support work; use it to plan training, never alone for performance decisions. HR and Legal approve before real use.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).

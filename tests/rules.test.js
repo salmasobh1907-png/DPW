@@ -520,3 +520,15 @@ test('forward / reassign: reason required; draft goes to the department shared m
   assert.ok(r.ownerKept); assert.match(r.log, /Forwarded to operations\.export@demo for Hala Mostafa \(Operations\) .* reason: Booking question/);
   assert.equal(r.c2who, 'nour'); assert.deepEqual(r.mbx, ['customs@demo', 'trucking@demo']);
 });
+
+test('cycle time: compares a person with the team on the same kind of work; flags need 3 items', async () => {
+  const r = await run(() => { const h = 36e5, t0 = Date.now() - 48 * h, mk = (who, mbx, min) => ({ who, mbx, recv: t0, sub: t0 + min * 6e4 });
+    const C = [mk('me','rates',30), mk('me','rates',40), mk('me','rates',35), mk('nour','rates',120), mk('nour','rates',150), mk('nour','rates',140),
+               mk('omar','rates',60), mk('omar','rates',70), mk('omar','rates',65), mk('mariam','net',30)];
+    const S = window.__rules.cycleStats(C), g = id => S.find(x => x.id === id);
+    return { me: [g('me').med, g('me').good], nour: [g('nour').med, g('nour').training], mariam: g('mariam').training, use: typeof g('me').use }; });
+  assert.deepEqual(r.me, [35, ['Ocean requests']]);
+  assert.deepEqual(r.nour, [140, ['Ocean requests']]);
+  assert.deepEqual(r.mariam, []);                 // one item: no flag
+  assert.equal(r.use, 'number');
+});
