@@ -84,6 +84,7 @@ Full table, one row per sub-screen: `TAB_MAP.csv`. Summary:
 | `lanes` | Summary per destination: rate count, valid count, lowest 40', cheapest carrier, carriers, months, requests, won, TEU, transit days | Calculated by `ratebank_to_data.py` |
 | `egypt, ports, nodes, edges, attach, choke, alts, services` | Map: ports with lat/lon, sea network, chokepoints (Suez, Bab el-Mandeb …), alternative ports, liner services | Reference data (kept as is) |
 | `health` | Row checks on the Rate Data Base | Calculated |
+| `qhist` | DUMMY closed quotes for the Margin advisor: `dir, pol, pod, eq, buy, sell, car, status, reason, created` | `make_dummy_quote_history.py` (production: the team's logged quotes) |
 | `susp` | Suspended carriers: `car, pod` (empty = all lanes), `since, until, why, by` | Pricing Rate Bank → Suspensions |
 | `mrules` | Fixed margin rules: `name, dir, cargo, pods[], m20, m40` | Pricing Rate Bank → Margin Rules |
 
@@ -143,6 +144,8 @@ In production the cases must move to the database (see section 9).
 2. A rate with no validity date is valid to the end of its month.
 3. Profit on ocean freight only. THC, B/L, telex and local charges pass at cost.
 4. Profit: China dry export ports fixed USD 25 per 20' and USD 50 per 40'. Other lanes: suggested from the gap to the next carrier and the market level; pricing can edit it. When no carrier on the lane is dearer, the tool reuses the newest margin quoted on the same lane (same direction, size and cargo) and says so; with no past quote the margin box stays empty and the offer is stopped until pricing types a margin. No flat default.
+4b. **Margin advisor** (Rates & offer, Pricing only, never Sales): suggests a margin, an accepted range, a confidence level and an estimated win chance, with each input and its source shown. Plain statistics, no AI:
+   (1) next dearer standard carrier on the lane: keep the sell under its cost; (2) market level: latest Market alerts index for the lane, else an estimate (average carrier rate + 6 %); (3) won / lost history of the same direction and size, on this lane when it has 6 or more decided quotes, else all lanes: win rate per margin band (smoothed toward the overall rate), best band = highest margin × win chance among bands with a win; only quotes won or lost on price count; (4) customer target prices from sales feedback. The lowest ceiling wins. China dry export stays fixed by policy. With no data it gives no number. Demo history is dummy (`qhist`, `scripts/make_dummy_quote_history.py`).
 5. Offer vs quote: an offer goes to sales; it becomes a quote (and counts in hit ratio) only when sales mark it sent to the customer.
 6. Checks before sending: stop on expired rate, suspended line, zero profit, offer valid after the carrier's validity. Warn when a rate ends within 3 days or a cheaper line exists.
 7. Suspended carriers can be set per lane, with an end date, in Help & settings.

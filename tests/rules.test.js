@@ -252,3 +252,22 @@ test('data sources: a higher source wins on the same carrier, lane, type and mon
     D.list = keep[0]; D.rows = keep[1]; R.dsApply(); return { used, conf, after: DATA.rates.some(x => x.src === 'Test link') }; });
   assert.deepEqual(r.used, ['New Line']); assert.equal(r.conf, 1); assert.equal(r.after, false);
 });
+
+test('margin advisor: picks the margin band with the best expected profit, capped by the next carrier and market', async () => {
+  const r = await run(() => { const S = window.__rules.marginStudy;
+    const hist = [];  // lane history: 50s win often, 100s win half, 200s rarely
+    for (let i = 0; i < 10; i++) hist.push({ m: 50, won: i < 8, reason: 'Price too high', lane: true });
+    for (let i = 0; i < 10; i++) hist.push({ m: 120, won: i < 6, reason: 'Price too high', lane: true });
+    for (let i = 0; i < 10; i++) hist.push({ m: 220, won: i < 1, reason: 'Price too high', lane: true });
+    for (let i = 0; i < 5; i++) hist.push({ m: 300, won: false, reason: 'Shipment cancelled or postponed', lane: true }); // not about price: ignored
+    const base = { buy: 1000, others: [{ car: 'B', v: 1300 }], market: { val: 1200, src: 'test' }, hist, fb: [] };
+    return { free: S(base), capped: S({ ...base, others: [{ car: 'B', v: 1080 }] }), target: S({ ...base, fb: [{ target: 1090 }] }),
+             china: S({ ...base, rule: { name: 'Dry export to China', m: 50 } }), none: S({ buy: 1000, others: [], hist: [], fb: [] }) }; });
+  assert.equal(r.free.rec, 120);               // 120 x 60% beats 50 x 80% and 220 x 10%
+  assert.equal(r.free.n, 30);                  // the 5 cancelled quotes are not counted
+  assert.equal(r.free.conf, 'High');
+  assert.equal(r.capped.rec, 75);              // next carrier only USD 80 above: stay under its cost
+  assert.equal(r.target.rec, 90);              // customer target 1090
+  assert.equal(r.china.rec, 50); assert.equal(r.china.fixed, true);
+  assert.equal(r.none.rec, null);              // no data: no number invented
+});
