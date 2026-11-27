@@ -915,6 +915,7 @@ const EG = Object.keys(DATA.egypt);
 const ALLDEST = Object.keys(DATA.ports).sort((a,b)=>a.localeCompare(b));
 $("from").innerHTML = EG.map(k=>`<option>${esc(k)}</option>`).join("");
 $("ports").innerHTML = ALLDEST.map(k=>`<option value="${esc(k)}">`).join("");
+DATA.dataAsof=DATA.dataAsof||DATA.asof||""; /* the date of the data itself; DATA.asof below is the demo's "today" */
 { const _d=new Date(), _M=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; DATA.asof=_d.getDate()+" "+_M[_d.getMonth()]+" "+_d.getFullYear(); DATA.asofHr=String(_d.getHours()).padStart(2,"0")+":00"; }
 $("asof").textContent = DATA.asof; $("asof3").textContent = DATA.asof+" · "+DATA.asofHr; $("asof2").textContent = DATA.asof; $("asof0").textContent = DATA.asof;
 function resolveDest(txt){
@@ -3791,7 +3792,8 @@ function dsTick(){ DS.list.forEach(s=>{ if(s.kind==="url"&&s.on!==false&&s.every
 function dsStart(){ dsLoad(); if(DS.list.some(s=>DS.rows[s.id])) dsApply(); if(!DS.timer) DS.timer=setInterval(dsTick,60000); setTimeout(dsTick,1500); }
 function dsRender(){ const p=$("p-dsrc"); if(!p||p.hidden) return; const nB=(XR.base||DATA.rates||[]).length, nM=(XR.items||[]).length, asof=DATA.asof||"";
   const chip=(st,tx)=>`<span class="dschip ds-${st}">${esc(tx)}</span>`;
-  const bank=`<tr><td class="n">1</td><td><b>${esc(DATA.rbsrc||"Pricing Rate Bank")}</b><span class="sub">Built in · rates, suspensions and margin rules</span></td><td>Scheduled job loads the workbook (today: scripts/pricing_rate_bank_to_data.py)</td><td>Data of ${esc(asof)}</td><td class="n">${nB}</td><td>${chip("ok","Connected")}</td><td></td></tr>`;
+  const dlSt=DL.status==="busy"?["busy","Loading…"]:DL.status==="err"?["err","Problem"]:["ok","Connected"];
+  const bank=`<tr><td class="n">1</td><td><b>${esc(DATA.rbsrc||"Pricing Rate Bank")}</b><span class="sub">Main source · ${esc(DL.name||"Data file inside the page")}</span></td><td style="overflow-wrap:anywhere">${DL.src==="embedded"?"Built into the page by scripts/pricing_rate_bank_to_data.py":esc(DL.url)}${DL.msg?`<span class="sub warn-t">${esc(DL.msg)}</span>`:""}</td><td>Data of ${esc(DATA.dataAsof||asof)}${DL.loadedAt?`<span class="sub">Loaded ${esc(dsAgo(DL.loadedAt))}</span>`:""}</td><td class="n">${nB}${DL.checks&&DL.checks.warn.length?`<span class="sub">${DL.checks.warn.length} warnings</span>`:""}</td><td>${chip(dlSt[0],dlSt[1])}</td><td></td></tr>`;
   const mail=`<tr><td class="n">2</td><td><b>Carrier emails</b><span class="sub">Built in · offers read on the Carrier offers screen</span></td><td>Mailbox or dropped .msg / .eml / Excel / PDF</td><td>When an offer is added</td><td class="n">${nM}</td><td>${chip(nM?"ok":"off",nM?"Connected":"No offers yet")}</td><td><button type="button" class="mini" data-dsgo="off">Open</button></td></tr>`;
   const rows=DS.list.map((s,i)=>{ const [st,tx]=dsState(s), u=(DS.used||{})[s.id]||{n:0,dup:0,conf:0}, ev=(DS_EVERY.find(e=>e[0]===+s.every)||DS_EVERY[0])[1];
     return `<tr><td class="n">${i+3}</td><td><b>${esc(s.name)}</b><span class="sub">${s.kind==="url"?"Online link":s.kind==="whatsapp"?"WhatsApp chat"+(s.car?" · "+esc(s.car):""):"Excel / CSV file"}</span></td><td style="overflow-wrap:anywhere">${esc(s.loc||"—")}${s.err?`<span class="sub warn-t">${esc(s.err)}</span>`:""}</td>
@@ -3800,7 +3802,14 @@ function dsRender(){ const p=$("p-dsrc"); if(!p||p.hidden) return; const nB=(XR.
       <button type="button" class="mini" data-dsu="${esc(s.id)}" aria-label="Move up" ${i?"":"disabled"}>↑</button><button type="button" class="mini" data-dson="${esc(s.id)}">${s.on===false?"Turn on":"Turn off"}</button><button type="button" class="mini" data-dsx="${esc(s.id)}">Remove</button></td></tr>`; }).join("");
   const C=(DS.conf||[]).slice(0,8);
   const N=DS.list.filter(s=>s.on!==false&&s.kind==="whatsapp").flatMap(s=>((DS.rows[s.id]||{}).news||[]).map(n=>({...n,src:s.name}))).sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time)).slice(0,15);
-  p.innerHTML=`<div class="card"><h3>Where the rates come from</h3><p class="note">Every rate in the tool comes from one of these sources. Higher in the list wins when two sources hold the same carrier, POL, POD, contract type and validity month. Links refresh by themselves while the tool is open; in production a scheduled job on a DP World service account does it. Plain rules only: no AI reads these files.</p>
+  const cfg=dlConfig();
+  p.innerHTML=`<div class="card"><h3>Main source</h3><p class="note">The data every screen reads: rates, suspensions, margin rules, contacts, requests. Every main source gives the same data shape (docs/DATA_CONTRACT.md), so the screens never change when the source changes. The tool checks the data first and keeps the file inside the page if it fails.</p>
+    <form id="dlForm" class="row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
+      <label class="f">Main source<select id="dlSrc">${Object.entries(DL_SOURCES).map(([k,v])=>`<option value="${k}" ${k===cfg.source?"selected":""}>${esc(v.name)}</option>`).join("")}</select></label>
+      <label class="f grow" id="dlUrlW">Link<input id="dlUrl" type="url" value="${esc(cfg.url||"")}" placeholder="https://… pricing-data.json"></label>
+      <button class="mini ok" type="submit">Switch</button>${cfg!==DPW_CONFIG?`<button class="mini" type="button" id="dlReset">Back to the default</button>`:""}</form>
+    <p class="note" id="dlMsg"></p></div>
+  <div class="card"><h3>Where the rates come from</h3><p class="note">Every rate in the tool comes from one of these sources. Higher in the list wins when two sources hold the same carrier, POL, POD, contract type and validity month. Links refresh by themselves while the tool is open; in production a scheduled job on a DP World service account does it. Plain rules only: no AI reads these files.</p>
     <div class="scroll"><table class="tbl dstbl"><thead><tr><th>#</th><th>Source</th><th>Where</th><th>Updates</th><th class="n">Rates used</th><th>Status</th><th></th></tr></thead><tbody>${bank}${mail}${rows}</tbody></table></div>
     ${C.length?`<h4>Conflicts (the higher source is used)</h4>${C.map(c=>`<div class="qal"><span><b>${esc(c.car)}</b> · ${esc(c.pol)} → ${esc(c.pod)}: ${esc(c.a)} USD ${money(c.av)} · ${esc(c.b)} USD ${money(c.bv)}</span></div>`).join("")}`:""}</div>
   ${N.length?`<div class="card"><h3>WhatsApp announcements</h3><p class="note">Messages with words like GRI, surcharge, suspension, blank sailing or delay. Read them and add what matters in Market alerts.</p>${N.map(n=>`<div class="qal"><span><span class="tago">${esc(n.tag)}</span> <b>${esc(n.car||n.who)}</b> · ${esc(fmtDate(n.date))} ${esc(n.time)}<br><small style="white-space:pre-line">${esc(n.text)}</small></span></div>`).join("")}</div>`:""}
@@ -3815,6 +3824,10 @@ function dsRender(){ const p=$("p-dsrc"); if(!p||p.hidden) return; const nB=(XR.
     <details><summary>Column names the tool understands</summary><p class="note">Any order, any sheet. Needed: Carrier, POL, POD and at least one rate column (20', 40', 20' RF, 40' RF). Also read: Rate ID, Direction, Currency, Valid From, Valid To / Validity, Contract Type, Customer, Transit days, Via, Free Time, POL Terminal, Spot Sailing, Comment. No Valid To = end of the month. A filled Contract Type other than "Standard" never counts as the lowest. Sheets named like credential or password are never opened.</p></details>
     <details><summary>Which links work</summary><p class="note">SharePoint or OneDrive file link ending in <code>?download=1</code> · a CSV or JSON link from a DP World system or API · a carrier tariff page that offers a CSV or Excel download. Web pages without a file cannot be read; save the table as Excel and use "Excel / CSV file". Outlook mail: use Carrier emails (row 2).</p></details>
     <details><summary>WhatsApp: how it works</summary><p class="note">On the phone: open the chat, More, Export chat, Without media; save the .txt file and upload it here (unzip it first if the phone made a .zip). The tool reads rate lines like "Sokhna - Jeddah 650/850" and names the carrier from the message, the sender or the carrier you picked. WhatsApp rates show a warning in the offer checks: get them confirmed by email before quoting. For automatic reading, DP World can use the official WhatsApp Business Platform on a company number (IT, Legal and Meta approval). The tool never reads a personal WhatsApp.</p></details></div>`;
+  { const sel=$("dlSrc"), syncU=()=>{ $("dlUrlW").hidden=sel.value==="embedded"; }; sel.onchange=syncU; syncU();
+    $("dlForm").onsubmit=async e=>{ e.preventDefault(); const c={source:sel.value,url:$("dlUrl").value.trim()}; if(c.source!=="embedded"&&!/^https:\/\//i.test(c.url)){ $("dlMsg").textContent="Use a link that starts with https://"; return; }
+      $("dlMsg").textContent="Loading and checking…"; const ok=await dataBoot(c); if(ok) lsSet("dataSrc_v1",c); else if(c.source==="embedded") lsSet("dataSrc_v1",null); dsRender(); const m=$("dlMsg"); if(m) m.textContent=ok?"Switched. Every screen now reads this source.":DL.msg; };
+    const rs=$("dlReset"); if(rs) rs.onclick=()=>{ try{ localStorage.removeItem("dataSrc_v1"); }catch(x){} location.reload(); }; }
   const kind=$("dsKind"), sync=()=>{ const u=kind.value==="url"; $("dsLocW").hidden=!u; $("dsEvW").hidden=!u; $("dsCarW").hidden=kind.value!=="whatsapp"; }; kind.onchange=sync; sync();
   $("dsAdd").onsubmit=e=>{ e.preventDefault(); const name=$("dsName").value.trim(), k=kind.value, loc=$("dsLoc").value.trim(); if(!name) return;
     if(k==="url"&&!/^https:\/\//i.test(loc)){ $("dsMsg").textContent="Use a link that starts with https://"; return; }
@@ -3889,7 +3902,78 @@ function maRender(){ const el=$("q-madv"); if(!el) return; if(!isPricing()||!quo
     <p class="note">Plain statistics on our quotes, carrier rates, market entries and sales feedback. No AI.${(DATA.qhist||[]).length?" Demo: includes dummy quote history.":""}</p>`;
   const u=$("maUse"); if(u) u.onclick=()=>{ $("q-mrg").value=S.rec; MRG_MANUAL=true; buildQuote(); rerenderOptions(); }; }
 { const _ra=renderAdvice; renderAdvice=function(){ _ra.apply(this,arguments); try{ maRender(); }catch(e){} }; }
-window.__rules = { marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
+/* ---------- Data layer: one data contract, swappable sources ----------
+   Screens read only DATA. A source must return the contract below; the layer checks it, fills what can be calculated
+   (lane summary), and swaps it in. Sources: the file inside the page (today) · a JSON data file from a link (SharePoint
+   or an API made by the scheduled job) · NPM (Network Pricing Manager, field names to confirm with the NPM team).
+   Contract: docs/DATA_CONTRACT.md. IT can set the source for everyone in DPW_CONFIG; a pricing lead can switch it on
+   the Data sources screen (saved in this browser). Links must be https. */
+const DPW_CONFIG={source:"embedded",url:""};   /* deployment setting, e.g. {source:"json",url:"https://…/pricing-data.json"} */
+const DL={src:"embedded",name:"",url:"",status:"ok",msg:"",loadedAt:"",checks:null};
+const DL_SOURCES={
+  embedded:{name:"Data file inside the page",load:async()=>null},
+  json:{name:"Data file (JSON) from a link",load:async c=>{ const r=await dlFetch(c.url); return await r.json(); }},
+  npm:{name:"NPM (Network Pricing Manager)",load:async c=>{ const r=await dlFetch(c.url); return npmMap(await r.json()); }}};
+const DL_REPLACE=["rates","reefers","imports","contacts","susp","mrules","lanes","requests","bookings","qhist","health","rbsrc","asof"];
+async function dlFetch(url){ if(!/^https:\/\//i.test(String(url||""))) throw new Error("The link must start with https://");
+  let r; try{ r=await fetch(url,{cache:"no-store",credentials:"include"}); }catch(e){ r=await fetch(url,{cache:"no-store",credentials:"omit"}); }
+  if(!r.ok) throw new Error("The link answered "+r.status); return r; }
+const isoOk=v=>v==null||v===""||/^\d{4}-\d{2}-\d{2}$/.test(String(v));
+/* check a data file against the contract; errors stop the switch, warnings are shown */
+function dataCheck(d){ const E=[], W=[]; if(!d||typeof d!=="object"||Array.isArray(d)) return {ok:false,errs:["Not a data object"],warn:[]};
+  if(!Array.isArray(d.rates)) E.push("rates must be a list"); if(d.imports!=null&&!Array.isArray(d.imports)) E.push("imports must be a list"); if(d.reefers!=null&&!Array.isArray(d.reefers)) E.push("reefers must be a list");
+  const chk=(L,name,rf)=>(L||[]).forEach((r,i)=>{ const at=name+" row "+(i+1);
+    if(!r||typeof r!=="object"){ E.push(at+": not an object"); return; }
+    ["car","pol","pod"].forEach(k=>{ if(typeof r[k]!=="string"||!r[k].trim()) E.push(at+": "+k+" is missing"); });
+    const cols=["r20","r40","rf20","rf40"].filter(k=>r[k]!=null); if(!cols.length) E.push(at+": no rate");
+    cols.forEach(k=>{ if(typeof r[k]!=="number"||!(r[k]>0)) E.push(at+": "+k+" must be a number above 0"); });
+    if(!isoOk(r.valid)) E.push(at+": valid must be YYYY-MM-DD");
+    if(r.cur&&r.cur!=="USD") W.push(at+": currency "+r.cur);
+    if(r.r20&&r.r40&&r.r40<r.r20) W.push(at+": 40' lower than 20'"); });
+  chk(d.rates,"rates"); chk(d.reefers,"reefers"); chk(d.imports,"imports");
+  const ids=[...(d.rates||[]),...(d.reefers||[]),...(d.imports||[])].map(r=>r&&r.id).filter(Boolean); if(ids.length&&new Set(ids).size!==ids.length) E.push("Rate IDs are not unique");
+  if(d.contacts!=null&&(typeof d.contacts!=="object"||Array.isArray(d.contacts))) E.push("contacts must be carrier → [pricing email, sales email]");
+  (d.susp||[]).forEach((x,i)=>{ if(!x||!x.car) E.push("susp row "+(i+1)+": car is missing"); else if(!isoOk(x.since)||!isoOk(x.until)) E.push("susp row "+(i+1)+": dates must be YYYY-MM-DD"); });
+  (d.mrules||[]).forEach((x,i)=>{ if(!x||!x.name||!Array.isArray(x.pods)) E.push("mrules row "+(i+1)+": name and pods are needed"); });
+  if(E.length>50){ const n=E.length; E.length=50; E.push("… and "+(n-50)+" more"); }
+  return {ok:!E.length,errs:E,warn:W.slice(0,50)}; }
+/* lane summary per destination, the same rule as the converter: valid standard dry 40', not suspended */
+function buildLanes(d,old){ const t=todayISO(), MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"], lanes={};
+  const sus=(car,pod)=>(d.susp||[]).some(x=>lc(x.car)===lc(car)&&(!x.pod||lc(x.pod)===lc(pod))&&(!x.since||x.since<=t)&&(!x.until||x.until>=t));
+  const by={}, rq={}; (d.rates||[]).forEach(r=>(by[r.pod]=by[r.pod]||[]).push(r)); (d.requests||[]).forEach(x=>(rq[x.port]=rq[x.port]||[]).push(x));
+  new Set([...Object.keys(old||{}),...Object.keys(by)]).forEach(pod=>{ const L={...((old||{})[pod]||{})}, R=by[pod]||[];
+    const std=R.filter(r=>isStd(r)&&r.r40&&!sus(r.car,pod)), eff=r=>r.valid||endOfMonth(), live=std.filter(r=>eff(r)>=t);
+    const best=live.reduce((a,b)=>!a||b.r40<a.r40?b:a,null), anyb=std.reduce((a,b)=>!a||b.r40<a.r40?b:a,null), Q=rq[pod]||[];
+    Object.assign(L,{rates:R.length,valid:live.length,min40:best?best.r40:null,min40any:anyb?anyb.r40:null,
+      cheap:best?`${best.car} ex ${best.pol} (${MON[+eff(best).slice(5,7)-1]})`:null,carriers:[...new Set(R.map(r=>r.car))],
+      months:[...new Set(R.map(r=>eff(r)).filter(Boolean).map(v=>MON[+v.slice(5,7)-1]))].sort((a,b)=>MON.indexOf(a)-MON.indexOf(b)),
+      req:Q.length||L.req||0,won:Q.length?Q.filter(x=>x.st==="won").length:(L.won||0),teu:Q.length?Q.reduce((a,x)=>a+(+x.teu||0),0):(L.teu||0)});
+    if(R.length&&!L.pol) L.pol=R[0].pol; L.hist=L.hist||{}; L.tt=L.tt||{}; lanes[pod]=L; });
+  return lanes; }
+/* NPM → contract. ASSUMED field names, to confirm with the NPM team before go-live (see docs/DATA_CONTRACT.md). */
+function npmMap(j){ const list=Array.isArray(j)?j:(j&&(j.rates||j.items||j.data))||[], num=v=>{ const n=parseFloat(v); return isFinite(n)&&n>0?n:null; };
+  const out={rates:[],reefers:[],imports:[],rbsrc:"NPM"};
+  list.forEach(x=>{ if(!x) return; const c=x.containerRates||x.rates||{}, dir=String(x.direction||x.tradeDirection||"export").toLowerCase();
+    const r={id:String(x.rateId||x.id||""),car:String(x.carrierName||x.carrier||""),pol:String(x.originPort||x.pol||""),pod:String(x.destinationPort||x.pod||""),
+      r20:num(c["20GP"]??c["20DC"]),r40:num(c["40HC"]??c["40GP"]??c["40DC"]),rf20:num(c["20RF"]),rf40:num(c["40RF"]??c["40RH"]),cur:String(x.currency||"USD"),
+      valid:String(x.validTo||x.validityEnd||"").slice(0,10),tt:num(x.transitDays),ts:String(x.via||x.transshipment||""),ft:String(x.freeTime||""),cmt:"NPM"+(x.remarks?" · "+x.remarks:"")};
+    const ct=String(x.contractType||x.rateType||""); if(ct&&!/^(standard|fak|spot market)?$/i.test(ct)) r.type=ct;
+    if(!r.id) delete r.id;
+    if(/^imp/.test(dir)) out.imports.push(r); else if((r.rf20||r.rf40)&&!(r.r20||r.r40)) out.reefers.push(r); else out.rates.push(r); });
+  return out; }
+function dlConfig(){ const c=lsGet("dataSrc_v1",null); return c&&DL_SOURCES[c.source]?c:DPW_CONFIG; }
+function applyData(d){ const keep=DATA.lanes; DL_REPLACE.forEach(k=>{ if(d[k]!==undefined) DATA[k]=d[k]; });
+  if(!d.lanes) DATA.lanes=buildLanes(DATA,keep); DATA.dataAsof=d.asof||todayISO();
+  XR.base=null; DS.ibase=null; gapStats.c=null; try{ xrApply(); }catch(e){} try{ dsApply(); }catch(e){} try{ updateLane(false); }catch(e){} try{ openTab(CUR_TAB,true); }catch(e){} }
+async function dataBoot(cfg){ cfg=cfg||dlConfig(); const S=DL_SOURCES[cfg.source]||DL_SOURCES.embedded; Object.assign(DL,{src:cfg.source in DL_SOURCES?cfg.source:"embedded",name:S.name,url:cfg.url||"",status:"ok",msg:"",checks:null});
+  if(DL.src==="embedded"){ DL.loadedAt=new Date().toISOString(); DL.checks=dataCheck(DATA); return true; }
+  DL.status="busy"; try{ const d=await S.load(cfg); const C=dataCheck(d); DL.checks=C;
+    if(!C.ok){ DL.status="err"; DL.msg="The data did not pass the checks, so the tool kept the data file inside the page. "+C.errs.slice(0,3).join("; "); return false; }
+    applyData(d); DL.status="ok"; DL.loadedAt=new Date().toISOString(); return true; }
+  catch(e){ DL.status="err"; DL.msg="Could not load the main source, so the tool kept the data file inside the page. "+(e&&e.message||""); return false; }
+  finally{ try{ dsRender(); }catch(e){} } }
+setTimeout(()=>{ dataBoot().catch(()=>{}); },0);
+window.__rules = { dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
 window.__route = route;
 })();
 </script>

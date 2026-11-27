@@ -271,3 +271,45 @@ test('margin advisor: picks the margin band with the best expected profit, cappe
   assert.equal(r.china.rec, 50); assert.equal(r.china.fixed, true);
   assert.equal(r.none.rec, null);              // no data: no number invented
 });
+
+test('data layer: the lane summary built in the page equals the converter\'s', async () => {
+  const diff = await run(() => { const L = window.__rules.buildLanes(DATA, {}); return Object.keys(DATA.lanes).filter(p => (DATA.lanes[p].min40 ?? null) !== (L[p] ? L[p].min40 ?? null : null)); });
+  assert.deepEqual(diff, []);
+});
+
+test('data layer: the contract check stops bad data', async () => {
+  const r = await run(() => { const C = window.__rules.dataCheck;
+    return { good: C(DATA).ok, noRates: C({}).ok, bad: C({ rates: [{ car: 'A', pol: 'Sokhna', pod: '', r40: '900', valid: '30/11/2026' }] }).errs,
+             dup: C({ rates: [{ id: 'X', car: 'A', pol: 'P', pod: 'Q', r40: 1 }, { id: 'X', car: 'B', pol: 'P', pod: 'Q', r40: 2 }] }).errs }; });
+  assert.equal(r.good, true); assert.equal(r.noRates, false);
+  assert.ok(r.bad.some(e => /pod is missing/.test(e)) && r.bad.some(e => /r40 must be a number/.test(e)) && r.bad.some(e => /YYYY-MM-DD/.test(e)));
+  assert.ok(r.dup.some(e => /not unique/.test(e)));
+});
+
+test('data layer: NPM fields map to the contract (assumed names)', async () => {
+  const m = await run(() => window.__rules.npmMap({ rates: [
+    { rateId: 'N1', carrierName: 'Aurora Lines', originPort: 'Sokhna', destinationPort: 'Jeddah', containerRates: { '20GP': 600, '40HC': 800 }, currency: 'USD', validTo: '2026-12-31T00:00:00Z', contractType: 'Spot' },
+    { rateId: 'N2', carrierName: 'Orion Lines', originPort: 'Shanghai', destinationPort: 'Sokhna', direction: 'IMPORT', containerRates: { '40HC': 1300 } },
+    { rateId: 'N3', carrierName: 'Red Sea Express', originPort: 'Sokhna', destinationPort: 'Jeddah', containerRates: { '40RF': 1650 } }] }));
+  assert.deepEqual([m.rates.length, m.imports.length, m.reefers.length], [1, 1, 1]);
+  assert.deepEqual([m.rates[0].r20, m.rates[0].r40, m.rates[0].valid, m.rates[0].type], [600, 800, '2026-12-31', 'Spot']);
+});
+
+test('data layer: switching the main source to a JSON link changes every screen; bad data is refused', async () => {
+  const base = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data/demo_data.json'), 'utf8'));
+  const good = JSON.parse(JSON.stringify(base)); delete good.lanes;
+  good.rates.find(r => r.pod === 'Jeddah' && r.car === 'Sahara Feeder').r40 = 700; good.asof = '2026-11-28';
+  const pg = await browser.newPage();
+  await pg.route(/^https?:\/\//, r => { const u = r.request().url();
+    if (u === 'https://data.example/good.json') return r.fulfill({ status: 200, headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' }, body: JSON.stringify(good) });
+    if (u === 'https://data.example/bad.json') return r.fulfill({ status: 200, headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' }, body: JSON.stringify({ rates: [{ car: 'X' }] }) });
+    return r.abort(); });
+  await pg.goto(PAGE); await pg.waitForFunction(() => !!window.__rules);
+  const bad = await pg.evaluate(async () => { const ok = await window.__rules.dataBoot({ source: 'json', url: 'https://data.example/bad.json' }); return { ok, min: DATA.lanes.Jeddah.min40 }; });
+  assert.equal(bad.ok, false); assert.equal(bad.min, 850);           // kept the data inside the page
+  const r = await pg.evaluate(async () => { const ok = await window.__rules.dataBoot({ source: 'json', url: 'https://data.example/good.json' });
+    const t = document.getElementById('to'); t.value = 'Jeddah'; t.dispatchEvent(new Event('change')); await new Promise(z => setTimeout(z, 600));
+    return { ok, min: DATA.lanes.Jeddah.min40, buy: document.getElementById('q-buy').value, asof: DATA.dataAsof }; });
+  assert.deepEqual(r, { ok: true, min: 700, buy: '700', asof: '2026-11-28' });
+  await pg.close();
+});

@@ -120,6 +120,14 @@ Built for the tool, not a copy of the team Rate Bank. Dummy data only.
 
 Load it: `python3 scripts/pricing_rate_bank_to_data.py "data/DPW Pricing Rate Bank (dummy).xlsx" data/demo_data.json`, then `inject_data.py`. The script reads only Rates, Suspensions, Margin Rules and Contacts, never writes to the workbook, and lists every row problem (duplicate Rate ID, 40' below 20', spot without sailing, Sokhna without terminal, dates, currency). Rebuild the dummy workbook: `scripts/build_pricing_rate_bank.py`. In production the same columns can be a SharePoint List or a database table; the screens do not change.
 
+### 5.6 Data layer (swap the main source without changing screens)
+
+All screens read one object, `DATA`. The data layer loads it from the main source, checks it against the contract
+(`docs/DATA_CONTRACT.md`), fills the lane summary when missing (`buildLanes`, same rule as the converter) and swaps it in.
+Sources: the data file inside the page (default) · a JSON data file from a link (made by a scheduled job from the Rate Bank
+on SharePoint) · NPM (`npmMap`, assumed field names). IT sets the default in `DPW_CONFIG`; a pricing lead can switch on
+Data sources → Main source. Bad data is refused and the page keeps its own file.
+
 ### 5.5 Data sources screen (Help & settings → Data sources)
 
 One list of every place rates come from, in priority order: 1 Pricing Rate Bank (built in), 2 carrier emails (Carrier offers), then sources added on the screen:
