@@ -260,6 +260,10 @@ The Gmail test box stands in for the DP World shared mailboxes. Each mailbox has
 
 Views are named by role, not by person or job title: **Executive** (pricing and operations staff, sees buy rates), **Sales** (sell rates only), **Direct Manager** (own team), **Senior Management** (department / Freight Forwarding), **Top Management** (whole company). Internal ids stay `pricing`, `sales`, `manager`, `director`, `ceo`; in production each maps to an Entra ID group.
 
+### 5.27 IT review copy
+
+`python3 scripts/make_it_build.py` writes `app/DP_World_Platform_IT.html`: the same page with `<meta name="dpw-build" content="it">`, which turns off every mail connection (Inbox uses the offline dummy copy, no "Check inbox" or "Pull from Gmail", draft links open a normal compose window). Dummy data only, safe to share with IT inside DP World. Rebuild it after every change to the main page.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).

@@ -408,6 +408,7 @@ body:not(.notes-on) .xp{display:none!important}
 @media (max-width:600px){.pct{font-size:12px}.pct th,.pct td{padding:7px 4px}.pct th:first-child{width:31%}.pct .ofp{padding:4px 3px;font-size:12px;min-width:38px}}
 .rxg{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px 18px;font-size:13px}.rxg>div{min-width:0}.rxg input{padding:3px 6px;border:1px solid var(--line-2);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit}
 .gmDlg{width:min(640px,94vw);border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:16px 18px}.gmDlg::backdrop{background:rgba(8,16,30,.4)}
+body.itb #ibxGo,body.itb #ibxPerm,body.itb #csGm{display:none!important}
 .dfb:empty{display:none}.dfb{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}.dfbh{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}.dfbh .mini{margin-left:auto}
 /* dpw-look */
 :root{--accent:#3e3c90;--accent-soft:#ecebf6;--focus:#3e3c90;--nav:#17163f;--nav-2:#272661}
@@ -2328,7 +2329,7 @@ function ibxUse(list,src){ IBX.items=list.map((e,i)=>({id:e.id||("x"+i),lastMsgI
 function ibxTO(pr,ms){ return Promise.race([pr,new Promise((_,no)=>setTimeout(()=>no(Object.assign(new Error("timeout"),{code:"timeout"})),ms))]); }
 async function ibxLoad(quiet){
   if(IBX.busy) return; IBX.busy=true; try{ await ibxLoad2(quiet); }finally{ IBX.busy=false; } }
-async function ibxLoad2(quiet){
+async function ibxLoad2(quiet){ if(IT_BUILD){ if(!IBX.items.length) ibxUse(IBX_OFFLINE,"offline"); IBX.state="idle"; if(!quiet) renderIbx(); return; }
   if(!quiet){ try{ if(!IBX.items.length) ibxUse(IBX_OFFLINE,"offline"); }catch(x){} IBX.state="loading"; IBX.msg=""; renderIbx(); }
   let mcp=null; try{ mcp=window.claude&&await ibxTO(claude.use("mcp"),10000); }catch(e){}
   if(!mcp){ if(quiet) return; IBX.state="nomcp"; renderIbx(); return; }
@@ -5063,12 +5064,13 @@ function rxTodayCard(){ const p=$("p-today"); if(!p||p.hidden||!isPricing()) ret
    The Gmail test box stands in for the DP World shared mailboxes: each mailbox has a +tag address
    (pricing.team.dpw+ops@gmail.com = Operations). "Pull from Gmail" reads them (search_threads, get_thread) and
    opens a case per email. Read only; real emails stay in this browser. IT later swaps this for M365 Graph. */
+const IT_BUILD=!!document.querySelector('meta[name="dpw-build"][content="it"]'); if(IT_BUILD) document.body.classList.add("itb");
 const GM_BOX="pricing.team.dpw@gmail.com", GM_TAGS={pricing:null,ops:"ops",commercial:"com",ff:"ff",air:"air"};
 function gmTag(addrs){ for(const a of [].concat(addrs||[])){ const m=String(a).toLowerCase().match(/\+([a-z]+)@/); if(m&&m[1] in GM_TAGS) return m[1]; } return null; }
 function gmBoxFor(tag,from,subj,body){ if(!tag) return null; if(GM_TAGS[tag]) return {box:GM_TAGS[tag],why:"Sent to the "+csMbx(GM_TAGS[tag]).name+" mailbox ("+GM_BOX.replace("@","+"+tag+"@")+")"};
   const R=csRoute(from,subj,body); return {box:R.box,why:"Pricing mailbox · "+R.why}; }
 function gmQuery(){ return "newer_than:30d to:("+Object.keys(GM_TAGS).map(t=>GM_BOX.replace("@","+"+t+"@")).join(" OR ")+")"; }
-async function gmPull(){ let mcp=null; try{ mcp=window.claude&&await claude.use("mcp"); }catch(e){}
+async function gmPull(){ if(IT_BUILD) return {ok:false,why:"IT review copy: no mail connection. In production this reads the M365 shared mailboxes via Graph."}; let mcp=null; try{ mcp=window.claude&&await claude.use("mcp"); }catch(e){}
   if(!mcp) return {ok:false,why:"Gmail is not connected here: open the tool from its claude.ai link and allow Gmail."};
   let th=[]; try{ const r=await mcp.callTool("Gmail","search_threads",{query:gmQuery(),pageSize:30,view:"THREAD_VIEW_IDS_ONLY"},{cache:false}); th=(r&&r.payload&&r.payload.threads)||[]; }catch(e){ return {ok:false,why:"Gmail search failed ("+((e&&e.code)||"error")+")."}; }
   const D=csLoad(), have=new Set(D.cases.map(c=>c.gid).filter(Boolean)); let n=0, n0=0; const now=Date.now();
@@ -5086,7 +5088,7 @@ async function gmPull(){ let mcp=null; try{ mcp=window.claude&&await claude.use(
 /* Draft buttons: when Gmail is connected, a Gmail compose link opens a preview in the tool and saves a Gmail draft. A human sends it. */
 function gmParseCompose(href){ try{ const u=new URL(href); if(u.hostname!=="mail.google.com"||u.searchParams.get("view")!=="cm") return null;
   return {to:(u.searchParams.get("to")||"").split(/[,;]/).map(x=>x.trim()).filter(Boolean),su:u.searchParams.get("su")||"",body:u.searchParams.get("body")||""}; }catch(e){ return null; } }
-let GM_MCP=null; setTimeout(async()=>{ try{ GM_MCP=window.claude&&await claude.use("mcp"); }catch(e){ GM_MCP=null; } },0);
+let GM_MCP=null; setTimeout(async()=>{ if(IT_BUILD) return; try{ GM_MCP=window.claude&&await claude.use("mcp"); }catch(e){ GM_MCP=null; } },0);
 function gmDraftDlg(D){ let d=$("gmDlg"); if(!d){ d=document.createElement("dialog"); d.id="gmDlg"; d.className="gmDlg"; document.body.appendChild(d); }
   d.innerHTML=`<form method="dialog" id="gmF"><h3 style="margin:0 0 8px">Email draft <span class="note">· saved in Gmail Drafts, you press Send in Gmail</span></h3>
    <label class="f">To<input type="text" id="gmTo"></label><label class="f" style="margin-top:6px">Subject<input type="text" id="gmSu"></label>
