@@ -14147,5 +14147,590 @@
     "msg": "40' rate is lower than 20' rate: check the columns"
    }
   ]
+ },
+ "hist": {
+  "month": "2026-10",
+  "rows": {
+   "Sahara Feeder|Sokhna|Jeddah": [
+    575.0,
+    700.0
+   ],
+   "Gulf Bridge|Sokhna|Jeddah": [
+    675.0,
+    925.0
+   ],
+   "Gulf Bridge|Sokhna|King Abdallah": [
+    650.0,
+    900.0
+   ],
+   "Sahara Feeder|Adabiya|King Abdallah": [
+    775.0,
+    1075.0
+   ],
+   "Sahara Feeder|Sokhna|Aqaba": [
+    825.0,
+    1125.0
+   ],
+   "Red Sea Express|Adabiya|Aqaba": [
+    975.0,
+    1350.0
+   ],
+   "Gulf Bridge|Adabiya|Aqaba": [
+    1075.0,
+    1500.0
+   ],
+   "Red Sea Express|Sokhna|Port Sudan": [
+    1700.0,
+    2500.0
+   ],
+   "Nile Star|Adabiya|Port Sudan": [
+    1575.0,
+    2400.0
+   ],
+   "Gulf Bridge|Adabiya|Port Sudan": [
+    1475.0,
+    2175.0
+   ],
+   "Sahara Feeder|Sokhna|Djibouti": [
+    1425.0,
+    2125.0
+   ],
+   "Red Sea Express|Adabiya|Djibouti": [
+    1275.0,
+    1875.0
+   ],
+   "Nile Star|Adabiya|Djibouti": [
+    1250.0,
+    1775.0
+   ],
+   "Sahara Feeder|Adabiya|Aden": [
+    1900.0,
+    2850.0
+   ],
+   "Gulf Bridge|Adabiya|Aden": [
+    1775.0,
+    2650.0
+   ],
+   "Red Sea Express|Adabiya|Aden": [
+    1950.0,
+    2925.0
+   ],
+   "Gulf Bridge|Sokhna|Jebel Ali": [
+    1100.0,
+    1500.0
+   ],
+   "Nile Star|Sokhna|Jebel Ali": [
+    1050.0,
+    1375.0
+   ],
+   "Gulf Bridge|Sokhna|Abu Dhabi": [
+    1125.0,
+    1550.0
+   ],
+   "Nile Star|Sokhna|Dammam": [
+    1350.0,
+    1750.0
+   ],
+   "Gulf Bridge|Sokhna|Dammam": [
+    1500.0,
+    1975.0
+   ],
+   "Nile Star|Sokhna|Hamad": [
+    1400.0,
+    1950.0
+   ],
+   "Gulf Bridge|Sokhna|Hamad": [
+    1325.0,
+    1875.0
+   ],
+   "Red Sea Express|Sokhna|Hamad": [
+    1250.0,
+    1675.0
+   ],
+   "Gulf Bridge|Sokhna|Shuwaikh": [
+    1525.0,
+    2025.0
+   ],
+   "Orion Lines|Sokhna|Shuwaikh": [
+    1400.0,
+    1900.0
+   ],
+   "Red Sea Express|Sokhna|Shuwaikh": [
+    1475.0,
+    1950.0
+   ],
+   "Red Sea Express|Sokhna|Sohar": [
+    1125.0,
+    1525.0
+   ],
+   "Orion Lines|Sokhna|Sohar": [
+    1375.0,
+    1850.0
+   ],
+   "Red Sea Express|Sokhna|Umm Qasr": [
+    1850.0,
+    2625.0
+   ],
+   "Nile Star|Sokhna|Umm Qasr": [
+    1800.0,
+    2450.0
+   ],
+   "Orion Lines|Sokhna|Umm Qasr": [
+    1700.0,
+    2350.0
+   ],
+   "Nile Star|Port Said East|Nhava Sheva": [
+    900.0,
+    1250.0
+   ],
+   "Pharos Line|Port Said East|Nhava Sheva": [
+    1000.0,
+    1375.0
+   ],
+   "Pharos Line|Port Said East|Mundra": [
+    750.0,
+    1025.0
+   ],
+   "Nile Star|Port Said East|Mundra": [
+    825.0,
+    1150.0
+   ],
+   "Pharos Line|Port Said East|Karachi": [
+    1050.0,
+    1400.0
+   ],
+   "Orion Lines|Sokhna|Karachi": [
+    1025.0,
+    1450.0
+   ],
+   "Nile Star|Sokhna|Karachi": [
+    975.0,
+    1400.0
+   ],
+   "Orion Lines|Port Said East|Colombo": [
+    1025.0,
+    1525.0
+   ],
+   "Nile Star|Sokhna|Chittagong": [
+    1700.0,
+    2350.0
+   ],
+   "Delta Marine|Port Said East|Shanghai": [
+    550.0,
+    725.0
+   ],
+   "Orion Lines|Port Said East|Shanghai": [
+    450.0,
+    600.0
+   ],
+   "Aurora Lines|Port Said East|Shanghai": [
+    475.0,
+    650.0
+   ],
+   "Orion Lines|Sokhna|Ningbo": [
+    425.0,
+    550.0
+   ],
+   "Aurora Lines|Sokhna|Ningbo": [
+    425.0,
+    600.0
+   ],
+   "Pharos Line|Port Said East|Ningbo": [
+    500.0,
+    675.0
+   ],
+   "Pharos Line|Sokhna|Qingdao": [
+    575.0,
+    775.0
+   ],
+   "Orion Lines|Port Said East|Qingdao": [
+    500.0,
+    650.0
+   ],
+   "Delta Marine|Port Said East|Xiamen": [
+    575.0,
+    775.0
+   ],
+   "Orion Lines|Port Said East|Xiamen": [
+    625.0,
+    850.0
+   ],
+   "Aurora Lines|Sokhna|Xiamen": [
+    550.0,
+    750.0
+   ],
+   "Pharos Line|Sokhna|Xiamen": [
+    450.0,
+    575.0
+   ],
+   "Orion Lines|Sokhna|Busan": [
+    625.0,
+    850.0
+   ],
+   "Aurora Lines|Port Said East|Busan": [
+    700.0,
+    950.0
+   ],
+   "Pharos Line|Sokhna|Busan": [
+    750.0,
+    1050.0
+   ],
+   "Delta Marine|Port Said East|Busan": [
+    600.0,
+    825.0
+   ],
+   "Pharos Line|Sokhna|Singapore": [
+    650.0,
+    925.0
+   ],
+   "Orion Lines|Sokhna|Singapore": [
+    550.0,
+    750.0
+   ],
+   "Delta Marine|Port Said East|Singapore": [
+    525.0,
+    700.0
+   ],
+   "Delta Marine|Sokhna|Port Klang": [
+    625.0,
+    850.0
+   ],
+   "Orion Lines|Port Said East|Port Klang": [
+    525.0,
+    650.0
+   ],
+   "Pharos Line|Port Said East|Ho Chi Minh": [
+    650.0,
+    875.0
+   ],
+   "Orion Lines|Sokhna|Ho Chi Minh": [
+    750.0,
+    975.0
+   ],
+   "Delta Marine|Sokhna|Jakarta": [
+    725.0,
+    975.0
+   ],
+   "Aurora Lines|Sokhna|Jakarta": [
+    800.0,
+    1025.0
+   ],
+   "Pharos Line|Sokhna|Jakarta": [
+    825.0,
+    1100.0
+   ],
+   "Aurora Lines|Sokhna|Mombasa": [
+    1675.0,
+    2350.0
+   ],
+   "Orion Lines|Sokhna|Mombasa": [
+    1575.0,
+    2325.0
+   ],
+   "Sahara Feeder|Sokhna|Mombasa": [
+    1775.0,
+    2550.0
+   ],
+   "Orion Lines|Sokhna|Dar Es Salaam": [
+    1850.0,
+    2700.0
+   ],
+   "Sahara Feeder|Sokhna|Dar Es Salaam": [
+    1850.0,
+    2800.0
+   ],
+   "Aurora Lines|Sokhna|Dar Es Salaam": [
+    1675.0,
+    2350.0
+   ],
+   "Orion Lines|Sokhna|Durban": [
+    1900.0,
+    2850.0
+   ],
+   "Aurora Lines|Sokhna|Durban": [
+    1875.0,
+    2775.0
+   ],
+   "Sahara Feeder|Sokhna|Durban": [
+    2025.0,
+    3075.0
+   ],
+   "Aurora Lines|Damietta|Mersin": [
+    425.0,
+    600.0
+   ],
+   "Delta Marine|Dekheila|Mersin": [
+    525.0,
+    775.0
+   ],
+   "Sahara Feeder|Port Said West|Mersin": [
+    500.0,
+    725.0
+   ],
+   "Delta Marine|Alexandria|Ambarli": [
+    550.0,
+    800.0
+   ],
+   "Sahara Feeder|Port Said West|Ambarli": [
+    550.0,
+    750.0
+   ],
+   "Aurora Lines|Damietta|Ambarli": [
+    525.0,
+    700.0
+   ],
+   "Pharos Line|Port Said West|Ambarli": [
+    500.0,
+    675.0
+   ],
+   "Pharos Line|Alexandria|Piraeus": [
+    650.0,
+    925.0
+   ],
+   "Sahara Feeder|Port Said West|Piraeus": [
+    575.0,
+    750.0
+   ],
+   "Delta Marine|Damietta|Piraeus": [
+    500.0,
+    675.0
+   ],
+   "Aurora Lines|Alexandria|Piraeus": [
+    600.0,
+    775.0
+   ],
+   "Sahara Feeder|Port Said West|Genoa": [
+    625.0,
+    850.0
+   ],
+   "Aurora Lines|Port Said West|Genoa": [
+    700.0,
+    975.0
+   ],
+   "Delta Marine|Port Said West|Genoa": [
+    650.0,
+    925.0
+   ],
+   "Sahara Feeder|Damietta|Valencia": [
+    825.0,
+    1100.0
+   ],
+   "Aurora Lines|Damietta|Valencia": [
+    625.0,
+    825.0
+   ],
+   "Sahara Feeder|Dekheila|Barcelona": [
+    750.0,
+    1050.0
+   ],
+   "Pharos Line|Alexandria|Barcelona": [
+    750.0,
+    1075.0
+   ],
+   "Delta Marine|Alexandria|Barcelona": [
+    825.0,
+    1150.0
+   ],
+   "Sahara Feeder|Dekheila|Koper": [
+    800.0,
+    1125.0
+   ],
+   "Delta Marine|Damietta|Koper": [
+    650.0,
+    900.0
+   ],
+   "Delta Marine|Alexandria|Malta": [
+    575.0,
+    775.0
+   ],
+   "Aurora Lines|Dekheila|Malta": [
+    550.0,
+    775.0
+   ],
+   "Delta Marine|Damietta|Beirut": [
+    575.0,
+    850.0
+   ],
+   "Aurora Lines|Damietta|Beirut": [
+    525.0,
+    750.0
+   ],
+   "Pharos Line|Port Said West|Beirut": [
+    575.0,
+    825.0
+   ],
+   "Sahara Feeder|Damietta|Beirut": [
+    550.0,
+    750.0
+   ],
+   "Delta Marine|Dekheila|Limassol": [
+    575.0,
+    800.0
+   ],
+   "Aurora Lines|Dekheila|Limassol": [
+    550.0,
+    725.0
+   ],
+   "Delta Marine|Port Said West|Casablanca": [
+    1100.0,
+    1500.0
+   ],
+   "Sahara Feeder|Port Said West|Casablanca": [
+    1100.0,
+    1525.0
+   ],
+   "Aurora Lines|Dekheila|Casablanca": [
+    1200.0,
+    1650.0
+   ],
+   "Aurora Lines|Alexandria|Rades": [
+    950.0,
+    1250.0
+   ],
+   "Pharos Line|Damietta|Rades": [
+    1000.0,
+    1375.0
+   ],
+   "Pharos Line|Damietta|Constanta": [
+    825.0,
+    1100.0
+   ],
+   "Aurora Lines|Dekheila|Constanta": [
+    875.0,
+    1175.0
+   ],
+   "Pharos Line|Alexandria|Rotterdam": [
+    1050.0,
+    1500.0
+   ],
+   "Delta Marine|Port Said East|Rotterdam": [
+    950.0,
+    1325.0
+   ],
+   "Aurora Lines|Alexandria|Antwerp": [
+    800.0,
+    1150.0
+   ],
+   "Pharos Line|Alexandria|Antwerp": [
+    925.0,
+    1250.0
+   ],
+   "Delta Marine|Alexandria|Antwerp": [
+    850.0,
+    1150.0
+   ],
+   "Delta Marine|Damietta|Hamburg": [
+    1050.0,
+    1425.0
+   ],
+   "Pharos Line|Port Said East|Hamburg": [
+    1025.0,
+    1325.0
+   ],
+   "Aurora Lines|Alexandria|Hamburg": [
+    900.0,
+    1225.0
+   ],
+   "Delta Marine|Port Said East|Felixstowe": [
+    1100.0,
+    1525.0
+   ],
+   "Aurora Lines|Damietta|Le Havre": [
+    1125.0,
+    1575.0
+   ],
+   "Pharos Line|Port Said East|Le Havre": [
+    1100.0,
+    1575.0
+   ],
+   "Delta Marine|Port Said East|Le Havre": [
+    875.0,
+    1200.0
+   ],
+   "Delta Marine|Damietta|Gdansk": [
+    1200.0,
+    1675.0
+   ],
+   "Pharos Line|Alexandria|Gdansk": [
+    1075.0,
+    1400.0
+   ],
+   "Delta Marine|Alexandria|Apapa": [
+    2600.0,
+    3600.0
+   ],
+   "Aurora Lines|Alexandria|Apapa": [
+    2300.0,
+    3200.0
+   ],
+   "Sahara Feeder|Alexandria|Apapa": [
+    2775.0,
+    3850.0
+   ],
+   "Delta Marine|Port Said East|Tema": [
+    2125.0,
+    2875.0
+   ],
+   "Sahara Feeder|Port Said East|Tema": [
+    2250.0,
+    3075.0
+   ],
+   "Aurora Lines|Port Said East|Tema": [
+    2600.0,
+    3750.0
+   ],
+   "Aurora Lines|Port Said East|Abidjan": [
+    2125.0,
+    2900.0
+   ],
+   "Sahara Feeder|Port Said East|Abidjan": [
+    2375.0,
+    3350.0
+   ],
+   "Orion Lines|Alexandria|New York": [
+    2075.0,
+    2750.0
+   ],
+   "Delta Marine|Port Said East|Houston": [
+    2175.0,
+    2800.0
+   ],
+   "Aurora Lines|Port Said East|Houston": [
+    2450.0,
+    3075.0
+   ],
+   "Orion Lines|Port Said East|Savannah": [
+    2000.0,
+    2550.0
+   ],
+   "Aurora Lines|Damietta|Savannah": [
+    2075.0,
+    2625.0
+   ],
+   "Aurora Lines|Alexandria|Montreal": [
+    2050.0,
+    2625.0
+   ],
+   "Orion Lines|Alexandria|Montreal": [
+    2175.0,
+    2850.0
+   ],
+   "Delta Marine|Port Said East|Montreal": [
+    2275.0,
+    2900.0
+   ],
+   "Aurora Lines|Alexandria|Santos": [
+    2350.0,
+    2900.0
+   ],
+   "Delta Marine|Damietta|Santos": [
+    2675.0,
+    3375.0
+   ],
+   "Orion Lines|Port Said East|Santos": [
+    2525.0,
+    3150.0
+   ]
+  }
  }
 }

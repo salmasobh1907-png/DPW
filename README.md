@@ -82,6 +82,7 @@ Full table, one row per sub-screen: `TAB_MAP.csv`. Summary:
 | `lanes` | Summary per destination: rate count, valid count, lowest 40', cheapest carrier, carriers, months, requests, won, TEU, transit days | Calculated by `ratebank_to_data.py` |
 | `egypt, ports, nodes, edges, attach, choke, alts, services` | Map: ports with lat/lon, sea network, chokepoints (Suez, Bab el-Mandeb …), alternative ports, liner services | Reference data (kept as is) |
 | `health` | Row checks on the Rate Data Base | Calculated |
+| `hist` | Last month's standard rates: `month`, `rows` = `carrier\|POL\|POD` → `[rate20, rate40]` | Dummy: `make_dummy_history.py`. Production: a read-only copy of the Rate Bank rows kept at each month end |
 | `asof` | Date of the data | Script |
 
 ### 5.2 Shared store collections (what users save)
@@ -118,6 +119,7 @@ In production the cases must move to the database (see section 9).
 13. My day. A card at the top of the Inbox, different for each viewer, built from plain rules on the tool's own data (no AI model). Pricing person: own requests over the SLA, next request due, requests with no owner, own open requests on a lane with no valid standard rate or whose lowest rate ends within 3 days, carriers that did not answer, new sales feedback, own status running longer than usual. Lead, in addition: team requests over the SLA, open requests owned by people who are not available, who is available now, leave in the next 7 days. Sales person: offers from pricing not yet sent to the customer, quotes ended with no result, follow-ups due, quotes ending soon, own requests still with pricing, answers to feedback, customers with no request for 60 days. The three most urgent lines show; the rest open under "more".
 14. One search box in the top bar (shortcut: `/`). It finds requests by number, subject, sender or owner; offers and quotes by number, customer, lane, carrier or sales person; and lanes by port or carrier. Each viewer finds only what they may see: a sales person finds only their own requests and quotes, and lane results show the number of carriers, not the lowest buy rate.
 15. No valid rate on a lane is never a dead end, and never a rate from memory. Rates & offer then shows: (1) the last known rates on that destination, marked "ended, reference only", with "Ask to renew"; (2) the nearest ports that do have valid rates, with the distance, to judge the level; (3) one rate request email to the carriers that serve the area, opened as a draft and added to "Waiting for carriers"; (4) "Log it as a request", which puts it in the Inbox with a number, an owner and an SLA clock. A sales user sees only the nearest ports (no buy rates) and "Ask pricing for this rate"; the open ask shows in their My day.
+16. Rate history. In the Pricing view each standard buy rate shows how it moved since last month: ▲ and the amount (dearer, red), ▼ and the amount (cheaper, green), "= Oct" (no change) or "new". Sales never see it, because it is about buy rates. The last-month numbers in this pack are invented by a script.
 10. Spot rates only when the carrier says spot; valid for that sailing only.
 11. Sales never see buy rates, profit or the market band.
 
@@ -194,6 +196,8 @@ python3 inject_data.py ../app/DP_World_Platform_DEMO.html ../data/demo_data.json
 # page → data file, and data file → dummy Excel
 python3 extract_data.py ../app/DP_World_Platform_DEMO.html ../data/demo_data.json
 python3 make_dummy_ratebank.py ../data/demo_data.json ../data
+# dummy last-month rates for the rate history arrows (run after ratebank_to_data.py, before inject_data.py)
+python3 make_dummy_history.py ../data/demo_data.json
 ```
 
 ## 13. Known limits of the prototype
