@@ -89,7 +89,7 @@ Full table, one row per sub-screen: `TAB_MAP.csv`. Summary:
 
 | Collection | Saved when | Main fields |
 | --- | --- | --- |
-| `quotes` | Pricing sends an offer; sales send a quote; won / lost | `dir, pol, pod, customer, eq, qty, buy, sell, car, valid, status, reason, booking, seller, pricedBy, toCust, followUp, no, reqId, created` |
+| `quotes` | Pricing sends an offer; sales send a quote; won / lost | `dir, pol, pod, customer, eq, qty, buy, sell, car, valid, status, reason, compPrice, booking, seller, pricedBy, toCust, followUp, no, reqId, created` |
 | `extraRates` | A carrier offer is added from email or file | `car, pol, pod, r20, r40, rf20, rf40, cur, valid, tt, ts, thc20, thc40, thccur, ft, ct, cmt` |
 | `feedback` | Sales report what the customer said | `dir, pol, pod, type, price, eq, customer, text, status, reply, created` |
 | `declines` | A carrier says it cannot serve a lane | `car, pods, reason, date, subject, by` |
@@ -120,6 +120,7 @@ In production the cases must move to the database (see section 9).
 14. One search box in the top bar (shortcut: `/`). It finds requests by number, subject, sender or owner; offers and quotes by number, customer, lane, carrier or sales person; and lanes by port or carrier. Each viewer finds only what they may see: a sales person finds only their own requests and quotes, and lane results show the number of carriers, not the lowest buy rate.
 15. No valid rate on a lane is never a dead end, and never a rate from memory. Rates & offer then shows: (1) the last known rates on that destination, marked "ended, reference only", with "Ask to renew"; (2) the nearest ports that do have valid rates, with the distance, to judge the level; (3) one rate request email to the carriers that serve the area, opened as a draft and added to "Waiting for carriers"; (4) "Log it as a request", which puts it in the Inbox with a number, an owner and an SLA clock. A sales user sees only the nearest ports (no buy rates) and "Ask pricing for this rate"; the open ask shows in their My day.
 16. Rate history. In the Pricing view each standard buy rate shows how it moved since last month: ▲ and the amount (dearer, red), ▼ and the amount (cheaper, green), "= Oct" (no change) or "new". Sales never see it, because it is about buy rates. The last-month numbers in this pack are invented by a script.
+17. Lost quotes. A reason is required. For "Price too high" the competitor price is also required, or a tick that the customer did not say it. The sales person report then shows how far our sell was above the competitor price on average.
 10. Spot rates only when the carrier says spot; valid for that sailing only.
 11. Sales never see buy rates, profit or the market band.
 
