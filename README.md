@@ -252,6 +252,14 @@ Terms added to the quote (email, PDF, Excel): D&D after free time as per tariff;
 
 On the published page, **Inbox → Check inbox** reads the owner's Gmail through the claude.ai Gmail connector (`search_threads`, `get_thread`), last 30 days, rate / quote / booking / freight words only (query saved per browser in `ibxQ_v1`). The reply button saves a **Gmail draft** (`create_draft`) as a reply to the sender; the person opens Gmail and sends it. The tool never sends. Nothing read from Gmail is written to the repo. Without the connector the page uses the offline dummy copy. For DP World, IT replaces this with M365 shared mailboxes via Microsoft Graph (read only).
 
+### 5.25 Gmail test box as the shared mailboxes (demo of the M365 set-up)
+
+The Gmail test box stands in for the DP World shared mailboxes. Each mailbox has a `+tag` address on the same box: `+pricing` (routed by the Cases rules to Ocean, Key accounts, Trucking or Air), `+ops` → **Operations**, `+commercial` → **Commercial**, `+ff` → **DP World Freight Forwarding**, `+air` → **Air requests**. **Shared inbox cases → Pull from Gmail** reads the last 30 days sent to those addresses (`search_threads`, `get_thread`) and opens one case per email (id `G-…`), with SLA, distribution and forwarding as for any case. Ten dummy sample emails were prepared as Gmail drafts for the owner to send. **Draft buttons everywhere**: when Gmail is connected, a Gmail compose link opens an in-tool preview (edit To, subject, text) and **Save draft in Gmail** (`create_draft`); the person sends from Gmail. Without Gmail the links open Gmail compose as before. In production: M365 shared mailboxes via Graph, read only, same screens.
+
+### 5.26 Role names
+
+Views are named by role, not by person or job title: **Executive** (pricing and operations staff, sees buy rates), **Sales** (sell rates only), **Direct Manager** (own team), **Senior Management** (department / Freight Forwarding), **Top Management** (whole company). Internal ids stay `pricing`, `sales`, `manager`, `director`, `ceo`; in production each maps to an Entra ID group.
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).

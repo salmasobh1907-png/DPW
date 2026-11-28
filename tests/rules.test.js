@@ -456,7 +456,7 @@ test('sign-in: the app starts on a sign-in screen; picking a user sets the view 
   const st = await pg.evaluate(() => ({ pane: [...document.querySelectorAll('.pane')].find(x => !x.hidden)?.id, who: window.__rules.whoAmI().name, dir: window.__rules.isDirector() }));
   await pg.close();
   assert.ok(facts.some(f => /Only Nour Adel can do: Answer tenders/.test(f)));
-  assert.deepEqual(st, { pane: 'p-cockpit', who: 'Director', dir: true });
+  assert.deepEqual(st, { pane: 'p-cockpit', who: 'Senior Management', dir: true });
 });
 
 test('sign-in: a signed-in person sees only their own view (no Pricing / Sales / Director switch)', async () => {
@@ -701,4 +701,15 @@ test('free time / D&D, ACI and currency terms in the quote', async () => {
   assert.deepEqual(r.aci, [false, false, false, true]);
   assert.ok(r.t1.some(t => /ACID/.test(t))); assert.ok(r.t1.some(t => /56\.40 EGP per USD on 27 Nov 2026/.test(t))); assert.ok(r.t1.some(t => /Free time as per carrier tariff/.test(t)));
   assert.ok(!r.t2.some(t => /ACID|EGP/.test(t))); assert.ok(r.t2.includes('All rates in USD.'));
+});
+
+test('Gmail as shared mailboxes: +tag picks the mailbox, pricing tag is routed by the rules; compose links are parsed for in-tool drafts', async () => {
+  const r = await run(() => { const R = window.__rules;
+    return { t: [R.gmTag(['pricing.team.dpw+ops@gmail.com']), R.gmTag(['x@y.com']), R.gmTag(['Pricing.Team.DPW+AIR@gmail.com'])],
+      ops: R.gmBoxFor('ops', 'a', 'b', 'c').box, ff: R.gmBoxFor('ff', 'a', 'b', 'c').box, pr: R.gmBoxFor('pricing', 'x', 'Trucking request', '3 trucks to 10th of Ramadan').box, none: R.gmBoxFor(null, '', '', ''),
+      q: R.gmQuery(), c: R.gmParseCompose('https://mail.google.com/mail/?authuser=a@b.com&view=cm&fs=1&to=a@x.com,b@y.com&su=Hi&body=Line'), nc: R.gmParseCompose('https://outlook.office.com/mail/') }; });
+  assert.deepEqual(r.t, ['ops', null, 'air']);
+  assert.equal(r.ops, 'ops'); assert.equal(r.ff, 'ff'); assert.equal(r.pr, 'trk'); assert.equal(r.none, null);
+  assert.ok(r.q.includes('pricing.team.dpw+commercial@gmail.com') && r.q.startsWith('newer_than:30d'));
+  assert.deepEqual(r.c, { to: ['a@x.com', 'b@y.com'], su: 'Hi', body: 'Line' }); assert.equal(r.nc, null);
 });

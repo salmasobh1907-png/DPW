@@ -407,6 +407,7 @@ body:not(.notes-on) .xp{display:none!important}
 .pct td.mono{white-space:nowrap}
 @media (max-width:600px){.pct{font-size:12px}.pct th,.pct td{padding:7px 4px}.pct th:first-child{width:31%}.pct .ofp{padding:4px 3px;font-size:12px;min-width:38px}}
 .rxg{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px 18px;font-size:13px}.rxg>div{min-width:0}.rxg input{padding:3px 6px;border:1px solid var(--line-2);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit}
+.gmDlg{width:min(640px,94vw);border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:16px 18px}.gmDlg::backdrop{background:rgba(8,16,30,.4)}
 .dfb:empty{display:none}.dfb{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}.dfbh{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}.dfbh .mini{margin-left:auto}
 /* dpw-look */
 :root{--accent:#3e3c90;--accent-soft:#ecebf6;--focus:#3e3c90;--nav:#17163f;--nav-2:#272661}
@@ -551,7 +552,7 @@ body.nl .side,body.nl .rail,body.nl nav.side{background:linear-gradient(180deg,#
   </nav>
   <header class="top">
     <div class="ttl"><h1 id="pgTitle">Rates &amp; offer</h1><div class="sub" id="pgSub"></div></div>
-    <div class="role" id="roleSw" role="group" aria-label="View as" hidden><span class="lbl">View as</span><button id="r-pricing" aria-pressed="true"><svg class="ic sm"><use href="#i-chart"/></svg>Pricing</button><button id="r-sales" aria-pressed="false"><svg class="ic sm"><use href="#i-bag"/></svg>Sales</button><button id="r-manager" aria-pressed="false"><svg class="ic sm"><use href="#i-chart"/></svg>Manager</button><button id="r-ceo" aria-pressed="false"><svg class="ic sm"><use href="#i-home"/></svg>CEO</button><button id="r-director" aria-pressed="false"><svg class="ic sm"><use href="#i-home"/></svg>Director</button></div>
+    <div class="role" id="roleSw" role="group" aria-label="View as" hidden><span class="lbl">View as</span><button id="r-pricing" aria-pressed="true"><svg class="ic sm"><use href="#i-chart"/></svg>Executive</button><button id="r-sales" aria-pressed="false"><svg class="ic sm"><use href="#i-bag"/></svg>Sales</button><button id="r-manager" aria-pressed="false"><svg class="ic sm"><use href="#i-chart"/></svg>Direct Manager</button><button id="r-ceo" aria-pressed="false"><svg class="ic sm"><use href="#i-home"/></svg>Top Management</button><button id="r-director" aria-pressed="false"><svg class="ic sm"><use href="#i-home"/></svg>Senior Management</button></div>
     <button class="iconbtn lg-who" id="whoBtn" aria-label="Signed in user: switch user" title="Switch user">?</button>
     <button class="iconbtn" id="lookBtn" aria-pressed="true" aria-label="New look on or off" title="New look on or off"><svg class="ic"><use href="#i-sun"/></svg></button>
     <span class="chipd" title="Source: Rate Bank Export / Import on SharePoint"><span class="dot"></span>Rate Bank · <span id="asof3"></span></span>
@@ -2609,7 +2610,7 @@ function renderSheet(){ const p=$("p-sheet"); if(!p) return; const R=sheetRows()
 const CS_LS="csState_v1", CS_SETK="csSet_v1", CS_MYK="csMy_v1";
 const CS_PEOPLE=[{id:"me",name:"You",mail:"you@lead.dpw-demo"},{id:"nour",name:"Nour Adel",mail:"nour.adel@pricing.dpw-demo"},{id:"omar",name:"Omar Fathy",mail:"omar.fathy@pricing.dpw-demo"},{id:"mariam",name:"Mariam Hany",mail:"mariam.hany@network.dpw-demo"},{id:"ahmed",name:"Ahmed Samir",mail:"ahmed.samir@internal.dpw-demo"}];
 // access by email domain: each person opens only the mailboxes of their domain
-const CS_DOM={"lead.dpw-demo":["rates","kam","trk","air","net","int"],"pricing.dpw-demo":["rates","kam","trk","air"],"network.dpw-demo":["net"],"internal.dpw-demo":["int"]};
+const CS_DOM={"lead.dpw-demo":["rates","kam","trk","air","net","int","ops","com","ff"],"pricing.dpw-demo":["rates","kam","trk","air"],"network.dpw-demo":["net"],"internal.dpw-demo":["int"]};
 function csAcc(pid){ const p=CS_PEOPLE.find(x=>x.id===pid); return p?(CS_DOM[p.mail.split("@")[1]]||[]):[]; }
 const CS_MBX=[
   {id:"rates",addr:"pricing.ocean@demo",name:"Ocean requests",who:"Customers and sales",sla:3},
@@ -2617,7 +2618,10 @@ const CS_MBX=[
   {id:"trk",addr:"pricing.trucking@demo",name:"Trucking requests",who:"Customers and sales",sla:3},
   {id:"air",addr:"pricing.air@demo",name:"Air requests",who:"Customers and sales",sla:2},
   {id:"net",addr:"network.pricing@demo",name:"Network requests",who:"DP World offices abroad",sla:4},
-  {id:"int",addr:"pricing.internal@demo",name:"Internal inquiries",who:"Ops, finance, management",sla:3}];
+  {id:"int",addr:"pricing.internal@demo",name:"Internal inquiries",who:"Ops, finance, management",sla:3},
+  {id:"ops",addr:"pricing.team.dpw+ops@gmail.com",name:"Operations",who:"Shared mailbox (Gmail demo)",sla:4},
+  {id:"com",addr:"pricing.team.dpw+commercial@gmail.com",name:"Commercial",who:"Shared mailbox (Gmail demo)",sla:4},
+  {id:"ff",addr:"pricing.team.dpw+ff@gmail.com",name:"DP World Freight Forwarding",who:"Shared mailbox (Gmail demo)",sla:4}];
 // one group mail: every email lands in the tool and is routed to a team box by these rules (first match wins)
 const CS_GROUP="pricing@demo", CS_KEYACC=["gulf home retail","nile valley foods"];
 const CS_RULES=[
@@ -2789,7 +2793,7 @@ function renderCases(){ const p=$("p-cases"); if(!p) return; const D=csLoad(), A
   ${CSV.me==="me"?`<div class="csTop">${csShiftCard()}</div>`:""}
   <div class="csChips">${boxes.map(([k,l,n])=>`<button class="csChip" data-box="${k}" aria-pressed="${CSV.box===k}">${esc(l)} <span class="cnt">${n}</span></button>`).join("")}</div>
   <div class="csBar2"><div class="csF">${fs.map(([k,l])=>`<button class="mini${CSV.f===k?" ok":""}" data-f="${k}">${l}</button>`).join("")}</div>
-    <button class="mini" id="csAuto">Auto-assign new cases</button><button class="mini" id="csNew">Send a test email (demo)</button><button class="mini" id="csReset">Reset demo cases</button></div>
+    <button class="mini" id="csAuto">Auto-assign new cases</button><button class="mini" id="csNew">Send a test email (demo)</button><button class="mini" id="csReset">Reset demo cases</button><button class="mini ok" id="csGm">Pull from Gmail</button></div>
   <div class="card csNewF" id="csNewF" hidden><h3>Test email to ${CS_GROUP}</h3><div class="trkform">
    <label class="f">To<select id="cnTo"><option value="">${CS_GROUP} (group mail)</option>${CS_PEOPLE.map(x=>`<option value="${x.id}">${esc(x.mail)} (${esc(x.name)} direct)</option>`).join("")}</select></label>
    <label class="f">From<select id="cnF">${["Cairo Home Appliances","Delta Textile Co.","Gulf Home Retail (import dept.)","Hala Mostafa (Sales)","DP World Mumbai office","Ops desk (Sokhna)"].map(x=>`<option>${esc(x)}</option>`).join("")}</select></label>
@@ -2815,6 +2819,8 @@ function renderCases(){ const p=$("p-cases"); if(!p) return; const D=csLoad(), A
     if(D0) c.log.push([now,"Assigned to "+csName(D0.who)+" by work distribution ("+D0.key+")"]);
     ALL.unshift(c); CSV.f="open"; const can=acc.includes(R.box)||c.who===CSV.me; CSV.open=can?c.id:null;
     CSV.msg=`<b>${to?"Pulled in from "+esc(csName(to))+"'s own inbox":"Routed"} to ${esc(csMbx(R.box).name)}${to?", assigned to "+esc(csName(to)):D0?", assigned to "+esc(csName(D0.who))+" (work distribution: "+esc(D0.key)+")":", not assigned yet"}</b> <span class="note">· ${esc(R.why)}${can?"":` · ${esc(csName(CSV.me))} cannot open this box, so it is not in this list`}</span>`; csStore(); const m=CSV.msg; renderCases(); CSV.msg=m; };
+  $("csGm").onclick=async()=>{ const b=$("csGm"); b.disabled=true; b.textContent="Reading Gmail…"; let R; try{ R=await gmPull(); }catch(e){ R={ok:false,why:"Gmail read failed."}; }
+    CSV.msg=esc(R.ok?(R.n?`${R.n} new email${R.n>1?"s":""} from Gmail opened as cases`:"No new emails in the Gmail mailboxes")+` (${R.total} found in the last 30 days). Live data: shown in this browser only.`:R.why); renderCases(); };
   $("csReset").onclick=()=>{ CS=csSeed(); CSV.open=null; csStore(); renderCases(); };
   csWireDet(); }
 function csWireList(root){ root.querySelectorAll("[data-cs]").forEach(b=>b.onclick=()=>{ CSV.open=b.dataset.cs; CSV.cat=null; renderCases(); }); }
@@ -2939,7 +2945,7 @@ function renderNav(){
   document.querySelectorAll("#nav button[data-k],#bnav button[data-k]").forEach(b=>b.onclick=()=>openTab(b.dataset.k));
   const cp=canPricing(); $("roleSw").hidden=!cp||(signedIn()&&!isAdmin()); /* the tool owner keeps the switch to see every view */ /* signed in: the view comes from the person, no switching */ document.body.classList.toggle("sales",!isPricing());
   $("r-pricing").setAttribute("aria-pressed",String(ROLE==="pricing"&&isPricing())); $("r-manager").setAttribute("aria-pressed",String(ROLE==="manager")); $("r-sales").setAttribute("aria-pressed",String(!isPricing())); $("r-director").setAttribute("aria-pressed",String(ROLE==="director")); $("r-ceo").setAttribute("aria-pressed",String(ROLE==="ceo")); document.body.classList.toggle("director",isDirector());
-  $("footRole").textContent=ROLE==="ceo"?"CEO view":isDirector()?"Director view":ROLE==="manager"?"Manager view":isPricing()?"Pricing view":"Sales view";
+  $("footRole").textContent=ROLE==="ceo"?"Top Management view":isDirector()?"Senior Management view":ROLE==="manager"?"Direct Manager view":isPricing()?"Executive view":"Sales view";
   updateBadges(); try{ plBadge(); }catch(e){}
 }
 function setRole(r){ IBX.open=null; try{ $("q-me").value=r==="sales"?DEMO_SP:(QT.meName||"Pricing team"); }catch(e){} ROLE=r; lsSet("rg-role",r); MRG_MANUAL=false; renderNav(); if(r==="ceo"||r==="director"||r==="manager") openTab("cockpit"); else if(!allowed(CUR_TAB)) openTab(r==="director"?"team":"lane"); else openTab(CUR_TAB,true); if(CUR_TAB!=="lane"){ updateLane(false); } renderOffer(); renderQ(); renderFbLane(); renderFbAll(); renderFbSend(); if(CUR_TAB==="ibx") renderIbx(); }
@@ -4407,7 +4413,7 @@ function renderApps(){ const p=$("p-apps"); if(!p) return; const C=apCfg(), m=ap
    Production: DP World sign-in (Entra ID) gives the person and the view; the demo lets you pick a dummy user. */
 const WHO_KEY="who_v1";
 const USERS=[{id:"me",name:"You",team:"Pricing",role:"pricing"},{id:"nour",name:"Nour Adel",team:"Pricing",role:"pricing"},{id:"omar",name:"Omar Fathy",team:"Customs clearance & trucking",role:"pricing"},
-  {id:"mariam",name:"Mariam Hany",team:"Network requests",role:"pricing"},{id:"ahmed",name:"Ahmed Samir",team:"Documentation & systems",role:"pricing"},{id:"manager",name:"Pricing Manager",team:"Pricing (manager)",role:"manager"},{id:"hala",name:"Hala Mostafa",team:"Operations (head)",role:"manager"},{id:"tamer",name:"Tamer Saleh",team:"Customs & trucking (head)",role:"manager"},{id:"karim",name:"Karim Nabil",team:"Sales",role:"sales"},{id:"director",name:"Director",team:"Freight Forwarding",role:"director"},{id:"ceo",name:"CEO",team:"DP World Egypt",role:"ceo"}];
+  {id:"mariam",name:"Mariam Hany",team:"Network requests",role:"pricing"},{id:"ahmed",name:"Ahmed Samir",team:"Documentation & systems",role:"pricing"},{id:"manager",name:"Direct Manager",team:"Pricing (manager)",role:"manager"},{id:"hala",name:"Hala Mostafa",team:"Operations (head)",role:"manager"},{id:"tamer",name:"Tamer Saleh",team:"Customs & trucking (head)",role:"manager"},{id:"karim",name:"Karim Nabil",team:"Sales",role:"sales"},{id:"director",name:"Senior Management",team:"Freight Forwarding",role:"director"},{id:"ceo",name:"Top Management",team:"DP World Egypt",role:"ceo"}];
 function signedIn(){ if(/[?&]skipLogin=1/.test(location.search)) return false; try{ const w=JSON.parse(localStorage.getItem("who_v1")||"null"); return !!(w&&w.id); }catch(e){ return false; } } /* safe before the sign-in code has loaded */
 function whoAmI(){ const w=lsGet(WHO_KEY,null); return w&&USERS.find(u=>u.id===w.id)||null; }
 function uName(id){ const u=USERS.find(x=>x.id===id); if(u) return u.name; try{ const d=DIR_PEOPLE.find(x=>x.id===id); if(d) return d.name; }catch(e){} return id; }
@@ -4484,7 +4490,7 @@ function tkTeamCard(){ const M=tkMatrix(), P=M.people.filter(inScope), maxH=Math
 function loginShow(){ let d=$("loginDlg"); if(d) d.remove(); d=document.createElement("dialog"); d.id="loginDlg"; d.className="eod-dlg lg-dlg";
   const BL=brandLogo(); d.innerHTML=`<div class="lg-head">${BL?`<img class="lg-logo" src="${BL}" alt="" style="background:#fff;object-fit:contain;padding:4px">`:`<div class="lg-logo" aria-hidden="true">DP</div>`}<div><h2>${esc(appName())}</h2><p class="note">${esc(appSub())}</p></div></div>
     <button type="button" class="svc btn primary lg-ms" disabled>Sign in with Microsoft (DP World)</button><p class="note">On DP World servers you sign in with your company account and your view comes from your group. This demo uses dummy people: pick one.</p>
-    <div class="lg-list">${USERS.map(u=>`<button type="button" class="lg-u" data-lg="${u.id}"><span class="td-tag td-${u.role==="director"?"err":u.role==="sales"?"due":"new"}">${esc(u.name.split(" ").map(w=>w[0]).join("").slice(0,2))}</span><span><b>${esc(u.name)}</b><small>${esc(u.team)} · ${u.role==="ceo"?"CEO view":u.role==="director"?"Director view":u.role==="manager"?"Manager view":u.role==="sales"?"Sales view":"Pricing view"}</small></span></button>`).join("")}</div>`;
+    <div class="lg-list">${USERS.map(u=>`<button type="button" class="lg-u" data-lg="${u.id}"><span class="td-tag td-${u.role==="director"?"err":u.role==="sales"?"due":"new"}">${esc(u.name.split(" ").map(w=>w[0]).join("").slice(0,2))}</span><span><b>${esc(u.name)}</b><small>${esc(u.team)} · ${u.role==="ceo"?"Top Management view":u.role==="director"?"Senior Management view":u.role==="manager"?"Direct Manager view":u.role==="sales"?"Sales view":"Executive view"}</small></span></button>`).join("")}</div>`;
   document.body.appendChild(d); d.addEventListener("cancel",e=>e.preventDefault()); /* sign-in cannot be skipped */
   d.querySelectorAll("[data-lg]").forEach(b=>b.onclick=()=>{ const u=USERS.find(x=>x.id===b.dataset.lg); lsSet(WHO_KEY,{id:u.id,at:Date.now()}); d.close(); d.remove(); try{ sessionStorage.removeItem("launch_v1"); }catch(e){} afterLogin(true); });
   try{ d.showModal(); }catch(e){ d.setAttribute("open",""); } }
@@ -4572,7 +4578,7 @@ function renderSupport(){ const p=$("p-support"); if(!p) return; const adm=isAdm
     <div class="card"><h3>${adm?"All tickets and feedback":"My tickets and feedback"}</h3>${mine.length?mine.map(one).join(""):`<p class="note">Nothing yet. Use the button above or the Report button at the bottom of every screen.</p>`}</div>
     ${adm?`<div class="card"><h3>Change log</h3><p class="note">Who changed tool settings and when.</p>${aud.length?`<div class="csTblW"><table class="csTbl"><thead><tr><th>When</th><th>Who</th><th>What</th></tr></thead><tbody>${aud.map(a=>`<tr><td>${esc(new Date(a.at).toLocaleString("en-GB",{timeZone:"Africa/Cairo",dateStyle:"short",timeStyle:"short"}))}</td><td>${esc(a.who)}${a.admin?"":` <span class="pill lost">not admin</span>`}</td><td>${esc(a.what)}</td></tr>`).join("")}</tbody></table></div>`:`<p class="note">No changes recorded yet.</p>`}</div>
     <div class="card"><h3>Error log</h3><p class="note">Script errors with time, screen and person, kept even when nobody reports them, to find the cause of a problem.</p>${errs.length?`<div class="csTblW"><table class="csTbl"><thead><tr><th>When</th><th>Who</th><th>Screen</th><th>Error</th></tr></thead><tbody>${errs.map(e=>`<tr><td>${esc(new Date(e.at).toLocaleString("en-GB",{timeZone:"Africa/Cairo",dateStyle:"short",timeStyle:"medium"}))}</td><td>${esc(e.who)}</td><td>${esc(e.screen)}</td><td style="overflow-wrap:anywhere">${esc(e.msg)}${e.src?` <small>(${esc(e.src)})</small>`:""}</td></tr>`).join("")}</tbody></table></div>`:`<p class="note">No errors recorded.</p>`}</div>
-    <div class="card"><h3>Rights</h3><div class="csTblW"><table class="csTbl"><thead><tr><th>Person</th><th>Team</th><th>View</th><th>Change settings</th></tr></thead><tbody>${USERS.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.team)}</td><td>${x.role==="director"?"Director":x.role==="sales"?"Sales":"Pricing"}</td><td>${ADMIN_IDS.includes(x.id)?"Yes (tool owner)":"No: view only"}</td></tr>`).join("")}</tbody></table></div>
+    <div class="card"><h3>Rights</h3><div class="csTblW"><table class="csTbl"><thead><tr><th>Person</th><th>Team</th><th>View</th><th>Change settings</th></tr></thead><tbody>${USERS.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.team)}</td><td>${x.role==="ceo"?"Top Management":x.role==="director"?"Senior Management":x.role==="manager"?"Direct Manager":x.role==="sales"?"Sales":"Executive"}</td><td>${ADMIN_IDS.includes(x.id)?"Yes (tool owner)":"No: view only"}</td></tr>`).join("")}</tbody></table></div>
       <p class="note">In the demo the rights live in this page. On DP World servers they come from Entra ID groups and the server refuses changes from anyone else.</p></div>`:""}`;
   $("spNew").onclick=()=>tktDialog();
   $("vfF").onsubmit=e=>{ e.preventDefault(); const r=ofVerify($("vfN").value,$("vfC").value,$("vfR").value.trim());
@@ -4641,8 +4647,8 @@ function cycleCard(){ const S=cycleStats().filter(x=>inScope(x.id)), hrs=m=>m==n
 /* ---------- Org chart, levels and the Executive summary (CEO view). Plain rules, no AI. ----------
    Level 1 employee: own work. Level 2 manager: every employee screen + team dashboards, data of their own team only.
    Level 3 Director: everything, all teams, Executive summary of the whole unit. Tool owner (admin): + settings. Dummy org. */
-const ORG={id:"director",name:"Director",title:"Director, Freight Forwarding",teams:[
-  {id:"pricing",name:"Pricing",lead:"manager",leadName:"Pricing Manager",members:["me","nour","mariam"]},
+const ORG={id:"director",name:"Senior Management",title:"Senior Management, Freight Forwarding",teams:[
+  {id:"pricing",name:"Pricing",lead:"manager",leadName:"Direct Manager",members:["me","nour","mariam"]},
   {id:"customs",name:"Customs clearance & trucking",lead:"tamer",leadName:"Tamer Saleh",members:["omar"]},
   {id:"docs",name:"Documentation & systems",lead:"ahmed",leadName:"Ahmed Samir",members:[]},
   {id:"ops",name:"Operations",lead:"hala",leadName:"Hala Mostafa",members:[]},
@@ -5053,6 +5059,48 @@ function rxTodayCard(){ const p=$("p-today"); if(!p||p.hidden||!isPricing()) ret
   <div class="tbl-wrap"><table class="opts"><thead><tr><th>Lane</th><th>Box</th><th class="n">Last month</th><th class="n">Now</th><th class="n">Move</th><th>What to do</th></tr></thead><tbody>${mv.slice(0,8).map(m=>`<tr><td>${esc(m.pol)} → ${esc(m.pod)}</td><td>${m.eq}</td><td class="n">${money(m.was)} <span class="note">${esc(m.wasCar)}</span></td><td class="n">${money(m.now)} <span class="note">${esc(m.nowCar)}</span></td><td class="n ${m.dir==="up"?"bad-t":"ok-t"}">${m.pct>0?"+":""}${m.pct}%</td><td class="note">${m.dir==="up"?"Re-check open offers on this lane before they are accepted.":"Tell sales: we can quote lower or keep more margin."}</td></tr>`).join("")}</tbody></table></div>
   <p class="note" style="margin:8px 0 0">Alert level: a move of ${S.pct}% or more on the lowest standard rate. Last month = the latest expired month on that lane.</p>`;
   p.appendChild(c); }
+/* ===== Live Gmail as shared mailboxes (demo) =====
+   The Gmail test box stands in for the DP World shared mailboxes: each mailbox has a +tag address
+   (pricing.team.dpw+ops@gmail.com = Operations). "Pull from Gmail" reads them (search_threads, get_thread) and
+   opens a case per email. Read only; real emails stay in this browser. IT later swaps this for M365 Graph. */
+const GM_BOX="pricing.team.dpw@gmail.com", GM_TAGS={pricing:null,ops:"ops",commercial:"com",ff:"ff",air:"air"};
+function gmTag(addrs){ for(const a of [].concat(addrs||[])){ const m=String(a).toLowerCase().match(/\+([a-z]+)@/); if(m&&m[1] in GM_TAGS) return m[1]; } return null; }
+function gmBoxFor(tag,from,subj,body){ if(!tag) return null; if(GM_TAGS[tag]) return {box:GM_TAGS[tag],why:"Sent to the "+csMbx(GM_TAGS[tag]).name+" mailbox ("+GM_BOX.replace("@","+"+tag+"@")+")"};
+  const R=csRoute(from,subj,body); return {box:R.box,why:"Pricing mailbox · "+R.why}; }
+function gmQuery(){ return "newer_than:30d to:("+Object.keys(GM_TAGS).map(t=>GM_BOX.replace("@","+"+t+"@")).join(" OR ")+")"; }
+async function gmPull(){ let mcp=null; try{ mcp=window.claude&&await claude.use("mcp"); }catch(e){}
+  if(!mcp) return {ok:false,why:"Gmail is not connected here: open the tool from its claude.ai link and allow Gmail."};
+  let th=[]; try{ const r=await mcp.callTool("Gmail","search_threads",{query:gmQuery(),pageSize:30,view:"THREAD_VIEW_IDS_ONLY"},{cache:false}); th=(r&&r.payload&&r.payload.threads)||[]; }catch(e){ return {ok:false,why:"Gmail search failed ("+((e&&e.code)||"error")+")."}; }
+  const D=csLoad(), have=new Set(D.cases.map(c=>c.gid).filter(Boolean)); let n=0, n0=0; const now=Date.now();
+  for(const t of th){ if(have.has(t.id)){ n0++; continue; }
+    let g=null; try{ g=(await mcp.callTool("Gmail","get_thread",{threadId:t.id,messageFormat:"PLAIN_TEXT"},{cache:false})).payload; }catch(e){ continue; }
+    const ms=(g&&g.messages)||[], m=ms[0]; if(!m) continue; const tag=gmTag([...(m.toRecipients||[]),...(m.ccRecipients||[])]); if(!tag) continue;
+    const from=String(m.sender||""), subj=String(m.subject||"").slice(0,200), body=String(m.plaintextBody||m.snippet||"").slice(0,4000), recv=Date.parse(m.date)||now;
+    const B=gmBoxFor(tag,from,subj,body), d=csDist(from+"\n"+subj+"\n"+body);
+    const c={id:"G-"+String(t.id).slice(-6).toUpperCase(),gid:t.id,lastMsgId:(ms[ms.length-1]||{}).id||"",src:"gmail",mbx:B.box,why:B.why,rt:"sales",from,subj,body,recv,who:null,status:"new",
+      msgs:[{dir:"in",by:from,at:recv,text:body}],log:[[recv,"Email arrived in "+GM_BOX.replace("@","+"+tag+"@")+" (Gmail, live) · routed to "+csMbx(B.box).name+" ("+B.why+")"]]};
+    ms.slice(1).forEach(x=>c.msgs.push({dir:"in",by:String(x.sender||""),at:Date.parse(x.date)||recv,text:String(x.plaintextBody||x.snippet||"").slice(0,2000)}));
+    if(d){ c.ab="Work distribution: "+d.key+" → "+csName(d.who); }
+    D.cases.unshift(c); n++; }
+  csStore(); return {ok:true,n,n0,total:th.length}; }
+/* Draft buttons: when Gmail is connected, a Gmail compose link opens a preview in the tool and saves a Gmail draft. A human sends it. */
+function gmParseCompose(href){ try{ const u=new URL(href); if(u.hostname!=="mail.google.com"||u.searchParams.get("view")!=="cm") return null;
+  return {to:(u.searchParams.get("to")||"").split(/[,;]/).map(x=>x.trim()).filter(Boolean),su:u.searchParams.get("su")||"",body:u.searchParams.get("body")||""}; }catch(e){ return null; } }
+let GM_MCP=null; setTimeout(async()=>{ try{ GM_MCP=window.claude&&await claude.use("mcp"); }catch(e){ GM_MCP=null; } },0);
+function gmDraftDlg(D){ let d=$("gmDlg"); if(!d){ d=document.createElement("dialog"); d.id="gmDlg"; d.className="gmDlg"; document.body.appendChild(d); }
+  d.innerHTML=`<form method="dialog" id="gmF"><h3 style="margin:0 0 8px">Email draft <span class="note">· saved in Gmail Drafts, you press Send in Gmail</span></h3>
+   <label class="f">To<input type="text" id="gmTo"></label><label class="f" style="margin-top:6px">Subject<input type="text" id="gmSu"></label>
+   <label class="f" style="margin-top:6px">Email<textarea class="ta" id="gmBd" rows="12"></textarea></label>
+   <div class="csBtns"><button class="mini ok" id="gmSave" type="button">Save draft in Gmail</button><a class="mini" id="gmOpen" target="_blank" rel="noopener">Open Gmail compose instead</a><button class="mini" value="x">Close</button><span class="note" id="gmMsg" role="status"></span></div></form>`;
+  $("gmTo").value=D.to.join(", "); $("gmSu").value=D.su; $("gmBd").value=D.body; $("gmOpen").href=D.href;
+  $("gmSave").onclick=async()=>{ const to=$("gmTo").value.split(/[,;]/).map(x=>x.trim()).filter(x=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x)), msg=$("gmMsg");
+    if(!to.length){ msg.textContent="Add a valid email address."; return; } const b=$("gmSave"); b.disabled=true; msg.textContent="Saving…";
+    try{ const r=await GM_MCP.callTool("Gmail","create_draft",{to,subject:$("gmSu").value,body:$("gmBd").value}); const u=r&&r.payload&&r.payload.viewUrl;
+      msg.textContent="Draft saved in Gmail. Open it and press Send yourself."; if(u&&/^https:\/\//.test(u)){ const a=document.createElement("a"); a.href=u; a.target="_blank"; a.rel="noopener"; a.textContent=" Open the draft"; msg.appendChild(a); } b.textContent="Saved ✓"; }
+    catch(e){ msg.textContent="Gmail could not save the draft ("+((e&&e.code)||"error")+"). Use Open Gmail compose instead."; b.disabled=false; } };
+  d.showModal(); }
+document.addEventListener("click",ev=>{ const a=ev.target.closest&&ev.target.closest("a[href]"); if(!a||!GM_MCP||ev.ctrlKey||ev.metaKey||ev.shiftKey) return; const P=gmParseCompose(a.href); if(!P) return;
+  ev.preventDefault(); gmDraftDlg(Object.assign(P,{href:a.href})); },true);
 /* settings screens are view only for everyone but the admin */
 { const wrap=(get,set,id,keep)=>{ const o=get(); set(function(){ const r=o.apply(this,arguments); try{ lockPane(id,keep); }catch(e){} return r; }); };
   wrap(()=>renderSrc,f=>renderSrc=f,"p-src"); wrap(()=>dsRender,f=>dsRender=f,"p-dsrc"); wrap(()=>renderApps,f=>renderApps=f,"p-apps"); wrap(()=>renderDict,f=>renderDict=f,"p-dict","#kbT,#kbTry button"); wrap(()=>renderCmbx,f=>renderCmbx=f,"p-cmbx"); wrap(()=>renderTasks,f=>renderTasks=f,"p-tasks","[data-tkd],[data-tkp],[data-tkm]"); }
@@ -5077,7 +5125,7 @@ setTimeout(()=>{ try{ tdFocusWatch(); }catch(e){} try{ eodWatch(); histSnap(); s
     try{ csTick(); const D=wtDay(csDay(Date.now())); if(D) row=`<tr><td><b>${esc(csName("me"))}</b> (this browser)</td><td>${csTime(D.first)}</td><td>${csTime(D.last)}</td><td class="n">${asDur(D.active)}</td><td class="n">${asDur(D.away)}</td><td class="n">${asDur(D.brk)}</td><td class="n">${asDur(D.off)}</td></tr>`; }catch(e){}
     p.insertAdjacentHTML("beforeend",`<div class="card"><h3>Team working time <span class="dschip ds-off">Managers only</span></h3><p class="note">Active, Away, Break and Off in the tool, per person, today. In this demo each browser keeps only its own log, so only your row shows. On DP World servers every person's log goes to the team database and shows here. Each person sees only their own time. HR and Legal approve before real use.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Person</th><th>First seen</th><th>Last seen</th><th class="n">Active</th><th class="n">Away</th><th class="n">Break</th><th class="n">Off</th></tr></thead><tbody>${row||`<tr><td colspan="7" class="note">No time logged yet today.</td></tr>`}</tbody></table></div></div>`); }; }
-window.__rules = { rateMoves, ddCost, aciCheck, rxTerms, ftDays, ckCustomers, ckForecast, decSet, decAll, smTarget, smOpts, smMargins, spRead, spRecipe, spLogAdd, kbImportRows, kbCheckRows, kbKnownPort, deptHealth, kpiStatus, deptMine, appName, applyBrand, ofCheck, ofVerify, ofRecord, ofNextNo, brandLogo, kbNorm, kbPort, kbAdd, kbAll, bm25Rank, kbMissAdd, gTraining, gAsk, GUIDE, teamScope, userLevel, execStats, execRisks, cycleStats, dirFind, fwdCase, DIR_MBX, isAdmin, tktNew, tktUpd, tktAll, errAdd, adminAlerts, lockPane, tkAll, tkMatrix, tkMark, tkDone, whoAmI, launchFacts, wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
+window.__rules = { gmTag, gmBoxFor, gmQuery, gmParseCompose, rateMoves, ddCost, aciCheck, rxTerms, ftDays, ckCustomers, ckForecast, decSet, decAll, smTarget, smOpts, smMargins, spRead, spRecipe, spLogAdd, kbImportRows, kbCheckRows, kbKnownPort, deptHealth, kpiStatus, deptMine, appName, applyBrand, ofCheck, ofVerify, ofRecord, ofNextNo, brandLogo, kbNorm, kbPort, kbAdd, kbAll, bm25Rank, kbMissAdd, gTraining, gAsk, GUIDE, teamScope, userLevel, execStats, execRisks, cycleStats, dirFind, fwdCase, DIR_MBX, isAdmin, tktNew, tktUpd, tktAll, errAdd, adminAlerts, lockPane, tkAll, tkMatrix, tkMark, tkDone, whoAmI, launchFacts, wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
 window.__route = route;
 })();
 </script>
