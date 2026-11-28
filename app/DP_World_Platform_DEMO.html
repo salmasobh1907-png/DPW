@@ -177,6 +177,12 @@ textarea.ta,.ta{font-size:13px;line-height:1.45;resize:vertical}
 @media(max-width:560px){.lsteps button .t span{display:none}.lsteps button{padding:8px}}
 .avBar{margin:12px 0;padding:10px 16px}.csOff{padding:8px 16px}.avRow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}.avChips{display:flex;flex-wrap:wrap;gap:6px;margin-right:auto}.avChips .csChip{padding:5px 11px}.avChips .csChip:disabled{opacity:.45;cursor:default}.avLv{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px}.csTbl input[type=time]{width:auto;padding:3px 6px}
 .mdCard{padding:14px 16px}.mdH{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-bottom:10px}.mdH h3{margin:0}.mdCard .qal{padding:7px 12px}.mdCard .qal .qno{margin:0 6px 0 0}.qal.ok .sev{background:var(--good,#0a7a3e)}.mdMore{margin-top:8px}.mdMore>summary{cursor:pointer}#p-ibx .mdCard{margin:0}
+.top{position:relative;z-index:30}.gs{position:relative;flex:0 1 300px;min-width:110px}.gs input{width:100%;height:34px;padding:0 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2,var(--surface));color:var(--ink);font:inherit;font-size:13px}.gs input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.gsRes{position:absolute;z-index:60;top:calc(100% + 6px);right:0;width:min(460px,92vw);max-height:70vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 36px rgba(0,0,0,.2);padding:6px}
+.gsRes h4{margin:8px 8px 4px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.gsRes button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--ink);font:inherit;padding:7px 8px;border-radius:8px;cursor:pointer}
+.gsRes button.on,.gsRes button:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}.gsRes button b{font-size:13px}.gsRes button small{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gsRes p{margin:8px;font-size:12.5px;color:var(--muted)}
+@media(max-width:820px){.gs{flex:0 0 38px;min-width:38px}.gs input{padding:0 6px;background-repeat:no-repeat;background-position:center;background-size:16px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238592a6' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E")}.gs input::placeholder{color:transparent}
+.gs:focus-within{position:absolute;left:12px;right:12px;top:11px;z-index:5}.gs:focus-within input{background-image:none;padding:0 10px}.gs:focus-within input::placeholder{color:var(--muted)}.gs:focus-within .gsRes{left:0;right:0;width:auto}}
 details.whatif{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
 details.whatif summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);list-style:none;display:flex;align-items:center;gap:6px}
 details.whatif summary::-webkit-details-marker{display:none}
@@ -506,6 +512,7 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
   </nav>
   <header class="top">
     <div class="ttl"><h1 id="pgTitle">Rates &amp; offer</h1><div class="sub" id="pgSub"></div></div>
+    <div class="gs" id="gs"><input type="search" id="gsQ" placeholder="Search request no., customer, lane…" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="gsRes" aria-label="Search requests, quotes and lanes. Shortcut: slash"><div class="gsRes" id="gsRes" role="listbox" hidden></div></div>
     <div class="role" id="roleSw" role="group" aria-label="View as" hidden><span class="lbl">View as</span><button id="r-pricing" aria-pressed="true"><svg class="ic sm"><use href="#i-chart"/></svg>Pricing</button><button id="r-sales" aria-pressed="false"><svg class="ic sm"><use href="#i-bag"/></svg>Sales</button></div>
     <span class="chipd" title="Source: Rate Bank Export / Import on SharePoint"><span class="dot"></span>Rate Bank · <span id="asof3"></span></span>
     <button class="iconbtn" id="noteBtn" aria-pressed="false" aria-label="Show or hide the explanations" title="Show or hide the explanations"><svg class="ic"><use href="#i-help"/></svg></button>
@@ -2835,12 +2842,39 @@ function mdSales(){ const sp=DEMO_SP, t=todayISO(), I=[], Q=QT.items.filter(q=>q
   return mdCard("My day · "+esc(sp),`${Q.filter(q=>effStatus(q)==="pending").length} open quotes · ${Q.filter(q=>q.status==="won").length} won`,I); }
 document.addEventListener("click",ev=>{ const b=ev.target.closest&&ev.target.closest("[data-md]"); if(!b) return; const a=b.dataset.md, i=a.indexOf(":"), k=i<0?a:a.slice(0,i), v=i<0?"":a.slice(i+1);
   try{ if(k==="tab") openTab(v);
-    else if(k==="ibx"){ IBX.open=v; renderIbx(); const r=document.querySelector("#p-ibx .ibx2"); if(r) r.scrollIntoView({block:"start"}); }
+    else if(k==="quote"){ openTab("q"); const qq=qById(v); if(qq){ QT.open=v; try{ $("qfStatus").value="all"; $("qfMonth").value=qq.month; }catch(e){} Promise.resolve(renderQ()).then(()=>{ const el=$("qr-"+v); if(el){ el.scrollIntoView({block:"center"}); el.classList.add("flash"); setTimeout(()=>el.classList.remove("flash"),1600); } }); } }
+    else if(k==="lane"){ const [pol,pod]=v.split("|"); IBX.req=null; LSTEP=1; if(DIR!=="exp") setDir("exp",pod); if(EG.includes(pol)) $("from").value=pol; $("to").value=pod; openTab("lane"); updateLane(); }
+    else if(k==="ibx"){ if(CUR_TAB!=="ibx") openTab("ibx"); IBX.open=v; renderIbx(); const r=document.querySelector("#p-ibx .ibx2"); if(r) r.scrollIntoView({block:"start"}); }
     else if(k==="st"){ avSet(CSV.me,v,CSV.me); renderCases(); }
     else { if(CUR_TAB!=="cases") openTab("cases"); CSV.box="all";
       if(k==="case"){ const c=csLoad().cases.find(x=>x.id===v); CSV.f=c&&c.sub?"all":"open"; CSV.open=v; CSV.cat=null; } else if(k==="f") CSV.f=v; else if(k==="chase") CSV.chase=true;
       renderCases(); const el=k==="chase"?$("csChase"):k==="case"?$("csDet"):document.querySelector("#p-cases .csWrap"); if(el) el.scrollIntoView({block:"start"}); } }catch(e){} });
 document.addEventListener("toggle",ev=>{ const d=ev.target; if(d&&d.classList&&d.classList.contains("mdMore")) MD.more=d.open; },true);
+
+// ---------- one search box: request number, customer, lane, carrier. Each viewer finds only what they may see. ----------
+const GS={i:0,n:0,lanes:null};
+function gsLanes(){ if(GS.lanes) return GS.lanes; const t=todayISO(), M=new Map(); (DATA.rates||[]).forEach(r=>{ const k=r.pol+"|"+r.pod; if(!M.has(k)) M.set(k,{pol:r.pol,pod:r.pod,n:0,low:null,cars:new Set()}); const g=M.get(k); g.cars.add(r.car);
+    if((!r.valid||r.valid>=t)&&!r.type){ g.n++; if(r.r40!=null&&(g.low==null||r.r40<g.low)) g.low=r.r40; } }); return GS.lanes=[...M.values()]; }
+function gsFind(q){ const pr=isPricing(), T=q.toLowerCase().split(/[\s→>]+/).filter(x=>x&&x!=="to"&&x!=="-"), out=[]; if(!T.length) return out;
+  const hit=s=>{ s=String(s||"").toLowerCase(); return T.every(x=>s.includes(x)); };
+  try{ if(pr){ csSyncIbx(); csVisible(csLoad().cases).filter(c=>hit(c.id+" "+c.subj+" "+c.from+" "+(c.who?csName(c.who):""))).sort((a,b)=>(!!a.sub-!!b.sub)||b.recv-a.recv).slice(0,6)
+        .forEach(c=>out.push({g:"Requests",act:"case:"+c.id,no:c.id,t:c.subj,s:c.from+" · "+csMbx(c.mbx).name+" · "+(c.sub?"answered":"open")+" · "+(c.who?csName(c.who):"no owner")})); }
+    else ibxVisible().filter(e=>hit(ibxNo(e)+" "+e.subject+" "+(ibxReq(e).cust||""))).slice(0,6).forEach(e=>{ const a=ibxAns(e); out.push({g:"My requests",act:"ibx:"+e.id,no:ibxNo(e),t:String(e.subject||"").replace(/^DEMO\s*\|\s*/i,""),s:a?"pricing answered · sell USD "+money(a.sell):"with pricing"}); }); }catch(e){}
+  try{ QT.items.filter(x=>(pr||x.seller===DEMO_SP)&&hit([x.no,x.customer,x.pol,x.pod,pr?x.car:"",x.seller,x.booking].join(" "))).slice(0,6)
+      .forEach(x=>out.push({g:"Offers and quotes",act:"quote:"+x.id,no:x.no||"",t:(x.customer||"—")+" · "+x.pol+" → "+x.pod,s:(x.eq||"")+" · sell USD "+money(x.sell)+" · "+effStatus(x)+(pr&&x.car?" · "+x.car:"")+(x.seller?" · "+x.seller:"")})); }catch(e){}
+  try{ gsLanes().filter(l=>hit(l.pol+" "+l.pod+" "+[...l.cars].join(" "))).sort((a,b)=>b.n-a.n).slice(0,6)
+      .forEach(l=>out.push({g:"Lanes",act:"lane:"+l.pol+"|"+l.pod,no:"",t:l.pol+" → "+l.pod,s:l.n?(pr?l.n+" valid standard rate"+(l.n>1?"s":"")+(l.low!=null?" · lowest 40' USD "+money(l.low):""):l.cars.size+" carrier"+(l.cars.size>1?"s":"")):"no valid standard rate today"})); }catch(e){}
+  return out; }
+function gsRender(){ const inp=$("gsQ"), box=$("gsRes"); if(!inp||!box) return; const q=inp.value.trim(); if(!q){ box.hidden=true; inp.setAttribute("aria-expanded","false"); return; }
+  const R=gsFind(q); GS.n=R.length; GS.i=Math.max(0,Math.min(GS.i,R.length-1)); let g="", h="";
+  R.forEach((x,i)=>{ if(x.g!==g){ g=x.g; h+=`<h4>${esc(g)}</h4>`; } h+=`<button type="button" role="option" data-md="${esc(x.act)}" data-gs="${i}" class="${i===GS.i?"on":""}"><b>${x.no?`<span class="qno">${esc(x.no)}</span>`:""}${esc(x.t)}</b><small>${esc(x.s)}</small></button>`; });
+  box.innerHTML=h||`<p>Nothing found for “${esc(q)}”. Try a request number (Q-1002), a customer, a port or a carrier.</p>`; box.hidden=false; inp.setAttribute("aria-expanded","true"); }
+(function(){ const inp=$("gsQ"), box=$("gsRes"); if(!inp||!box) return; const close=()=>{ box.hidden=true; inp.setAttribute("aria-expanded","false"); };
+  inp.addEventListener("input",()=>{ GS.i=0; gsRender(); }); inp.addEventListener("focus",gsRender); inp.addEventListener("blur",()=>setTimeout(()=>{ if(document.activeElement!==inp) close(); },180));
+  inp.addEventListener("keydown",e=>{ if(e.key==="ArrowDown"||e.key==="ArrowUp"){ e.preventDefault(); if(GS.n){ GS.i=(GS.i+(e.key==="ArrowDown"?1:GS.n-1))%GS.n; gsRender(); const on=box.querySelector("button.on"); if(on) on.scrollIntoView({block:"nearest"}); } }
+    else if(e.key==="Enter"){ const on=box.querySelector("button.on"); if(on&&!box.hidden){ e.preventDefault(); on.click(); } } else if(e.key==="Escape"){ inp.value=""; close(); inp.blur(); } });
+  box.addEventListener("mousedown",e=>e.preventDefault()); box.addEventListener("click",e=>{ if(e.target.closest("[data-gs]")){ inp.value=""; close(); inp.blur(); } });
+  document.addEventListener("keydown",e=>{ if(e.key!=="/"||e.ctrlKey||e.metaKey||e.altKey) return; const a=document.activeElement; if(a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable)) return; e.preventDefault(); inp.focus(); }); })();
 
 // ---------- Cases page ----------
 const CSV={box:"all",f:"open",open:null,cat:null,me:"me"};
