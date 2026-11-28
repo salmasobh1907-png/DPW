@@ -23,6 +23,7 @@ Contents: 1 Pack contents · 2 What the tool does · 3 Architecture · 4 Screens
 | `data/demo_data.json` | The starting data of the page (the `const DATA = ...` line), as a readable file. |
 | `scripts/` | Python 3 scripts (need `openpyxl`): Excel → data file → page, and back. |
 | `TAB_MAP.csv` | One row per screen: data source → what it shows → what it feeds → where it is saved → production source. Opens in Excel. |
+| `docs/DATA_SOURCES.csv` | Data Sources Register for the BTI meeting: one row per data source: who owns it, the cheapest way it reaches the tool, what we ask IT for, the cost, and the open question. Opens in Excel. |
 
 ## 2. What the tool does
 
@@ -121,6 +122,7 @@ In production the cases must move to the database (see section 9).
 15. No valid rate on a lane is never a dead end, and never a rate from memory. Rates & offer then shows: (1) the last known rates on that destination, marked "ended, reference only", with "Ask to renew"; (2) the nearest ports that do have valid rates, with the distance, to judge the level; (3) one rate request email to the carriers that serve the area, opened as a draft and added to "Waiting for carriers"; (4) "Log it as a request", which puts it in the Inbox with a number, an owner and an SLA clock. A sales user sees only the nearest ports (no buy rates) and "Ask pricing for this rate"; the open ask shows in their My day.
 16. Rate history. In the Pricing view each standard buy rate shows how it moved since last month: ▲ and the amount (dearer, red), ▼ and the amount (cheaper, green), "= Oct" (no change) or "new". Sales never see it, because it is about buy rates. The last-month numbers in this pack are invented by a script.
 17. Lost quotes. A reason is required. For "Price too high" the competitor price is also required, or a tick that the customer did not say it. The sales person report then shows how far our sell was above the competitor price on average.
+18. Parts of a request. One email can ask for several things (FCL, LCL, EXW pickup, trucking, air). The tool finds the parts from words in the email; a person can add a part. Each part is answered on its own, or marked "cannot offer" with a reason. The request stays open and its SLA clock keeps running until every part is closed. An answer that covers only some parts says "Still to come: …" in the email, the list shows "Parts 1/3", and My day reminds the owner. An offer sent from Rates & offer closes the FCL part (and EXW pickup when the offer is EXW). LCL has no rates in this pack: the part can be tracked, but it is priced outside the tool.
 10. Spot rates only when the carrier says spot; valid for that sailing only.
 11. Sales never see buy rates, profit or the market band.
 

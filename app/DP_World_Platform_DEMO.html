@@ -185,6 +185,7 @@ textarea.ta,.ta{font-size:13px;line-height:1.45;resize:vertical}
 .gs:focus-within{position:absolute;left:12px;right:12px;top:11px;z-index:5}.gs:focus-within input{background-image:none;padding:0 10px}.gs:focus-within input::placeholder{color:var(--muted)}.gs:focus-within .gsRes{left:0;right:0;width:auto}}
 .nr{margin-top:10px;border:1px solid var(--line);border-left:4px solid var(--warn,#b7791f);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:12px}.nrS{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px}.nrN{width:22px;height:22px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:12px;font-weight:700}.nrS .list{margin-top:6px}.nrS .qal{padding:7px 10px}
 .rh{display:block;font:600 10.5px var(--f-body);color:var(--muted);white-space:nowrap;margin-top:1px}.rh.up{color:var(--bad)}.rh.dn{color:var(--good,#0a7a3e)}.rh.new{color:var(--accent)}
+.csParts{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0;display:flex;flex-direction:column;gap:6px}.csParts.one{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;border-style:dashed}.csParts .csSh{gap:8px}.csPAdd{margin-left:auto}.csPAdd select,.csPart select{width:auto;max-width:230px;padding:4px 8px;font-size:12.5px}.csPart{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.5px}.csPSt{color:var(--muted)}.csPAns{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:8px 0 2px}
 details.whatif{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
 details.whatif summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);list-style:none;display:flex;align-items:center;gap:6px}
 details.whatif summary::-webkit-details-marker{display:none}
@@ -2355,6 +2356,7 @@ function ibxSalesHtml(e,M){ const r=ibxReq(e), who=ibxWho(e)||DEMO_SP, first=who
   const box=$("of-prev").cloneNode(true); const ps=[...box.querySelectorAll("p")];
   if(ps[0]) ps[0].innerHTML="Dear "+esc(first)+",";
   if(ps[1]) ps[1].innerHTML=`Thank you for your request. Please find below our ${M.one?"offer":"options"} for your customer <b>${esc(r.cust||"")}</b>, ${esc(r.pol)} → ${esc(r.pod)}, ${r.qty} × ${r.size}' ${esc(r.type)}${r.target?` (customer target USD ${money(r.target)})`:""}. These are sell rates, ready to send to the customer.`;
+  try{ const cc=csLoad().cases.find(x=>x.ibx===e.id); let ex=false; try{ ex=!!exwState().on; }catch(x){} const rest=cc?csPOpen(cc).filter(x=>x.k!=="fcl"&&!(ex&&x.k==="exw")):[]; if(ps[1]&&rest.length) ps[1].innerHTML+=` <b>Still to come: ${esc(csPNames(rest))}.</b>`; }catch(x){}
   const last=ps[ps.length-1]; if(last) last.innerHTML="Best regards,<br>Pricing team<br>DP World Logistics – Egypt";
   const close=ps[ps.length-2]; if(close&&close!==ps[1]) close.innerHTML="The quote is logged in the DP World Platform under your name. Mark it won or lost there when the customer answers.";
   return {html:`<div style="font-family:Arial,sans-serif;font-size:13px;color:#1a1a1a">${box.innerHTML}<p style="color:#888;font-size:11px">DEMO email with dummy data.</p></div>`,text:box.innerText+"\n\nDEMO email with dummy data.",who}; }
@@ -2632,7 +2634,8 @@ const CS_SEED=[
  ["kam","cnee","Gulf Home Retail (import dept.)","Monthly volume review rates","Please share the rate sheet for our monthly review.",1500,"nour",70,[]],
  ["rates","cnee","Delta Textile Co.","Alexandria to Genoa 1x40","Rate please for 1x40DV Alexandria to Genoa.",1800,"omar",230,[["line","omar"]]],
  ["net","net","DP World Jeddah office","Sokhna to Jeddah weekly 5x40HC","Please quote weekly 5x40HC for our customer.",2100,"mariam",200,[]],
- ["rates","sales","Hala Mostafa (Sales)","2x20 Damietta to Beirut","Customer is asking for Beirut, 2x20DV, please advise.",2300,"nour",160,[["cnee","nour"]]]];
+ ["rates","sales","Hala Mostafa (Sales)","2x20 Damietta to Beirut","Customer is asking for Beirut, 2x20DV, please advise.",2300,"nour",160,[["cnee","nour"]]],
+ ["rates","cnee","Cairo Home Appliances","Quote: 2x40HC FCL and 4 cbm LCL Sokhna to Jeddah, EXW 10th of Ramadan","Dear team,\nPlease quote:\n1) FCL 2x40HC Sokhna to Jeddah\n2) LCL 4 cbm on the same lane\n3) EXW pickup from our factory in 10th of Ramadan to Sokhna\nThanks",50,"me",null,[]]];
 const CS_ACT={nour:[.9,.1],omar:[.82,.18],mariam:[.88,.12],ahmed:[.75,.25]};
 function csSeed(){ const now=Date.now(); let n=2041; const cases=CS_SEED.map(([m,rt,from,subj,body,age,who,done,extra,direct])=>{
     const recv=age==="after"?csPrevEnd(now)+100*6e4:csBack(now,age);
@@ -2713,6 +2716,8 @@ function csSyncIbx(){ if(!IBX.items.length) return false; const D=csLoad(), now=
       if(off){ if(IBX.read.has(e.id)){ at=now; what="Offer read into Carrier offers"; } }
       else { const a=ibxAns(e); if(a||e.replied||IBX.done.has(e.id)){ at=a&&a.created?Date.parse(a.created):NaN; if(!isFinite(at)){ const m=(e.msgs||[]).find(x=>/pricing\.team/i.test(x.from||"")); at=m?Date.parse(m.date):NaN; } if(!isFinite(at)) at=now; what=a?"Offer sent to "+(a.seller||"sales")+" · "+(a.car||"")+" · USD "+money(a.sell)+" per "+(a.eq||"container"):"Answered from the mailbox"; } }
       if(at!=null){ at=Math.max(c.recv,Math.min(now,at)); const by=c.who||CSV.me; if(!c.who){ c.who=by; c.ab="Taken by "+csName(by); c.log.push([at,"Assigned to "+csName(by)]); }
+        { const P=csP(c); if(P&&P.some(x=>x.st==="open")){ const a2=off?null:ibxAns(e), ks=["fcl"].concat(a2&&a2.inco==="EXW"?["exw"]:[]), did=P.filter(x=>x.st==="open"&&ks.includes(x.k)); did.forEach(x=>{ x.st="done"; x.at=at; x.by=by; }); const rest=P.filter(x=>x.st==="open");
+          if(rest.length){ if(did.length){ c.msgs.push({dir:"out",cat:c.rt,by,at,text:what+"\nStill to come: "+csPNames(rest)+".",submit:false}); c.log.push([at,what+" by "+csName(by)+" · answered: "+csPNames(did)+" · still open: "+csPNames(rest)+" · clock keeps running"]); ch=true; } return; } } }
         c.msgs.push({dir:"out",cat:c.rt,by,at,text:what,submit:true}); c.sub=at; c.subBy=by; c.status="submitted"; c.log.push([at,what+" by "+csName(by)+" · clock stopped"]); ch=true; } } });
   if(ch) csStore(); return ch; }
 // what the mailbox email offers on top of a plain case: request details, Price it, or read the carrier offer
@@ -2816,6 +2821,7 @@ function mdPricing(L){ const now=Date.now(), me=CSV.me, lead=avLead(me), open=L.
   const q=c=>`<span class="qno">${esc(c.id)}</span>${esc(c.subj.slice(0,60))}`;
   if(brM.length) I.push({sev:"exp",txt:`<b>${brM.length} of your requests ${brM.length>1?"are":"is"} over the SLA.</b> Most late: ${q(brM[0])} · ${csDur(-st(brM[0]).left)} over`,act:"case:"+brM[0].id});
   if(nextM){ const s=st(nextM); I.push({sev:s.st==="soon"?"warn":"fu",txt:`<b>Next for you:</b> ${q(nextM)} · ${s.paused?"clock paused, ":""}${csDur(s.left)} left`,act:"case:"+nextM.id}); }
+  mine.forEach(c=>{ const P=csP(c); if(P&&P.some(x=>x.st!=="open")){ const rest=csPOpen(c); if(rest.length) I.push({sev:"warn",txt:`<b>${rest.length} part${rest.length>1?"s":""} still open</b> in ${q(c)}: ${esc(csPNames(rest))}. The customer has only part of the answer.`,act:"case:"+c.id}); } });
   if(CS_AVAIL_ON){ const c=avCur(me), S=CS_ST[c.t]; if(c.since&&S[2]&&(now-c.since)/6e4>S[2]) I.push({sev:"warn",txt:`<b>Your status is ${S[0]}</b> since ${csTime(c.since)} (usual length ${csDur(S[2])}). New requests are not assigned to you.`,act:"st:ok",btn:"I am back"}); }
   if(lead){ const brT=open.filter(c=>st(c).st==="breach"&&c.who!==me); if(brT.length) I.push({sev:"exp",txt:`<b>Team: ${brT.length} request${brT.length>1?"s":""} over the SLA</b> · ${[...new Set(brT.map(c=>c.who?csName(c.who):"no owner"))].join(", ")}`,act:"f:breach",btn:"Show"});
     if(CS_AVAIL_ON){ const away=open.filter(c=>c.who&&c.who!==me&&!avFree(c.who)), who=[...new Set(away.map(c=>c.who))];
@@ -2914,6 +2920,30 @@ function noRateRender(){ const box=$("noRate"); if(!box) return; const pr=isPric
   const aa=$("nrAskAll"); if(aa) aa.addEventListener("click",()=>{ cars.forEach(x=>chaseAdd(x,subj)); });
   const lg=$("nrLog"); if(lg) lg.onclick=()=>{ nrLog(pol,pod); noRateRender(); }; }
 
+// ---------- Parts of a request: one email can ask for several things (FCL, LCL, EXW pickup, trucking, air) ----------
+// Each part is answered on its own. The request stays open, and its SLA clock keeps running, until every part is answered or marked "cannot offer".
+const CS_PART={fcl:"FCL",lcl:"LCL",exw:"EXW pickup",trk:"Trucking",air:"Air"}, CS_PNA=["No service on this lane","No rate from the carriers","Not handled by this team","The customer dropped this part"];
+function csPartsOf(subj,body){ const x=(String(subj||"")+"\n"+String(body||"")).toLowerCase(), P=[];
+  if(/\bfcl\b|\b\d+\s?x\s?(20|40)/.test(x)) P.push("fcl");
+  if(/\blcl\b|\bcbm\b|less than (a )?container/.test(x)) P.push("lcl");
+  if(/\bexw\b|ex[- ]?works|pick[- ]?up|door[- ]to[- ]/.test(x)) P.push("exw");
+  if(/\b(by truck|trucking|ftl|cross[- ]?border truck)\b/.test(x)&&!P.includes("exw")) P.push("trk");
+  if(/\bby air\b|air ?freight|\bawb\b/.test(x)) P.push("air");
+  return P.length>1?P.map(k=>({k,st:"open"})):null; }
+function csP(c){ if(c.parts===undefined){ c.parts=c.rt==="line"?null:csPartsOf(c.subj,c.body); if(c.parts&&c.sub) c.parts.forEach(p=>{ p.st="done"; p.at=c.sub; p.by=c.subBy; }); } return c.parts; }
+function csPOpen(c){ const P=csP(c); return P?P.filter(p=>p.st==="open"):[]; }
+function csPNames(L){ return L.map(p=>CS_PART[p.k]).join(", "); }
+function csPartPill(c){ const P=csP(c); if(!P) return ""; const d=P.filter(p=>p.st!=="open").length; return `<span class="pill ${d===P.length?"won":d?"open":"seen"}">Parts ${d}/${P.length}</span>`; }
+function csPartsHtml(c){ const P=csP(c), miss=Object.keys(CS_PART).filter(k=>!(P||[]).some(p=>p.k===k));
+  const add=c.sub||!miss.length?"":`<span class="csPAdd"><select id="csPNew" aria-label="Part to add"><option value="">Add a part…</option>${miss.map(k=>`<option value="${k}">${CS_PART[k]}</option>`).join("")}</select></span>`;
+  if(!P) return add?`<div class="csParts one"><span class="note">This request has one part. If the email asks for more (for example LCL or EXW pickup too):</span>${add}</div>`:"";
+  const d=P.filter(p=>p.st!=="open").length;
+  return `<div class="csParts"><div class="csSh"><b>Parts of this request</b><span class="note">${d} of ${P.length} closed · the clock stops when every part is answered or marked cannot offer</span>${add}</div>
+   ${P.map(p=>`<div class="csPart"><span class="pill ${p.st==="done"?"won":p.st==="na"?"lost":"pending"}">${CS_PART[p.k]}</span><span class="csPSt">${p.st==="done"?`answered ${csWhen(p.at)} by ${esc(csName(p.by))}`:p.st==="na"?`cannot offer: ${esc(p.why||"")} · ${csWhen(p.at)} by ${esc(csName(p.by))}`:"open"}</span>
+     <span class="qact">${p.st==="open"?`<select data-pwhy="${p.k}" aria-label="Why ${CS_PART[p.k]} cannot be offered"><option value="">Cannot offer because…</option>${CS_PNA.map(w=>`<option>${esc(w)}</option>`).join("")}</select>`:c.sub?"":`<button class="mini" data-pre="${p.k}">Reopen</button>`}</span></div>`).join("")}</div>`; }
+// close the request when no part is open any more
+function csPClose(c,now,by){ const P=csP(c); if(!P||c.sub||P.some(p=>p.st==="open")) return false; c.sub=now; c.subBy=by; c.status="submitted"; c.log.push([now,"Every part is closed · clock stopped"]); return true; }
+
 // ---------- Cases page ----------
 const CSV={box:"all",f:"open",open:null,cat:null,me:"me"};
 function csVisible(L){ const A=new Set(csAcc(CSV.me)); return L.filter(c=>A.has(c.mbx)||c.who===CSV.me); }
@@ -2924,7 +2954,7 @@ function csFilter(L){ return L.filter(c=>(CSV.box==="all"||c.mbx===CSV.box)&&(CS
   .sort((a,b)=>CSV.f==="done"?b.sub-a.sub:(csState(a).left-csState(b).left)); }
 function csListHtml(){ const D=csLoad(), L=csFilter(csVisible(D.cases));
   return L.length?L.map(c=>`<button class="csRow${CSV.open===c.id?" on":""}" data-cs="${c.id}"><span class="csT"><b>${esc(c.subj)}</b><span class="note"><span class="qno">${esc(c.id)}</span> ${esc(c.from)}</span></span>
-    <span class="csM"><span class="pill seen">${esc(csMbx(c.mbx).name)}</span>${c.direct?`<span class="pill new">Direct to ${esc(csName(c.direct))}</span>`:""}${csPill(c)}<span class="note">${esc(c.who?csName(c.who):"Not assigned")}${avTag(c.who,CSV.me)} · ${csWhen(c.recv)}</span></span></button>`).join(""):`<p class="note" style="padding:12px">No cases here.</p>`; }
+    <span class="csM"><span class="pill seen">${esc(csMbx(c.mbx).name)}</span>${c.direct?`<span class="pill new">Direct to ${esc(csName(c.direct))}</span>`:""}${csPill(c)}${csPartPill(c)}<span class="note">${esc(c.who?csName(c.who):"Not assigned")}${avTag(c.who,CSV.me)} · ${csWhen(c.recv)}</span></span></button>`).join(""):`<p class="note" style="padding:12px">No cases here.</p>`; }
 function csDetHtml(c){ if(!c) return `<div class="card"><p class="note">Pick a case on the left to open it.</p></div>`;
   const s=csState(c), S=csSet(), mine=c.who===CSV.me, cat=CSV.cat||c.rt;
   const ppl=CS_PEOPLE.map(p=>`<option value="${p.id}"${c.who===p.id?" selected":""}>${esc(p.name)}</option>`).join("");
@@ -2935,15 +2965,21 @@ function csDetHtml(c){ if(!c) return `<div class="card"><p class="note">Pick a c
    ${csIbxBlock(c)}
    <div class="csMsgs">${c.msgs.map(m=>`<div class="csMsg ${m.dir}"><div class="note">${m.dir==="in"?esc(m.by):"Sent by "+esc(csName(m.by))+" · to "+esc(CS_CAT[m.cat]||"")}${m.submit?" · <b>submitted</b>":""} · ${csWhen(m.at)}</div><div class="csTx">${esc(m.text).replace(/\n/g,"<br>")}</div></div>`).join("")}</div>
    ${c.sub?`<p class="note">Clock stopped at ${csWhen(c.sub)} when ${esc(csName(c.subBy))} sent the reply and pressed Submit. Time used: ${csDur(s.used)} of ${csSla(c.mbx)}h.</p>`:""}
+   ${csPartsHtml(c)}
    <div class="csComp"><div class="csSh"><b>Write an email</b><label class="f csTo">Send to<select id="csCat">${Object.entries(CS_CAT).map(([k,l])=>`<option value="${k}"${k===cat?" selected":""}>${l}</option>`).join("")}</select></label></div>
    <textarea id="csTxt" rows="3" placeholder="Dummy reply text">${c.sub?"":"Dear "+esc(c.from.split(" (")[0])+",\nPlease find our rate below."}</textarea>
-   <div class="csBtns"><button class="mini" id="csSend">Send only</button>${c.sub?"":`<button class="btn primary" id="csSub">Send and submit</button>`}${!mine&&c.who?`<span class="note">This case is ${esc(csName(c.who))}'s. Reassign it above, or your email counts for you and the case stays with them.</span>`:""}</div>
+   ${csPOpen(c).length?`<div class="csPAns"><span class="note">This email answers:</span>${csPOpen(c).map((p,i)=>`<label class="csCk"><input type="checkbox" data-pa="${p.k}"${i===0?" checked":""}> ${CS_PART[p.k]}</label>`).join("")}<span class="note bad-t" id="csPErr" aria-live="polite"></span></div>`:""}
+   <div class="csBtns"><button class="mini" id="csSend">Send only</button>${c.sub?"":`<button class="btn primary" id="csSub">${csPOpen(c).length?"Send and mark answered":"Send and submit"}</button>`}${!mine&&c.who?`<span class="note">This case is ${esc(csName(c.who))}'s. Reassign it above, or your email counts for you and the case stays with them.</span>`:""}</div>
    <p class="note" style="margin:6px 0 0">Send only = asking the line or ops, the clock keeps running. Send and submit = the answer, the clock stops.</p></div>
    <details class="csLog"><summary>Case history</summary><ul>${c.log.map(([t,w])=>`<li><span class="note">${csWhen(t)}</span> ${esc(w)}</li>`).join("")}</ul></details></div>`; }
-function csSendMsg(c,submit){ const txt=($("csTxt")||{}).value||"", cat=($("csCat")||{}).value||c.rt, now=Date.now();
-  const me=CSV.me; if(!c.who){ c.who=me; c.status="assigned"; c.log.push([now,"Assigned to "+csName(me)]); }
-  c.msgs.push({dir:"out",cat,by:me,at:now,text:txt||"(email sent)",submit:!!submit}); c.log.push([now,"Email to "+CS_CAT[cat]+" sent by "+csName(me)+(submit?" and submitted · clock stopped":"")]);
-  if(submit){ c.sub=now; c.subBy=me; c.status="submitted"; } CSV.cat=null; csStore(); csRender(); }
+function csSendMsg(c,submit){ let txt=($("csTxt")||{}).value||"", cat=($("csCat")||{}).value||c.rt, now=Date.now();
+  const me=CSV.me, P=csP(c); let ans=[], rest=[];
+  if(submit&&P&&P.some(p=>p.st==="open")){ const ch=[...document.querySelectorAll("#csDet [data-pa]:checked")].map(x=>x.dataset.pa); if(!ch.length){ const e=$("csPErr"); if(e) e.textContent="Tick the part this email answers."; return; }
+    P.forEach(p=>{ if(p.st==="open"&&ch.includes(p.k)){ p.st="done"; p.at=now; p.by=me; ans.push(p); } }); rest=P.filter(p=>p.st==="open"); if(rest.length) txt=(txt||"(email sent)")+"\n\nStill to come: "+csPNames(rest)+"."; }
+  if(!c.who){ c.who=me; c.status="assigned"; c.log.push([now,"Assigned to "+csName(me)]); }
+  const stop=!!submit&&!rest.length;
+  c.msgs.push({dir:"out",cat,by:me,at:now,text:txt||"(email sent)",submit:stop}); c.log.push([now,"Email to "+CS_CAT[cat]+" sent by "+csName(me)+(ans.length?" · answered: "+csPNames(ans):"")+(rest.length?" · still open: "+csPNames(rest)+" · clock keeps running":stop?" and submitted · clock stopped":"")]);
+  if(stop){ c.sub=now; c.subBy=me; c.status="submitted"; } CSV.cat=null; csStore(); csRender(); }
 function renderCases(){ const p=$("p-cases"); if(!p) return; ibxAuto(); csSyncIbx(); const D=csLoad(), ALL=D.cases, L=csVisible(ALL), now=Date.now(), S=csSet(), acc=csAcc(CSV.me);
   if(CSV.box!=="all"&&!acc.includes(CSV.box)) CSV.box="all"; if(CSV.open&&!L.some(c=>c.id===CSV.open)) CSV.open=null;
   const boxes=[["all",acc.length>1?"All my mailboxes":"My mailbox",L.filter(c=>!c.sub).length],...CS_MBX.filter(m=>acc.includes(m.id)).map(m=>[m.id,m.name,L.filter(c=>c.mbx===m.id&&!c.sub).length])];
@@ -2990,6 +3026,10 @@ function csWireDet(){ const c=csLoad().cases.find(x=>x.id===CSV.open); if(!c) re
   const w=$("csWho"); if(w) w.onchange=()=>{ const was=c.who; c.who=w.value||null; c.ab=c.who?"By hand ("+csName(CSV.me)+")":""; c.status=c.sub?"submitted":(c.who?"assigned":"new"); c.log.push([Date.now(),(c.who?(was?"Reassigned from "+csName(was)+" to ":"Assigned to ")+csName(c.who):"Unassigned")+" by "+csName(CSV.me)+(c.who?" · now counts in "+csName(c.who)+"'s KPIs":"")]); csStore(); renderCases(); };
   if($("csTake")) $("csTake").onclick=()=>{ c.who=CSV.me; c.ab="Taken by "+csName(CSV.me); c.status="assigned"; c.log.push([Date.now(),"Taken by "+csName(CSV.me)]); csStore(); renderCases(); };
   if($("csCat")) $("csCat").onchange=()=>{ CSV.cat=$("csCat").value; };
+  { const d=$("csDet"), now=()=>Date.now(); if(d){
+    d.querySelectorAll("[data-pwhy]").forEach(s=>s.onchange=()=>{ if(!s.value) return; const pt=csP(c).find(x=>x.k===s.dataset.pwhy); if(!pt) return; const t0=now(); pt.st="na"; pt.why=s.value; pt.at=t0; pt.by=CSV.me; c.log.push([t0,CS_PART[pt.k]+" marked cannot offer ("+s.value+") by "+csName(CSV.me)]); if(!c.who){ c.who=CSV.me; c.status="assigned"; } csPClose(c,t0,CSV.me); csStore(); renderCases(); });
+    d.querySelectorAll("[data-pre]").forEach(b=>b.onclick=()=>{ const pt=csP(c).find(x=>x.k===b.dataset.pre); if(!pt||c.sub) return; pt.st="open"; delete pt.why; c.log.push([now(),CS_PART[pt.k]+" reopened by "+csName(CSV.me)]); csStore(); renderCases(); });
+    const n=$("csPNew"); if(n) n.onchange=()=>{ if(!n.value||c.sub) return; if(!csP(c)) c.parts=[]; c.parts.push({k:n.value,st:"open"}); c.log.push([now(),"Part added: "+CS_PART[n.value]+" by "+csName(CSV.me)]); csStore(); renderCases(); }; } }
   const det=$("csDet"); if(det){ det.querySelectorAll("[data-ibxoff]").forEach(b=>b.onclick=()=>{ ibxMarkRead(b.dataset.ibxoff); ibxToOffer(IBX.items.find(x=>x.id===b.dataset.ibxoff)); });
     det.querySelectorAll("[data-ibxq]").forEach(b=>b.onclick=()=>ibxToQuote(IBX.items.find(x=>x.id===b.dataset.ibxq))); }
   if($("csSend")) $("csSend").onclick=()=>csSendMsg(c,false);
