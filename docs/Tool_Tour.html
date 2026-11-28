@@ -1,0 +1,396 @@
+<title>Pricing Tool Tour</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* VOICE work, a self-running tour of the whole tool for IT and management, in the Showcase's ocean look
+   IDEA a guided product tour: twelve short scenes, each one screen of the tool doing its job with dummy data
+   PICTURE each scene's own moving mock-up: lanes racing, emails dropping into mailboxes, a quote locking, a cockpit counting up
+   COLOUR abyss #030B17 ground, sea #3BE3D2 = the tool, alarm #FF6B5A = the old way or a warning, road #FFB23F = results
+   TYPE Archivo (wide) + IBM Plex Sans / Mono
+   LAYOUT fixed 16:9 stage scaled to the window: scene title top left, mock-up below, controls and scene dots at the bottom */
+:root{color-scheme:dark;--abyss:#030B17;--panel:rgba(8,24,46,.82);--p2:#0b2340;--line:rgba(120,190,220,.2);--ink:#EAF4FA;--mute:#8FA9BE;--soft:#C5D8E6;--sea:#3BE3D2;--alarm:#FF6B5A;--road:#FFB23F;--good:#7BE38B}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(1200px 800px at 72% 40%,#0B2747 0%,#05142A 45%,var(--abyss) 80%);color:var(--ink);font:16px/1.4 "IBM Plex Sans",system-ui,sans-serif;overflow:hidden}
+#wrap{position:fixed;inset:0;display:grid;place-items:center}
+#stage{position:relative;width:1600px;height:900px;transform-origin:center center;flex:none}
+.scene{position:absolute;inset:0;padding:40px 56px 110px;opacity:0;visibility:hidden;transition:opacity .45s}
+.scene.cur{opacity:1;visibility:visible}
+.eb{font:600 14px/1 "IBM Plex Mono",monospace;color:var(--sea);margin:0 0 10px}
+h2{margin:0;font:800 42px/1.04 "Archivo",sans-serif;font-variation-settings:"wdth" 115;letter-spacing:-.005em}
+.sub{margin:10px 0 0;font-size:18px;color:var(--soft);max-width:1100px}
+.body{margin-top:26px}
+.row{display:grid;gap:18px}
+.c2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.c3{grid-template-columns:repeat(3,minmax(0,1fr))}.c4{grid-template-columns:repeat(4,minmax(0,1fr))}.c5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.c64{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.panel h3{margin:0 0 10px;font:600 13px/1 "IBM Plex Mono",monospace;color:var(--sea);letter-spacing:.04em}
+.a{opacity:0;transform:translateY(12px);transition:opacity .4s,transform .45s cubic-bezier(.2,.8,.2,1)}
+.a.on{opacity:1;transform:none}
+.chip{display:inline-block;font:600 14px/1 "IBM Plex Sans",sans-serif;padding:8px 11px;border-radius:9px;background:var(--p2);border:1px solid rgba(59,227,210,.4);margin:0 6px 6px 0}
+.chip i{display:block;font:500 11px/1 "IBM Plex Mono",monospace;font-style:normal;color:var(--mute);margin-bottom:4px}
+.tag{font:600 11.5px/1 "IBM Plex Mono",monospace;padding:4px 7px;border-radius:999px;white-space:nowrap}
+.tg{background:rgba(59,227,210,.18);color:var(--sea)}.tw{background:rgba(255,178,63,.18);color:var(--road)}.tb{background:rgba(255,107,90,.18);color:var(--alarm)}.tn{background:rgba(143,169,190,.18);color:var(--soft)}
+table.t{width:100%;border-collapse:collapse;font-size:15px}
+table.t th{font:600 12px/1 "IBM Plex Mono",monospace;color:var(--mute);text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+table.t td{padding:9px 8px;border-bottom:1px solid rgba(120,190,220,.1);white-space:nowrap}
+table.t td.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+tr.hl td,.hl{background:rgba(59,227,210,.14)}
+.big{font:800 46px/1 "Archivo",sans-serif;font-variation-settings:"wdth" 118;font-variant-numeric:tabular-nums}
+.road{color:var(--road)}.seac{color:var(--sea)}.alc{color:var(--alarm)}.mute{color:var(--mute)}
+.note{font-size:13.5px;color:var(--mute);margin:8px 0 0}
+.mail{background:#F4F7FA;color:#14202e;border-radius:14px;overflow:hidden}
+.mail .mb{background:#0f6cbd;color:#fff;padding:8px 14px;font:600 13px/1 "IBM Plex Sans",sans-serif;display:flex;justify-content:space-between}
+.mail .mt{padding:12px 16px;font-size:15px;line-height:1.65}
+.mail .mt b{font-size:17px}
+.typed{white-space:pre-wrap}
+.bar{height:16px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:999px}
+.stamp{display:inline-block;font:800 20px/1 "Archivo",sans-serif;padding:10px 14px;border-radius:10px}
+/* controls */
+.ctl{position:absolute;left:56px;right:56px;bottom:26px;display:flex;align-items:center;gap:14px;z-index:5}
+.ctl button{font:600 14px/1 "IBM Plex Mono",monospace;color:var(--ink);background:rgba(3,14,30,.75);border:1px solid var(--line);border-radius:999px;padding:12px 16px;cursor:pointer;min-height:44px;min-width:44px}
+.ctl button:hover{border-color:var(--sea)}.ctl button:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.ctl button[aria-pressed="true"]{border-color:var(--road);color:var(--road)}
+.dots{display:flex;gap:6px;flex:1;justify-content:center}
+.dots button{min-width:0;width:44px;padding:0;height:44px;border:0;background:none;position:relative}
+.dots button::before{content:"";position:absolute;left:8px;right:8px;top:20px;height:4px;border-radius:2px;background:rgba(255,255,255,.18)}
+.dots button.cur::before{background:var(--sea)}
+.dots button.done::before{background:rgba(59,227,210,.45)}
+.cnt{font:500 13px/1 "IBM Plex Mono",monospace;color:var(--mute);min-width:150px;text-align:right}
+.prog{position:absolute;left:56px;right:56px;bottom:86px;height:3px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sea),var(--road))}
+.dummy{position:absolute;left:56px;bottom:96px;margin:0;z-index:4;font:500 12px/1.3 "IBM Plex Mono",monospace;color:var(--mute);text-align:right}
+/* scene-specific */
+.lane{display:grid;grid-template-columns:200px minmax(0,1fr) 150px;align-items:center;gap:18px;margin:18px 0}
+.lane b{font:800 24px/1 "Archivo",sans-serif}
+.ticks{position:relative;height:40px}
+.ticks span{position:absolute;top:12px;width:16px;height:16px;border-radius:50%;border:3px solid;background:#0A1E38;transform:translateX(-50%)}
+.box5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.mbx{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;min-height:330px}
+.mbx b{display:block;font:700 15px/1.2 "Archivo",sans-serif;margin-bottom:4px}
+.mbx small{font:500 11.5px/1.2 "IBM Plex Mono",monospace;color:var(--mute)}
+.case{margin-top:10px;background:var(--p2);border-left:3px solid var(--sea);border-radius:8px;padding:8px 10px;font-size:13.5px}
+.case em{font-style:normal;font:600 11.5px/1 "IBM Plex Mono",monospace;color:var(--road);display:block;margin-bottom:3px}
+.pdf{background:#fbfbf8;color:#14202e;border-radius:10px;padding:22px 26px;position:relative;overflow:hidden;min-height:400px}
+.pdf .wm{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%) rotate(-18deg);font:900 110px/1 "Archivo",sans-serif;color:rgba(11,46,79,.07);white-space:nowrap}
+.pdf .hd{background:#0b2e4f;color:#fff;margin:-22px -26px 16px;padding:14px 26px;display:flex;justify-content:space-between;font-weight:600}
+.pdf table{width:100%;border-collapse:collapse;font-size:14px}.pdf th{background:#0b2e4f;color:#fff;text-align:left;padding:6px 8px}.pdf td{border:1px solid #c9d3dc;padding:6px 8px}
+.lock{position:absolute;right:18px;bottom:16px;font:700 13px/1 "IBM Plex Mono",monospace;color:#0b2e4f;background:#e6eef7;border-radius:999px;padding:7px 10px}
+.vf{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;font:500 15px/1.4 "IBM Plex Mono",monospace}
+.xl{background:#fff;color:#1d1d1d;border-radius:10px;overflow:hidden}
+.xl .xh{background:#107c41;color:#fff;padding:8px 12px;font:600 13px/1 "IBM Plex Sans",sans-serif}
+.xl table{width:100%;border-collapse:collapse;font-size:13.5px}.xl td,.xl th{border:1px solid #dfe5ea;padding:5px 7px;white-space:nowrap}.xl th{background:#e9eef2;text-align:left}
+.xl tr.new td{background:#e5f3eb;font-weight:600}
+.blur{filter:blur(6px)}
+.rc b{display:block;font:800 22px/1.1 "Archivo",sans-serif;margin:4px 0 8px}
+.rc ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--soft)}.rc li{margin-bottom:5px}
+.kpi b{display:block;font:800 44px/1 "Archivo",sans-serif;font-variant-numeric:tabular-nums}
+.kpi span{display:block;font-size:14px;color:var(--soft);margin-top:6px}
+.dec{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(120,190,220,.1);font-size:15px}
+.btn2{font:600 12.5px/1 "IBM Plex Mono",monospace;padding:7px 10px;border-radius:8px;border:1px solid var(--line)}
+.btn2.ok{background:var(--sea);color:#02201d;border-color:var(--sea)}
+.safe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.safe .panel b{display:block;font:800 24px/1.1 "Archivo",sans-serif;margin-bottom:8px}
+.safe .panel p{margin:0;font-size:15px;color:var(--soft)}
+.tl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px}
+.tl div{border-top:4px solid var(--sea);padding-top:12px}
+.tl b{display:block;font:800 20px/1.1 "Archivo",sans-serif;margin:4px 0 6px}
+.tl em{font-style:normal;font:600 13px/1 "IBM Plex Mono",monospace;color:var(--sea)}
+.tl p{margin:0;font-size:15px;color:var(--soft)}
+.mkb{position:relative;height:18px;border-radius:9px;background:linear-gradient(90deg,#1d6b54,#6b5a22,#6b2a2a);margin:24px 0 8px}
+.mkb i{position:absolute;top:-6px;width:4px;height:30px;border-radius:2px;transform:translateX(-50%);transition:left 1s cubic-bezier(.2,.8,.2,1)}
+/* bigger for projection */
+.scene{padding:48px 56px 130px;display:flex;flex-direction:column;justify-content:center}
+.eb{font-size:15px}h2{font-size:52px}.sub{font-size:20px}.body{margin-top:30px}
+.panel{padding:20px 24px}.panel h3{font-size:15px;margin-bottom:14px}
+table.t{font-size:18px}table.t td{padding:12px 10px}table.t th{font-size:13px}
+.dec{font-size:18px;padding:13px 0}.tag{font-size:13px;padding:5px 9px}
+.chip{font-size:17px;padding:11px 14px}.chip i{font-size:12px}
+.case{font-size:15.5px;padding:10px 12px}.mbx{min-height:300px;padding:14px}.mbx b{font-size:18px}
+.mail .mt{font-size:17.5px}.mail .mt b{font-size:20px}.mail .mb{font-size:14px;padding:10px 16px}
+.note{font-size:15px}.typed{font-size:17px!important}
+.xl table{font-size:16px}.xl td,.xl th{padding:8px 9px}.xl .xh{font-size:14px;padding:10px 14px}
+.rc b{font-size:26px}.rc ul{font-size:17px}
+.safe .panel{padding:28px}.safe .panel b{font-size:30px}.safe .panel p{font-size:18px}
+.tl p{font-size:17px}.tl b{font-size:24px}.tl em{font-size:14px}
+.kpi b{font-size:58px}.kpi span{font-size:16px}.big{font-size:58px}
+.bar{height:22px}.lane b{font-size:28px}.ticks{height:46px}.ticks span{top:14px;width:18px;height:18px}
+.pdf{min-height:470px;padding:26px 30px}.pdf table{font-size:16px}.pdf td,.pdf th{padding:9px 10px}.pdf .hd{font-size:16px}
+.vf{font-size:19px}.stamp{font-size:24px;padding:12px 16px}
+</style>
+
+<div id="wrap"><div id="stage">
+  <p class="dummy">DP World Egypt · Pricing tool tour · all carriers, customers, people and rates are dummy</p>
+
+  <!-- 1 opening race -->
+  <section class="scene" data-dur="12000" aria-label="Scene 1: one request, two ways">
+    <p class="eb">1 · The idea</p>
+    <h2>One request, two ways</h2>
+    <p class="sub">The same customer email, answered the old way and with the tool. Same people, same carriers, fewer stops.</p>
+    <div class="body panel" style="margin-top:34px;padding:26px 30px">
+      <div class="lane"><b class="alc">Before</b><div><div class="bar"><i data-grow="100" data-at="400" data-dur="10000" style="background:var(--alarm)"></i></div><div class="ticks" id="tkB"></div></div><span class="big alc" data-count data-from="0" data-to="30" data-at="400" data-dur="10000" data-fmt="min">0</span></div>
+      <div class="lane"><b class="seac">With the tool</b><div><div class="bar"><i data-grow="40" data-at="400" data-dur="4000" style="background:var(--sea)"></i></div><div class="ticks" id="tkA"></div></div><span class="big seac" data-count data-from="0" data-to="12" data-at="400" data-dur="4000" data-fmt="min">0</span></div>
+      <p class="note">Minutes are an example (30 vs 12) to show the idea. The pilot measures the real ones.</p>
+    </div>
+    <div class="row c4" style="margin-top:20px">
+      <div class="panel a" data-at="10600"><span class="big road">9 → 5</span><p class="note" style="color:var(--soft)">stops for one request</p></div>
+      <div class="panel a" data-at="10800"><span class="big road">4 → 1</span><p class="note" style="color:var(--soft)">places to work: inbox, Excel, calculator, email</p></div>
+      <div class="panel a" data-at="11000"><span class="big road">2 → 8</span><p class="note" style="color:var(--soft)">of 8 steps leave a record</p></div>
+      <div class="panel a" data-at="11200"><span class="big road">0</span><p class="note" style="color:var(--soft)">emails sent by the tool: a person sends</p></div>
+    </div>
+  </section>
+
+  <!-- 2 today -->
+  <section class="scene" data-dur="12000" aria-label="Scene 2: Today and the morning brief">
+    <p class="eb">2 · Today</p>
+    <h2>The day starts with one list, not ten inboxes</h2>
+    <p class="sub">Today gathers what is late, due and new, starts a timer on the next task, flags lanes that moved, and writes the morning brief.</p>
+    <div class="body row c64">
+      <div class="panel"><h3>Next up · Good morning</h3>
+        <div class="dec a" data-at="400"><span><span class="tag tb">LATE</span> Q-1038 · Delta Home Textiles · Alexandria → Genoa</span><span class="mute">2h 10m over SLA</span></div>
+        <div class="dec a" data-at="900"><span><span class="tag tw">DUE</span> Rate expires Fri · Sahara Feeder · Sokhna → Jeddah</span><span class="mute">18 Dec</span></div>
+        <div class="dec a" data-at="1400"><span><span class="tag tg">NEW</span> Q-1042 · Gulf Home Retail · Sokhna → Jeddah 2×40'HC</span><span class="mute">09:02</span></div>
+        <div class="dec a" data-at="1900"><span><span class="tag tw">F/U</span> Offer to sales, no answer for 2 days</span><span class="mute">Q-1031</span></div>
+        <div class="dec a hl" data-at="2600" style="border-radius:8px;padding:10px"><span><b>Working on Q-1042</b> · timer</span><span class="big seac" style="font-size:30px" data-count data-from="0" data-to="7.5" data-at="2600" data-dur="8000" data-fmt="mmss">00:00</span></div>
+      </div>
+      <div style="display:grid;gap:18px">
+        <div class="panel a" data-at="3600"><h3>Rate moves · this month vs last</h3>
+          <table class="t"><tr><td>Sokhna → Busan 40'</td><td class="n">900 → 1,000</td><td><span class="tag tb">+11.1%</span></td></tr><tr><td>Sokhna → Jakarta 40'</td><td class="n">1,150 → 1,025</td><td><span class="tag tg">−10.9%</span></td></tr><tr><td>Alexandria → Apapa 40'</td><td class="n">3,600 → 3,250</td><td><span class="tag tg">−9.7%</span></td></tr></table></div>
+        <div class="panel a" data-at="5200"><h3>Morning brief · ready to copy</h3><div class="typed" style="font-size:14.5px;color:var(--soft)" data-type data-at="5600" data-cps="70" data-text="1 late, 3 due today, 4 new requests.&#10;Busan up 11%: re-check open offers.&#10;Jakarta and Apapa down: tell sales we can quote lower."></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 mailboxes -->
+  <section class="scene" data-dur="12000" aria-label="Scene 3: shared mailboxes become cases">
+    <p class="eb">3 · Shared mailboxes</p>
+    <h2>Every email becomes a case, with an owner and an SLA clock</h2>
+    <p class="sub">Five shared mailboxes. Rules route each email; nothing sits in a personal inbox. Forwarding needs a person, a mailbox and a reason.</p>
+    <div class="body box5">
+      <div class="mbx"><b>Pricing</b><small>SLA 3 h</small><div class="case a" data-at="500"><em>C-2041 · 0h 12m</em>Rate request Sokhna → Jeddah 2×40HC</div><div class="case a" data-at="2600"><em>C-2044 · 0h 03m</em>Spot offer Aurora Lines, Busan</div><div class="case a" data-at="4800"><em>C-2046 · 0h 01m</em>Import RFQ Shanghai → Sokhna</div></div>
+      <div class="mbx"><b>Operations</b><small>SLA 4 h</small><div class="case a" data-at="1100"><em>C-2042 · 1h 40m</em>Container still at Sokhna, free time ends 30 Nov</div><div class="case a" data-at="3800"><em>C-2045 · 0h 05m</em>3 trucks Alexandria → 10th of Ramadan</div></div>
+      <div class="mbx"><b>Commercial</b><small>SLA 4 h</small><div class="case a" data-at="1700"><em>C-2043 · 2h 05m</em>Tender Q1 2027, 120 × 40' to GCC</div></div>
+      <div class="mbx"><b>Freight Forwarding</b><small>SLA 4 h</small><div class="case a" data-at="3200"><em>C-2047 · 0h 20m</em>B/L draft approval, Rotterdam → Alexandria</div></div>
+      <div class="mbx"><b>Air</b><small>SLA 2 h</small><div class="case a" data-at="4200"><em>C-2048 · 0h 09m</em>Air import Frankfurt → Cairo, ACID check</div></div>
+    </div>
+    <div class="row c2" style="margin-top:16px">
+      <div class="panel a" data-at="6400"><h3>Forward C-2042 · all three are required</h3><span class="chip a" data-at="6800"><i>Person</i>Operations executive</span><span class="chip a" data-at="7300"><i>Mailbox</i>Operations</span><span class="chip a" data-at="7800"><i>Reason</i>Truck booking, not a rate</span><span class="tag tg a" data-at="8400">Forwarded ✓ logged</span></div>
+      <div class="panel a" data-at="9000"><h3>Today: a Gmail test box · with IT: M365 via Graph, read only</h3><p style="margin:0;color:var(--soft)">Same screens; only the source changes.</p></div>
+    </div>
+  </section>
+
+  <!-- 4 email to quote -->
+  <section class="scene" data-dur="13000" aria-label="Scene 4: from the email to the quote">
+    <p class="eb">4 · From the email to the quote</p>
+    <h2>The tool reads the request; the person decides</h2>
+    <p class="sub">Lane, boxes, customer and target come out of the email. The carriers on the lane appear with the lowest standard rate marked.</p>
+    <div class="body row" style="grid-template-columns:420px minmax(0,1fr)">
+      <div class="mail"><div class="mb"><span>Q-1042 · Mona Adel (Sales)</span><span>09:02</span></div><div class="mt"><b>Rate request Sokhna → Jeddah 2x40HC</b><br>POL: <span data-hl data-at="500" data-off="3200">Sokhna (DP World terminal)</span><br>POD: <span data-hl data-at="800" data-off="3200">Jeddah</span><br>Boxes: <span data-hl data-at="1100" data-off="3200">2 x 40' HC</span>, furniture<br>Customer: <span data-hl data-at="1400" data-off="3200">Gulf Home Retail</span><br>Target: <span data-hl data-at="1700" data-off="3200">USD 900 per 40'</span></div></div>
+      <div style="display:grid;gap:14px">
+        <div class="panel"><h3>Read from the email</h3><span class="chip a" data-at="700"><i>POL</i>Sokhna · DP World</span><span class="chip a" data-at="1000"><i>POD</i>Jeddah</span><span class="chip a" data-at="1300"><i>Boxes</i>2 × 40'HC</span><span class="chip a" data-at="1600"><i>Customer</i>Gulf Home Retail</span><span class="chip a" data-at="1900"><i>Target</i>USD 900</span></div>
+        <div class="panel a" data-at="2600"><h3>Carriers on the lane · Rate Bank</h3><table class="t"><tr><th>Carrier</th><th>Terminal</th><th>40HC</th><th>Valid</th><th></th></tr>
+          <tr class="a" data-at="2900" data-hlrow="4200"><td>Sahara Feeder</td><td>DP World</td><td class="n">850</td><td>18 Dec</td><td><span class="tag tg">Lowest standard</span></td></tr>
+          <tr class="a" data-at="3200"><td>Gulf Bridge</td><td>DP World</td><td class="n">1,025</td><td>18 Dec</td><td><span class="tag tw">Standard</span></td></tr>
+          <tr class="a" data-at="3500"><td>Aurora Lines</td><td>Other</td><td class="n">560</td><td>28 Nov</td><td><span class="tag tb">Spot · other terminal</span></td></tr></table></div>
+        <div class="panel a" data-at="5000"><h3>Reply to sales, sell only</h3><div class="typed" style="font-size:15px;color:var(--soft)" data-type data-at="5400" data-cps="60" data-text="Sokhna (DP World terminal) → Jeddah, 2 × 40'HC: USD 900 per 40'HC, valid until 18 Dec 2026, free time 21 days. All rates in USD."></div><span class="stamp a" data-at="8200" style="background:var(--sea);color:#02201d;margin-top:10px">Draft saved ✓</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 rates & offer -->
+  <section class="scene" data-dur="12000" aria-label="Scene 5: margin advisor and checks">
+    <p class="eb">5 · Rates & offer</p>
+    <h2>Buy + profit = sell, explained, then checked</h2>
+    <p class="sub">The fixed USD 25 / 50 applies to China dry exports only. On other lanes the advisor sets the profit from the gap to the other carriers and the market level.</p>
+    <div class="body row c2">
+      <div class="panel"><h3>Margin advisor · Sokhna → Jeddah 40'HC</h3>
+        <div class="mkb"><i style="left:10%;background:#fff" data-move="20" data-at="600"></i><i style="left:10%;background:var(--sea)" data-move="34" data-at="1400"></i><i style="left:10%;background:var(--road);width:6px" data-move="46" data-at="2400"></i></div>
+        <p class="note">market band from standard rates only · white = buy, teal = next carrier gap, amber = sell</p>
+        <div class="big a" data-at="3200" style="margin-top:18px">850 <span class="mute">+</span> <span class="seac">50</span> <span class="mute">=</span> <span class="road">900</span></div>
+        <p class="note a" data-at="3600" style="color:var(--soft)">Buy 850 (Sahara Feeder) · next carrier 1,025 · customer target 900 reached · THC and local charges at cost.</p></div>
+      <div class="panel"><h3>Before you send · inside the tool only</h3>
+        <div class="dec a" data-at="4400"><span>Rate move on this lane</span><span class="tag tg">none ≥ 5% ✓</span></div>
+        <div class="dec a" data-at="5000"><span>Free time and D&amp;D</span><span class="tag tg">21 days · 5 days over = USD 750</span></div>
+        <div class="dec a" data-at="5600"><span>ACI / Nafeza</span><span class="tag tn">export: not needed</span></div>
+        <div class="dec a" data-at="6200"><span>Currency and FX date</span><span class="tag tg">USD · EGP rate dated ✓</span></div>
+        <div class="dec a" data-at="6800"><span>Terminal</span><span class="tag tg">DP World first · other flagged</span></div>
+        <p class="note a" data-at="7600">The matching terms go into the quote by themselves: D&amp;D after free time, currency, ACID on imports.</p></div>
+    </div>
+  </section>
+
+  <!-- 6 quote PDF -->
+  <section class="scene" data-dur="12000" aria-label="Scene 6: locked quote with a check code">
+    <p class="eb">6 · The quote</p>
+    <h2>A locked PDF with a number and a check code</h2>
+    <p class="sub">Print only, no editing. If someone changes a copy, Verify says it is not the quote the tool sent.</p>
+    <div class="body row c64">
+      <div class="pdf a" data-at="300"><div class="wm">DP WORLD</div><div class="hd"><span>DP WORLD · Logistics Egypt · Pricing</span><span>Quotation OF-261128-001 · check 7F3A-91C2</span></div>
+        <p style="margin:0 0 10px;font-weight:700">Ocean freight offer · Gulf Home Retail</p>
+        <table><tr><th>Option</th><th>Routing</th><th>Transit</th><th>40' DC/HC USD</th><th>Free time</th><th>Valid until</th></tr><tr><td>Our offer</td><td>Sokhna (DP World terminal) → Jeddah</td><td>5 days</td><td><b>900</b></td><td>21 days</td><td>18 Dec 2026</td></tr></table>
+        <p style="font-size:13px;margin:12px 0 0">After free time, demurrage and detention as per carrier / terminal tariff. All rates in USD.</p>
+        <span class="lock a" data-at="1500">Locked · print only</span></div>
+      <div class="panel"><h3>Verify a quote</h3>
+        <div class="vf a" data-at="2600"><span class="mute">Number</span><span data-type data-at="2800" data-cps="20" data-text="OF-261128-001"></span><span class="mute">Code</span><span data-type data-at="3600" data-cps="20" data-text="7F3A-91C2"></span><span class="mute">Price</span><span data-type data-at="4200" data-cps="20" data-text="900"></span></div>
+        <p class="a" data-at="4800" style="margin:12px 0 0"><span class="stamp" style="background:var(--sea);color:#02201d">Matches ✓</span></p>
+        <div class="vf a" data-at="6600" style="margin-top:22px"><span class="mute">Price</span><span data-type data-at="6800" data-cps="20" data-text="850 (edited copy)"></span></div>
+        <p class="a" data-at="7800" style="margin:12px 0 0"><span class="stamp" style="background:var(--alarm);color:#2a0803">Not in the quote sent ✗</span></p></div>
+    </div>
+  </section>
+
+  <!-- 7 rate bank & spot -->
+  <section class="scene" data-dur="12000" aria-label="Scene 7: carrier offers and spot rates">
+    <p class="eb">7 · Rate Bank and spot rates</p>
+    <h2>Carrier offers turn into rows; spot rates stay one sailing</h2>
+    <p class="sub">An offer email, Excel or PDF is read into Rate Bank rows. A spot rate is kept for its sailing only, never as the month’s lowest.</p>
+    <div class="body row c2">
+      <div style="display:grid;gap:14px">
+        <div class="mail a" data-at="300"><div class="mb"><span>Aurora Lines pricing desk</span><span>08:40</span></div><div class="mt">Spot offer, valid for sailing <b>AL-2611</b> only<br>Sokhna → Busan · 20' USD 720 · 40' USD 940<br>Free time 14 days · transit 24 days, direct</div></div>
+        <div class="panel a" data-at="5200"><h3>Spot recipe · Aurora Lines</h3><p style="margin:0;color:var(--soft);font-size:15px">1 Open the spot page in a window beside the tool · 2 You log in yourself · 3 Search Sokhna → Busan · 4 Copy the page and paste: the tool reads the rate.</p></div>
+      </div>
+      <div class="xl a" data-at="1200"><div class="xh">Rate Bank · rows added from email</div><table><tr><th>Carrier</th><th>POL</th><th>POD</th><th>20DC</th><th>40HC</th><th>Valid</th><th>Type</th></tr>
+        <tr><td>Orion Lines</td><td>Sokhna</td><td>Busan</td><td>—</td><td>900</td><td>31 Oct</td><td></td></tr>
+        <tr><td>Pharos Line</td><td>Sokhna</td><td>Busan</td><td>—</td><td>1,000</td><td>31 Dec</td><td></td></tr>
+        <tr class="new a" data-at="2400"><td>Aurora Lines</td><td>Sokhna</td><td>Busan</td><td>720</td><td>940</td><td>sailing AL-2611</td><td>Spot</td></tr></table>
+        <p style="margin:0;padding:10px 12px;font-size:13.5px;color:#43566a" class="a" data-at="3400">Read from the email: carrier, lane, 20/40, free time, transit, “spot” and the sailing. Missing fields are flagged in yellow.</p></div>
+    </div>
+  </section>
+
+  <!-- 8 converter -->
+  <section class="scene" data-dur="11000" aria-label="Scene 8: converter">
+    <p class="eb">8 · Converter</p>
+    <h2>PDF to Excel or Word, and a messy sheet cleaned</h2>
+    <p class="sub">For the whole team. Files are read in the browser only, never uploaded or saved.</p>
+    <div class="body row c3">
+      <div class="panel"><h3>PDF → Excel</h3><div class="xl a" data-at="600"><div class="xh">rate sheet.xlsx · Page 1</div><table><tr><th>POL</th><th>POD</th><th>20DC</th><th>40HC</th><th>Valid</th></tr><tr class="a" data-at="1100"><td>Sokhna</td><td>Jeddah</td><td>650</td><td>850</td><td>2026-12-31</td></tr><tr class="a" data-at="1500"><td>Alexandria</td><td>Genoa</td><td>700</td><td>1250</td><td>2026-12-31</td></tr></table></div><p class="note">Columns lined up even when the header is centred.</p></div>
+      <div class="panel"><h3>PDF → Word</h3><div class="mail a" data-at="3000" style="background:#fff"><div class="mb" style="background:#2b579a"><span>rate sheet.doc</span><span>Word</span></div><div class="mt" style="font-size:14px"><b>DEMO rate sheet December</b><br>A table with POL, POD and rates<br>Rates per container, dummy carrier.</div></div><p class="note">Headings, text and tables; save as .docx from Word.</p></div>
+      <div class="panel"><h3>Clean an Excel file</h3>
+        <div class="dec a" data-at="5200"><span>“ 1,250 ”</span><span class="seac">1250</span></div><div class="dec a" data-at="5700"><span>05/12/2026</span><span class="seac">2026-12-05</span></div><div class="dec a" data-at="6200"><span>Empty rows</span><span class="seac" data-count data-from="0" data-to="14" data-at="6200" data-dur="1200" data-fmt="int">0</span></div><div class="dec a" data-at="6800"><span>Duplicate rows</span><span class="seac" data-count data-from="0" data-to="3" data-at="6800" data-dur="900" data-fmt="int">0</span></div>
+        <p class="note a" data-at="7800">Scanned PDFs have no text: the screen says so and points to Word.</p></div>
+    </div>
+  </section>
+
+  <!-- 9 roles -->
+  <section class="scene" data-dur="11000" aria-label="Scene 9: five roles">
+    <p class="eb">9 · Roles</p>
+    <h2>Five roles, each sees only what the job needs</h2>
+    <p class="sub">Roles, not names or job titles. In production each role is an Entra ID group set by IT.</p>
+    <div class="body row c5">
+      <div class="panel rc a" data-at="300"><span class="tag tg">Level 1</span><b>Executive</b><ul><li>Cases with SLA</li><li>Buy rates</li><li>Buy + profit = sell</li><li>Drafts and PDF</li></ul></div>
+      <div class="panel rc a" data-at="800"><span class="tag tg">Level 1</span><b>Sales</b><ul><li>Quick price on sell rates</li><li>Offers and feedback</li><li>Buy: <span class="blurme">USD 850</span></li></ul></div>
+      <div class="panel rc a" data-at="1300"><span class="tag tw">Level 2</span><b>Direct Manager</b><ul><li>Own team only</li><li>Load, late cases</li><li>Cycle time</li><li>Reassign with reason</li></ul></div>
+      <div class="panel rc a" data-at="1800"><span class="tag tw">Level 3</span><b>Senior Management</b><ul><li>Department Cockpit</li><li>Top 3 pains</li><li>Approve or reject</li></ul></div>
+      <div class="panel rc a" data-at="2300"><span class="tag tb">Level 4</span><b>Top Management</b><ul><li>Company Cockpit</li><li>Margin, win rate, TEU</li><li>Forecast</li></ul></div>
+    </div>
+    <div class="panel a" data-at="4000" style="margin-top:18px"><h3>Sales view</h3><p style="margin:0;color:var(--soft)">The buy rate and the profit disappear; only the sell rate and the quote stay. <span class="tag tb">buy hidden</span></p></div>
+  </section>
+
+  <!-- 10 cockpit -->
+  <section class="scene" data-dur="12000" aria-label="Scene 10: cockpit">
+    <p class="eb">10 · Cockpit</p>
+    <h2>Management sees the biggest pain first</h2>
+    <p class="sub">Each manager sees their own team; Top Management sees the company. Figures below are dummy, from the demo.</p>
+    <div class="body row c4">
+      <div class="panel kpi"><h3>Win rate</h3><b class="seac" data-count data-from="0" data-to="46" data-at="400" data-dur="1600" data-fmt="pct">0%</b><span>target 45%</span></div>
+      <div class="panel kpi"><h3>Replies in SLA</h3><b class="road" data-count data-from="0" data-to="86" data-at="700" data-dur="1600" data-fmt="pct">0%</b><span>target 90% · below</span></div>
+      <div class="panel kpi"><h3>Margin per 40'</h3><b class="seac" data-count data-from="0" data-to="62" data-at="1000" data-dur="1600" data-fmt="usd">USD 0</b><span>won quotes, last 3 months</span></div>
+      <div class="panel kpi"><h3>Month forecast</h3><b class="seac" data-count data-from="0" data-to="104" data-at="1300" data-dur="1600" data-fmt="pct">0%</b><span>of an average month</span></div>
+    </div>
+    <div class="row c2" style="margin-top:16px">
+      <div class="panel"><h3>Where it hurts · top 3</h3>
+        <div class="dec a" data-at="3200"><span><b>Operations:</b> demurrage on held boxes</span><span class="mute">owner: Operations head · fix: free time alert</span></div>
+        <div class="dec a" data-at="3700"><span><b>Pricing:</b> replies past SLA on Fridays</span><span class="mute">fix: back-up roster</span></div>
+        <div class="dec a" data-at="4200"><span><b>Commercial:</b> tender work on one person</span><span class="mute">fix: second owner</span></div></div>
+      <div class="panel"><h3>Decisions for you</h3>
+        <div class="dec a" data-at="5200"><span>Name a back-up for tenders</span><span><span class="btn2 a ok" data-at="6400">Approved ✓</span></span></div>
+        <div class="dec a" data-at="5700"><span>Training: margin advisor, 30 minutes</span><span><span class="btn2 a ok" data-at="7200">Approved ✓</span></span></div>
+        <p class="note a" data-at="7800">Each decision is logged with who and when.</p></div>
+    </div>
+  </section>
+
+  <!-- 11 safety -->
+  <section class="scene" data-dur="10000" aria-label="Scene 11: built-in control">
+    <p class="eb">11 · Built-in control</p>
+    <h2>Safe by design</h2>
+    <p class="sub">What the tool will never do, whatever the screen.</p>
+    <div class="body safe">
+      <div class="panel a" data-at="300"><b>No AI inside</b><p>Plain rules: keywords and formulas, as IT asked.</p></div>
+      <div class="panel a" data-at="900"><b>Never sends email</b><p>It saves a draft; a person checks it and presses Send.</p></div>
+      <div class="panel a" data-at="1500"><b>Sales never see buy rates</b><p>Buy and profit stay with the Executive role.</p></div>
+      <div class="panel a" data-at="2100"><b>Sources read only</b><p>The Rate Bank and mailboxes are read, never written.</p></div>
+      <div class="panel a" data-at="2700"><b>Check code on every quote</b><p>An edited copy is caught by Verify.</p></div>
+      <div class="panel a" data-at="3300"><b>No passwords stored</b><p>Carrier sites are opened by the person, who logs in.</p></div>
+    </div>
+  </section>
+
+  <!-- 12 ask -->
+  <section class="scene" data-dur="11000" aria-label="Scene 12: the ask">
+    <p class="eb">12 · Next</p>
+    <h2>Three decisions start a 12-week pilot</h2>
+    <p class="sub">Egypt Pricing first. The tool reads the Rate Bank and the shared mailboxes; later NPM and CARGOES, with the same screens.</p>
+    <div class="body row c3">
+      <div class="panel a" data-at="400"><span class="big road">1</span><p style="font-size:18px;margin:10px 0 0">Approve the pilot, hosted by IT inside DP World with Entra ID sign-in.</p></div>
+      <div class="panel a" data-at="900"><span class="big road">2</span><p style="font-size:18px;margin:10px 0 0">BTI meeting: read-only Rate Bank on SharePoint and shared mailboxes via Graph.</p></div>
+      <div class="panel a" data-at="1400"><span class="big road">3</span><p style="font-size:18px;margin:10px 0 0">One owner each for rates, FX and ACI data.</p></div>
+    </div>
+    <div class="tl">
+      <div class="a" data-at="2600"><em>Weeks 1–4</em><b>Access and baseline</b><p>Read-only access, owners named, baseline times measured.</p></div>
+      <div class="a" data-at="3200"><em>Weeks 5–8</em><b>Live requests</b><p>Pricing uses the tool on real requests; cases and quotes in a database.</p></div>
+      <div class="a" data-at="3800"><em>Weeks 9–12</em><b>Measure and decide</b><p>Time to quote, SLA, win rate, margin vs before; then NPM and CARGOES.</p></div>
+    </div>
+  </section>
+
+  <div class="prog"><i id="bar"></i></div>
+  <div class="ctl">
+    <button id="prev" type="button" aria-label="Previous scene">←</button>
+    <button id="play" type="button" aria-pressed="true">Auto-play</button>
+    <div class="dots" id="dots"></div>
+    <span class="cnt" id="cnt"></span>
+    <button id="next" type="button" aria-label="Next scene">→</button>
+  </div>
+</div></div>
+
+<script>
+{
+const $=id=>document.getElementById(id);
+const S=[...document.querySelectorAll(".scene")];
+function fit(){ const s=Math.min(innerWidth/1600,innerHeight/900); $("stage").style.transform="scale("+s+")"; }
+addEventListener("resize",fit); fit();
+// race ticks
+const tick=(id,n,col,w)=>{ $(id).innerHTML=Array.from({length:n},(_,i)=>`<span data-tk="${i}" style="left:${(i/(n-1))*w}%;border-color:${col}"></span>`).join(""); };
+tick("tkB",9,"#FF6B5A",100); tick("tkA",5,"#3BE3D2",40);
+$("dots").innerHTML=S.map((s,i)=>`<button type="button" aria-label="Scene ${i+1}: ${s.getAttribute("aria-label").replace(/^Scene \d+: /,"")}"></button>`).join("");
+const D=[...$("dots").children];
+let cur=0, t0=performance.now(), auto=true, paused=false;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const fmt=(v,f)=>f==="min"?Math.round(v)+" min":f==="mmss"?String(Math.floor(v)).padStart(2,"0")+":"+String(Math.floor((v%1)*60)).padStart(2,"0"):f==="pct"?Math.round(v)+"%":f==="usd"?"USD "+Math.round(v):String(Math.round(v));
+function draw(sc,t){
+  sc.querySelectorAll("[data-at]").forEach(e=>{ const at=+e.dataset.at, off=e.dataset.off!=null?+e.dataset.off:1e9;
+    if(e.hasAttribute("data-hl")){ e.classList.toggle("hl",t>=at&&t<off); e.style.borderRadius="4px"; return; }
+    if(e.hasAttribute("data-count")){ const a=+e.dataset.from,b=+e.dataset.to,d=+e.dataset.dur||1000, k=Math.max(0,Math.min(1,(t-at)/d)); e.textContent=fmt(a+(b-a)*k,e.dataset.fmt); return; }
+    if(e.hasAttribute("data-grow")){ const d=+e.dataset.dur||1000, k=Math.max(0,Math.min(1,(t-at)/d)); e.style.width=(+e.dataset.grow*k)+"%"; return; }
+    if(e.hasAttribute("data-type")){ const txt=e.dataset.text||"", cps=+e.dataset.cps||60, n=Math.max(0,Math.min(txt.length,Math.floor((t-at)/1000*cps))); e.textContent=txt.slice(0,n); return; }
+    if(e.hasAttribute("data-move")){ e.style.left=(t>=at?+e.dataset.move:10)+"%"; return; }
+    if(e.hasAttribute("data-hlrow")){ e.classList.toggle("hl",t>=+e.dataset.hlrow); }
+    e.classList.toggle("on",t>=at&&t<off); });
+  // race ticks light as the bars pass them
+  if(sc===S[0]){ const kB=Math.max(0,Math.min(1,(t-400)/10000)), kA=Math.max(0,Math.min(1,(t-400)/4000));
+    $("tkB").querySelectorAll("span").forEach((s,i)=>s.style.background=i/8<=kB?"#FF6B5A":"#0A1E38"); $("tkA").querySelectorAll("span").forEach((s,i)=>s.style.background=i/4<=kA?"#3BE3D2":"#0A1E38"); }
+  // Sales role: buy blurred
+  sc.querySelectorAll(".blurme").forEach(e=>e.classList.toggle("blur",t>=4000));
+}
+function show(i){ cur=(i+S.length)%S.length; t0=performance.now(); S.forEach((s,k)=>s.classList.toggle("cur",k===cur)); D.forEach((d,k)=>{ d.classList.toggle("cur",k===cur); d.classList.toggle("done",k<cur); });
+  $("cnt").textContent=(cur+1)+" / "+S.length; if(reduce) draw(S[cur],+S[cur].dataset.dur); try{ history.replaceState(null,"","#s"+(cur+1)); }catch(e){} }
+function loop(now){ const sc=S[cur], dur=+sc.dataset.dur; let t=now-t0;
+  if(!paused){ if(t>=dur+1500){ if(auto) { show(cur+1); return requestAnimationFrame(loop); } t0=now; t=0; } draw(sc,Math.min(t,dur)); $("bar").style.width=(100*Math.min(1,t/dur))+"%"; }
+  requestAnimationFrame(loop); }
+$("prev").onclick=()=>show(cur-1); $("next").onclick=()=>show(cur+1);
+D.forEach((d,k)=>d.onclick=()=>show(k));
+$("play").onclick=()=>{ auto=!auto; $("play").setAttribute("aria-pressed",String(auto)); $("play").textContent=auto?"Auto-play":"Loop this scene"; };
+let pAt=0; addEventListener("keydown",e=>{ if(e.key==="ArrowRight"||e.key==="PageDown") show(cur+1); else if(e.key==="ArrowLeft"||e.key==="PageUp") show(cur-1);
+  else if(e.code==="Space"){ e.preventDefault(); if(!paused){ paused=true; pAt=performance.now(); } else { t0+=performance.now()-pAt; paused=false; } } });
+const h=+(location.hash.match(/^#s(\d+)$/)||[])[1]; show(h>=1&&h<=S.length?h-1:0);
+if(reduce){ auto=false; $("play").hidden=true; } else requestAnimationFrame(loop);
+}
+</script>
