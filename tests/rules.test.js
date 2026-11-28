@@ -713,3 +713,24 @@ test('Gmail as shared mailboxes: +tag picks the mailbox, pricing tag is routed b
   assert.ok(r.q.includes('pricing.team.dpw+commercial@gmail.com') && r.q.startsWith('newer_than:30d'));
   assert.deepEqual(r.c, { to: ['a@x.com', 'b@y.com'], su: 'Hi', body: 'Line' }); assert.equal(r.nc, null);
 });
+
+test('converter: PDF text items line up into columns; pasted text and HTML tables parse; cleaning fixes numbers, dates, empties and duplicates; Word export has headings and tables', async () => {
+  const r = await run(() => { const R = window.__rules;
+    const items = [{ x: 50, y: 700, w: 120, h: 18, s: 'Rate sheet Dec' },
+      { x: 50, y: 660, w: 30, h: 10, s: 'POL' }, { x: 150, y: 660, w: 30, h: 10, s: 'POD' }, { x: 250, y: 660, w: 30, h: 10, s: '40HC' },
+      { x: 50, y: 640, w: 40, h: 10, s: 'Sokhna' }, { x: 151, y: 640, w: 40, h: 10, s: 'Jeddah' }, { x: 252, y: 640, w: 30, h: 10, s: '850' },
+      { x: 50, y: 620, w: 50, h: 10, s: 'Damietta' }, { x: 250, y: 620, w: 30, h: 10, s: '1,250' }];
+    const rows = R.convRows(items);
+    const word = R.convWordHtml([rows], 'Test');
+    const C = R.convClean([[' A ', '', 'x'], ['', '', ''], ['1,250', '', '05/12/2026'], ['1,250', '', '05/12/2026'], ['USD 900', '', '7 Dec 2026'], ['007', '', 'n/a']]);
+    return { rows: rows.map(x => x.cells), t1: R.convParseText('a\tb\nc\td'), t2: R.convParseText('a;b\nc;"d;e"'), t3: R.convParseText('Sokhna   Jeddah   850\nDamietta   Genoa   950'),
+      t4: R.convParseText('1,250\n2,300'), h: R.convHtmlRows('<table><tr><td colspan="2">A</td><td>B</td></tr><tr><td>1</td><td>2</td><td>3</td></tr></table>'),
+      c: C.rows, st: C.stat, hasH: /<h2>Rate sheet Dec<\/h2>/.test(word), hasT: /<table/.test(word) && /Jeddah/.test(word) }; });
+  assert.deepEqual(r.rows, [['Rate sheet Dec'], ['POL', 'POD', '40HC'], ['Sokhna', 'Jeddah', '850'], ['Damietta', '', '1,250']]);
+  assert.deepEqual(r.t1, [['a', 'b'], ['c', 'd']]); assert.deepEqual(r.t2, [['a', 'b'], ['c', 'd;e']]);
+  assert.deepEqual(r.t3, [['Sokhna', 'Jeddah', '850'], ['Damietta', 'Genoa', '950']]); assert.deepEqual(r.t4, [['1,250'], ['2,300']]);
+  assert.deepEqual(r.h, [['A', '', 'B'], ['1', '2', '3']]);
+  assert.deepEqual(r.c, [['A', 'x'], [1250, '2026-12-05'], [900, '2026-12-07'], ['007', 'n/a']]);
+  assert.deepEqual(r.st, { rows: 6, emptyRows: 1, emptyCols: 1, dups: 1 });
+  assert.ok(r.hasH && r.hasT);
+});

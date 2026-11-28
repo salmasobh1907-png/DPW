@@ -264,6 +264,10 @@ Views are named by role, not by person or job title: **Executive** (pricing and 
 
 `python3 scripts/make_it_build.py` writes `app/DP_World_Platform_IT.html`: the same page with `<meta name="dpw-build" content="it">`, which turns off every mail connection (Inbox uses the offline dummy copy, no "Check inbox" or "Pull from Gmail", draft links open a normal compose window). Dummy data only, safe to share with IT inside DP World. Rebuild it after every change to the main page.
 
+### 5.28 Converter (Reference → Converter, everyone)
+
+Four helpers for the team, plain rules in the browser (pdf.js + SheetJS); files are read in the page only, never uploaded or saved. **PDF to Excel**: every page becomes a sheet; text is grouped into rows by height and into columns by the merged x-spans of the cells, so a centred header sits over its data (`convRows`). **PDF to Word**: headings (larger text), paragraphs and tables (3+ aligned cells in a run) in a `.doc` file Word opens; save as .docx from Word (`convWordHtml`). **Paste a table**: from Excel or a web page (tabs or the copied HTML table), CSV (`;` or `,`) or a PDF copy (2+ spaces) (`convParseText`, `convHtmlRows`). **Clean an Excel file**: trims spaces, removes empty rows, empty columns and duplicate rows, turns text numbers (“1,250”, “USD 900”) into numbers and dates into YYYY-MM-DD (`convClean`); sheets named like credential or password are skipped. Scanned PDFs have no text: the screen says so and points to Word (File, Open).
+
 ### 5.3 Browser-only storage (per user)
 
 Shared inbox cases and their settings (`csState_v1`, `csSet_v1` incl. mailboxes added in the tool, `csMy_v1`), data sources (`dsSources_v1`, `dsRows_v1`), working-time log (`wtLog_v1`, 31 days), Apps hub settings (`apps_v1`), Next up timer and snoozes (`tdTask_v1`, `tdDone_v1`, `tdSnooze_v1`), theme, last screen, view (pricing / sales).

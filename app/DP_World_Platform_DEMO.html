@@ -409,6 +409,7 @@ body:not(.notes-on) .xp{display:none!important}
 .rxg{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px 18px;font-size:13px}.rxg>div{min-width:0}.rxg input{padding:3px 6px;border:1px solid var(--line-2);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit}
 .gmDlg{width:min(640px,94vw);border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:16px 18px}.gmDlg::backdrop{background:rgba(8,16,30,.4)}
 body.itb #ibxGo,body.itb #ibxPerm,body.itb #csGm{display:none!important}
+.cvg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}@media(max-width:700px){.cvg{grid-template-columns:minmax(0,1fr)}}.cvg label.drop{display:block;margin-top:10px}.cvg .card>.note{margin:0}
 .dfb:empty{display:none}.dfb{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}.dfbh{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}.dfbh .mini{margin-left:auto}
 /* dpw-look */
 :root{--accent:#3e3c90;--accent-soft:#ecebf6;--focus:#3e3c90;--nav:#17163f;--nav-2:#272661}
@@ -737,6 +738,7 @@ body.nl .side,body.nl .rail,body.nl nav.side{background:linear-gradient(180deg,#
     <section class="pane" id="p-dict" hidden></section>
     <section class="pane" id="p-health" hidden></section>
     <section class="pane" id="p-spot" hidden></section>
+    <section class="pane" id="p-conv" hidden></section>
     <section class="pane" id="p-cockpit" hidden></section>
     <section class="pane" id="p-ibx" hidden></section>
     <section class="pane" id="p-sheet" hidden></section>
@@ -2906,12 +2908,12 @@ const NAV={
   pricing:[["Daily work",[["today","Today","check"],["tasks","My responsibilities","note"],["apps","Apps hub","box"],["ibx","Inbox","inbox"],["cases","Shared inbox cases","clock"],["lane","Rates & offer","map"],["q","Offers & feedback","file"]],"pricing + sales"],
            ["Rate Bank",[["sheet","Rate Bank","db"],["spot","Carrier spot rates","ship"],["trk","Trucking rates","truck"]],"pricing"],
            ["Reports",[["home","Overview","home"],["team","Team dashboard","chart"]],"managers"],
-           ["Reference",[["svc","Alliance loops","ship"],["support","Support","help"],["info","Help & settings","help"]],"everyone"]],
+           ["Reference",[["conv","Converter","file"],["svc","Alliance loops","ship"],["support","Support","help"],["info","Help & settings","help"]],"everyone"]],
   director:[["Management",[["team","Team dashboard","chart"],["home","Overview","home"],["today","Today","check"]],"director"],
             ["Pricing",[["q","Offers & feedback","file"],["lane","Rates & offer","map"],["sheet","Rate Bank","db"]],"read and check"],
             ["Reference",[["apps","Apps hub","box"],["svc","Alliance loops","ship"],["support","Support","help"],["info","Help & settings","help"]],"everyone"]],
   sales:[["Daily work",[["ibx","Inbox","inbox"],["lane","Find a rate","map"],["q","My offers & feedback","file"]],"sales"],
-         ["Reference",[["trk","Trucking rates","truck"],["svc","Alliance loops","ship"],["support","Support","help"],["info","Help","help"]],"everyone"]]
+         ["Reference",[["trk","Trucking rates","truck"],["conv","Converter","file"],["svc","Alliance loops","ship"],["support","Support","help"],["info","Help","help"]],"everyone"]]
 };
 { const mgmt=[["cockpit","Cockpit","chart"],["exec","Executive summary","chart"],["health","Department health","chart"],["team","Team dashboard","chart"],["home","Overview","home"]], keep=new Set(mgmt.map(x=>x[0]));
   const rest=NAV.pricing.map(([g,items,sub])=>[g,items.filter(x=>!keep.has(x[0])),sub]).filter(g=>g[1].length);
@@ -2924,11 +2926,11 @@ function navKey(t){ return PAR[t]||t; }
 function renderSub(t){ let bar=$("subsw"); const pk=navKey(t), L=SUBS[pk]; if(!bar){ bar=document.createElement("div"); bar.id="subsw"; bar.className="subsw"; bar.setAttribute("role","group"); bar.setAttribute("aria-label","Part of this page"); const w=$("work"); w.insertBefore(bar,w.firstChild); }
   const ok=L&&(isPricing()||pk!=="info"); bar.hidden=!ok; if(!ok) return; bar.innerHTML=L.map(([k,l])=>`<button type="button" data-sk="${k}" aria-pressed="${k===t}">${esc((!isPricing()&&SUBS_SALES[k])||l)}</button>`).join(""); bar.querySelectorAll("[data-sk]").forEach(x=>x.onclick=()=>openTab(x.dataset.sk)); }
 const NAVOPEN=new Set();
-const PAGE={cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],cockpit:["Cockpit","How we are doing, where it hurts, decisions for you, customers and the forecast"],spot:["Carrier spot rates","Open the carrier site, paste the result page, the tool reads the rates by your saved recipe"],health:["Department health","Where each department loses money, whether it is under control, and what to do"],dict:["Dictionary","Ports, equipment and work words in English, Arabic and Franco; words the tool did not understand"],exec:["Executive summary","Results, risks and the decisions for today · managers and Director"],support:["Support","Report a problem, ask for a change or share an idea; answers and status"],tasks:["My responsibilities","The work you do, ticked or counted each day, as your manager sees it"],apps:["Apps hub","Outlook, Teams, files, DP World systems and carrier sites in one place, with one-click email, chat, call and meeting"],team:["Team dashboard","Each person: open, late, answered, reply time, working time and end-of-day choice · managers only"],today:["Today","Everything that needs Pricing now, and Quick price in one line"],dsrc:["Data sources","Rate Bank, carrier emails, online links and files: freshness, order and conflicts"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
+const PAGE={conv:["Converter","PDF to Excel or Word, pasted tables to Excel, clean Excel files · read in this browser only"],cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],cockpit:["Cockpit","How we are doing, where it hurts, decisions for you, customers and the forecast"],spot:["Carrier spot rates","Open the carrier site, paste the result page, the tool reads the rates by your saved recipe"],health:["Department health","Where each department loses money, whether it is under control, and what to do"],dict:["Dictionary","Ports, equipment and work words in English, Arabic and Franco; words the tool did not understand"],exec:["Executive summary","Results, risks and the decisions for today · managers and Director"],support:["Support","Report a problem, ask for a change or share an idea; answers and status"],tasks:["My responsibilities","The work you do, ticked or counted each day, as your manager sees it"],apps:["Apps hub","Outlook, Teams, files, DP World systems and carrier sites in one place, with one-click email, chat, call and meeting"],team:["Team dashboard","Each person: open, late, answered, reply time, working time and end-of-day choice · managers only"],today:["Today","Everything that needs Pricing now, and Quick price in one line"],dsrc:["Data sources","Rate Bank, carrier emails, online links and files: freshness, order and conflicts"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
   q:["Offers & quotes","Offers pricing sent to sales, and quotes sales sent to customers"],fb:["Sales feedback","What sales hear from customers, with pricing's replies"],off:["Carrier offers","A carrier email or Excel turned into Rate Bank rows"],
   req:["Ask carriers","Monthly “Rate Idea” emails to the lines"],svc:["Alliance loops","Reference list of liner rotations that call Egypt, 19 Oct 2026"],vol:["Carrier volumes","What we booked with each line, for contract and volume talks"],trk:["Trucking rates","Pickup in Egypt for EXW requests, and cross-border trucks"],hl:["Rate Bank check","Rows in the Rate Bank that are wrong or easy to misread"],gw:["Market alerts","Disruptions, rate-increase notices and the weekly market index"],info:["Help","How the platform works and where the numbers come from"]};
 const PAGE_SALES={ibx:["Inbox","Your customer requests from email · demo with dummy data"],lane:["Find a rate","Route, carrier rates, customer offer and quotation"],q:["My offers & quotes","Pricing's offers to you, your quotes to customers, follow-ups and hit ratio"],fb:["Feedback to pricing","Tell pricing what the customer said and read their answer"]};
-const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",dsrc:"Data",today:"Today",team:"Team",apps:"Apps",tasks:"Tasks",support:"Support",exec:"Exec",dict:"Words",health:"Health",spot:"Spot",cockpit:"Cockpit",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
+const SHORT={conv:"Convert",cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",dsrc:"Data",today:"Today",team:"Team",apps:"Apps",tasks:"Tasks",support:"Support",exec:"Exec",dict:"Words",health:"Health",spot:"Spot",cockpit:"Cockpit",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
 let ROLE=lsGet("rg-role","pricing"), CUR_TAB="lane";
 QT.isOwner=false;
 function canPricing(){ return !QT.shared || QT.isOwner || ((QT.settings&&QT.settings.pricing)||[]).includes(QT.meId); }
@@ -2956,9 +2958,9 @@ function setTitle(t){ const P=(!isPricing()&&PAGE_SALES[t])||PAGE[t]||["",""]; $
 document.addEventListener("click",e=>{ const c=e.target.closest&&e.target.closest(".cmt"); if(!c) return; e.stopPropagation(); c.classList.toggle("open"); c.title=c.classList.contains("open")?"Click to shorten":"Click to read the full note"; },true);
 function openTab(t,quiet){
   if(!allowed(t)) t="lane";
-  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","dsrc","today","team","apps","tasks","support","exec","dict","health","spot","cockpit","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
+  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","dsrc","today","team","apps","tasks","support","exec","dict","health","spot","cockpit","plog","info","conv"]; const prevTab=CUR_TAB; CUR_TAB=t;
   panes.forEach(k=>{ const p=$("p-"+k); if(p) p.hidden=k!==t; });
-  { const wasNo=document.body.classList.contains("nomap"); document.body.classList.toggle("nomap",t==="trk"||t==="sheet"||t==="ibx"||t==="cases"||t==="ckpi"||t==="cmbx"||t==="dsrc"||t==="today"||t==="team"||t==="apps"||t==="tasks"||t==="support"||t==="exec"||t==="health"||t==="spot"||t==="cockpit"); if(wasNo&&t!=="trk"&&t!=="sheet"&&t!=="ibx"&&t!=="cases"&&t!=="ckpi"&&t!=="cmbx"&&t!=="dsrc"&&t!=="today"&&t!=="team"&&t!=="apps"&&t!=="tasks"&&t!=="support"&&t!=="exec"&&t!=="health"&&t!=="spot"&&t!=="cockpit") setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
+  { const wasNo=document.body.classList.contains("nomap"); document.body.classList.toggle("nomap",t==="trk"||t==="sheet"||t==="ibx"||t==="cases"||t==="ckpi"||t==="cmbx"||t==="dsrc"||t==="today"||t==="team"||t==="apps"||t==="tasks"||t==="support"||t==="exec"||t==="health"||t==="spot"||t==="cockpit"||t==="conv"); if(wasNo&&t!=="trk"&&t!=="sheet"&&t!=="ibx"&&t!=="cases"&&t!=="ckpi"&&t!=="cmbx"&&t!=="dsrc"&&t!=="today"&&t!=="team"&&t!=="apps"&&t!=="tasks"&&t!=="support"&&t!=="exec"&&t!=="health"&&t!=="spot"&&t!=="cockpit"&&t!=="conv") setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
   document.querySelectorAll("#nav button[data-k],#bnav button[data-k]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.k===navKey(t)))); renderSub(t);
   { const nb=document.querySelector('#nav button[data-k="'+navKey(t)+'"]'); if(nb&&nb.closest(".gi[hidden]")) renderNav(); }
   setTitle(t); $("work").scrollTop=0; if(!quiet) window.scrollTo&&window.scrollTo(0,0);
@@ -2981,6 +2983,7 @@ function openTab(t,quiet){
   if(t==="dsrc") dsRender();
   if(t==="cockpit") setTimeout(()=>{ try{ renderCockpit(); }catch(e){ console.error(e); } },0);
   if(t==="spot") setTimeout(()=>{ try{ renderSpot(); }catch(e){ console.error(e); } },0);
+  if(t==="conv") setTimeout(()=>{ try{ renderConv(); }catch(e){ console.error(e); } },0);
   if(t==="health") setTimeout(()=>{ try{ renderHealth(); }catch(e){ console.error(e); } },0);
   if(t==="dict") setTimeout(()=>{ try{ renderDict(); }catch(e){ console.error(e); } },0);
   if(t==="exec") setTimeout(()=>{ try{ renderExec(); }catch(e){ console.error(e); } },0);
@@ -5103,6 +5106,100 @@ function gmDraftDlg(D){ let d=$("gmDlg"); if(!d){ d=document.createElement("dial
   d.showModal(); }
 document.addEventListener("click",ev=>{ const a=ev.target.closest&&ev.target.closest("a[href]"); if(!a||!GM_MCP||ev.ctrlKey||ev.metaKey||ev.shiftKey) return; const P=gmParseCompose(a.href); if(!P) return;
   ev.preventDefault(); gmDraftDlg(Object.assign(P,{href:a.href})); },true);
+/* ===== Converter: PDF to Excel, PDF to Word, pasted table to Excel, clean an Excel file =====
+   Plain rules in the browser (pdf.js + SheetJS). Files are read here and never uploaded or stored.
+   Scanned PDFs (pictures) have no text to read: the screen says so. */
+/* text items {x,y,w,s,h} of one page -> rows of cells, columns aligned across the page */
+function convRows(items){ const rows=[];
+  (items||[]).forEach(it=>{ const s=String(it.s||""); if(!s.trim()) return; let r=rows.find(r=>Math.abs(r.y-it.y)<3); if(!r) rows.push(r={y:it.y,it:[],h:0}); r.it.push(it); r.h=Math.max(r.h,it.h||0); });
+  rows.sort((a,b)=>b.y-a.y);
+  rows.forEach(r=>{ r.it.sort((a,b)=>a.x-b.x); const cells=[]; let c=null;
+    r.it.forEach(t=>{ const w=t.w||String(t.s).length*4; if(c&&t.x-(c.x+c.w)<=8){ c.s+=(t.x-(c.x+c.w)>1.5?" ":"")+t.s; c.w=t.x+w-c.x; } else cells.push(c={x:t.x,w,s:String(t.s)}); });
+    r.cells=cells.map(c=>({x:c.x,w:c.w,s:c.s.replace(/\s+/g," ").trim()})).filter(c=>c.s); });
+  /* columns = merged x-spans of cells in multi-cell rows, so a centred header lands over its data */
+  const sp=[]; rows.forEach(r=>{ if(r.cells.length>1) r.cells.forEach(c=>sp.push([c.x,c.x+c.w])); }); sp.sort((a,b)=>a[0]-b[0]);
+  const cols=[]; sp.forEach(([a,b])=>{ const k=cols[cols.length-1]; if(k&&a<=k.max+2){ k.max=Math.max(k.max,b); } else cols.push({min:a,max:b}); });
+  const colOf=x=>{ let best=0,bd=1e9; cols.forEach((c,i)=>{ const d=x<c.min?c.min-x:x>c.max?x-c.max:0; if(d<bd){ bd=d; best=i; } }); return best; };
+  return rows.map(r=>{ if(r.cells.length<2||!cols.length) return {cells:[r.cells.map(c=>c.s).join(" ")],h:r.h,one:true};
+    const out=[]; r.cells.forEach(c=>{ let i=colOf(c.x+c.w/2); while(out[i]!=null) i++; out[i]=c.s; }); for(let i=0;i<out.length;i++) if(out[i]==null) out[i]=""; return {cells:out,h:r.h,one:false}; }); }
+/* pasted text -> rows: tabs first (Excel, web), then ; or , (CSV), then 2+ spaces (PDF copy) */
+function convParseText(t){ const L=String(t||"").replace(/\r/g,"").split("\n").filter(l=>l.trim());
+  if(!L.length) return []; const has=re=>L.filter(l=>re.test(l)).length>=Math.ceil(L.length*.6);
+  const csv=(l,d)=>{ const out=[]; let cur="",q=false; for(let i=0;i<l.length;i++){ const ch=l[i]; if(ch==='"'){ if(q&&l[i+1]==='"'){ cur+='"'; i++; } else q=!q; } else if(ch===d&&!q){ out.push(cur); cur=""; } else cur+=ch; } out.push(cur); return out; };
+  if(has(/\t/)) return L.map(l=>l.split("\t").map(s=>s.trim()));
+  if(has(/;/)) return L.map(l=>csv(l,";").map(s=>s.trim()));
+  if(has(/,/)&&!has(/\d,\d{3}\b/)) return L.map(l=>csv(l,",").map(s=>s.trim()));
+  return L.map(l=>l.trim().split(/\s{2,}/)); }
+function convHtmlRows(html){ try{ const d=new DOMParser().parseFromString(String(html||""),"text/html"); const T=d.querySelector("table"); if(!T) return null;
+  return [...T.querySelectorAll("tr")].map(tr=>[...tr.children].flatMap(td=>{ const v=td.textContent.replace(/\s+/g," ").trim(), n=Math.max(1,Math.min(20,+td.getAttribute("colspan")||1)); return [v,...Array(n-1).fill("")]; })).filter(r=>r.some(Boolean)); }catch(e){ return null; } }
+/* clean rows: trim, one space, numbers stored as text -> numbers, dates -> YYYY-MM-DD, drop empty rows/columns, drop exact duplicates */
+const CONV_MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,sept:9,oct:10,nov:11,dec:12};
+function convCell(v,o){ o=o||{}; if(v==null) return ""; if(v instanceof Date&&!isNaN(v)) return localISO(v); if(typeof v==="number") return v;
+  let s=String(v).replace(/[ \s]+/g," ").trim(); if(!s) return "";
+  if(o.numbers!==false&&/^-?(USD|EUR|EGP|\$|€)?\s?-?\d{1,3}(,\d{3})+(\.\d+)?$|^-?(USD|EUR|EGP|\$|€)?\s?-?\d+(\.\d+)?$/i.test(s)&&!/^0\d/.test(s.replace(/^-?(USD|EUR|EGP|\$|€)?\s?/i,""))){ const n=+s.replace(/^-?(USD|EUR|EGP|\$|€)\s?/i,m=>m.startsWith("-")?"-":"").replace(/,/g,""); if(isFinite(n)) return n; }
+  if(o.dates!==false){ let m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/); if(m&&+m[2]<=12&&+m[1]<=31) return m[3]+"-"+String(m[2]).padStart(2,"0")+"-"+String(m[1]).padStart(2,"0");
+    m=s.match(/^(\d{1,2})[ -]([A-Za-z]{3,4})[a-z]*[ -,]*(\d{4})$/); if(m&&CONV_MON[m[2].toLowerCase()]) return m[3]+"-"+String(CONV_MON[m[2].toLowerCase()]).padStart(2,"0")+"-"+String(m[1]).padStart(2,"0");
+    m=s.match(/^(\d{4})[\/.-](\d{1,2})[\/.-](\d{1,2})$/); if(m) return m[1]+"-"+String(m[2]).padStart(2,"0")+"-"+String(m[3]).padStart(2,"0"); }
+  return s; }
+function convClean(rows,o){ o=o||{}; let R=(rows||[]).map(r=>(r||[]).map(v=>convCell(v,o))); const stat={rows:R.length,emptyRows:0,emptyCols:0,dups:0};
+  R=R.filter(r=>{ const e=!r.some(v=>v!==""); if(e) stat.emptyRows++; return !e; });
+  const w=Math.max(0,...R.map(r=>r.length)); const keep=[]; for(let j=0;j<w;j++){ if(R.some(r=>r[j]!==""&&r[j]!=null)) keep.push(j); else stat.emptyCols++; }
+  R=R.map(r=>keep.map(j=>r[j]==null?"":r[j]));
+  if(o.dups!==false){ const seen=new Set(); R=R.filter(r=>{ const k=JSON.stringify(r); if(seen.has(k)){ stat.dups++; return false; } seen.add(k); return true; }); }
+  return {rows:R,stat}; }
+/* rows of one page -> Word HTML: big text = heading, 3+ aligned cells in a run = table */
+function convWordHtml(pages,title){ const esc2=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const body=pages.map((rows,pi)=>{ const hs=rows.map(r=>r.h).filter(Boolean).sort((a,b)=>a-b), med=hs[Math.floor(hs.length/2)]||10; let html="", tbl=[];
+    const flush=()=>{ if(!tbl.length) return; if(tbl.length<2){ html+=tbl.map(r=>`<p>${esc2(r.join("  "))}</p>`).join(""); } else { const w=Math.max(...tbl.map(r=>r.length)); html+=`<table border="1" cellpadding="4" style="border-collapse:collapse">${tbl.map(r=>`<tr>${Array.from({length:w},(_,j)=>`<td>${esc2(r[j]||"")}</td>`).join("")}</tr>`).join("")}</table><p></p>`; } tbl=[]; };
+    rows.forEach(r=>{ if(!r.one&&r.cells.filter(Boolean).length>=3){ tbl.push(r.cells); return; } flush(); const t=r.cells.filter(Boolean).join("  "); html+=r.h>med*1.3?`<h2>${esc2(t)}</h2>`:`<p>${esc2(t)}</p>`; }); flush();
+    return (pi?'<br style="page-break-before:always">':"")+html; }).join("");
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>${esc2(title||"Converted")}</title><style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt}td{font-size:10pt}</style></head><body>${body}</body></html>`; }
+async function convPdfPages(buf){ const L=await loadPDF(); const doc=await L.getDocument({data:new Uint8Array(buf),isEvalSupported:false}).promise; const pages=[]; let chars=0;
+  for(let p=1;p<=Math.min(doc.numPages,60);p++){ const pg=await doc.getPage(p); const tc=await pg.getTextContent();
+    const items=tc.items.map(it=>({x:it.transform[4],y:it.transform[5],w:it.width,h:Math.abs(it.transform[3])||it.height||0,s:it.str||""})); chars+=items.reduce((a,b)=>a+b.s.trim().length,0); pages.push(convRows(items)); }
+  return {pages,chars,n:doc.numPages}; }
+const CV={rows:null,name:"",kind:"",stat:null,msg:""};
+function convPreview(rows){ if(!rows||!rows.length) return '<p class="note">Nothing to show yet.</p>'; const w=Math.min(12,Math.max(...rows.map(r=>r.length)));
+  return `<div class="tbl-wrap"><table class="opts"><tbody>${rows.slice(0,15).map(r=>`<tr>${Array.from({length:w},(_,j)=>`<td>${esc(r[j]==null?"":String(r[j]))}</td>`).join("")}</tr>`).join("")}</tbody></table></div><p class="note">Showing ${Math.min(15,rows.length)} of ${rows.length} rows${Math.max(...rows.map(r=>r.length))>12?", first 12 columns":""}.</p>`; }
+async function convXlsx(sheets,fn){ const X=await loadXLSX(); const wb=X.utils.book_new(); sheets.forEach(([name,rows],i)=>{ const ws=X.utils.aoa_to_sheet(rows); X.utils.book_append_sheet(wb,ws,String(name||("Sheet"+(i+1))).replace(/[\\\/?*\[\]:]/g," ").slice(0,31)||("Sheet"+(i+1))); });
+  const buf=X.write(wb,{type:"array",bookType:"xlsx"}); await ofSave(new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),fn); }
+function renderConv(){ const p=$("p-conv"); if(!p) return;
+  p.innerHTML=`<div class="card"><h3>Converter <span class="note">· files are read in this browser only, never uploaded or saved</span></h3>
+   <p class="lead">Turn a PDF into Excel or Word, a pasted table into Excel, or tidy a messy Excel file. Plain rules, no AI.</p></div>
+  <div class="cvg">
+   <div class="card"><h3>PDF to Excel</h3><p class="note">Each page becomes a sheet; columns are lined up by position. Text PDFs only.</p><label class="drop" for="cvPdfX"><b>Choose a PDF</b><br><span class="note">or drop it here</span></label><input type="file" id="cvPdfX" accept="application/pdf,.pdf" hidden></div>
+   <div class="card"><h3>PDF to Word</h3><p class="note">Text, headings and tables, in a file Word opens. The layout is simple, not a copy of the PDF.</p><label class="drop" for="cvPdfW"><b>Choose a PDF</b><br><span class="note">or drop it here</span></label><input type="file" id="cvPdfW" accept="application/pdf,.pdf" hidden></div>
+   <div class="card"><h3>Paste a table</h3><p class="note">From an email, a web page, a PDF or Excel. Then download it as Excel.</p><textarea class="ta" id="cvPaste" rows="4" placeholder="Paste here (Ctrl+V)"></textarea><div class="qact"><button class="mini ok" id="cvPasteGo" type="button">Make a table</button></div></div>
+   <div class="card"><h3>Clean an Excel file</h3><p class="note">Trims spaces, removes empty rows and columns and duplicates, turns “1,250” into a number and dates into YYYY-MM-DD.</p><label class="drop" for="cvXls"><b>Choose .xlsx, .xls or .csv</b></label><input type="file" id="cvXls" accept=".xlsx,.xls,.csv" hidden></div>
+  </div>
+  <div class="card" id="cvOut"${CV.rows||CV.msg?"":" hidden"}><h3>${esc(CV.name||"Result")}</h3><p class="note" id="cvMsg" role="status">${esc(CV.msg||"")}</p>
+   <div class="qact" style="margin-bottom:10px"><label class="tg"><input type="checkbox" id="cvNum" checked> numbers</label><label class="tg"><input type="checkbox" id="cvDate" checked> dates</label><label class="tg"><input type="checkbox" id="cvDup" checked> remove duplicates</label><button class="mini" id="cvClean" type="button"${CV.rows?"":" disabled"}>Clean</button><button class="mini ok" id="cvDl" type="button"${CV.rows?"":" disabled"}>Download Excel</button></div>
+   ${CV.rows?convPreview(CV.rows):""}</div>`;
+  const msg=t=>{ CV.msg=t; const m=$("cvMsg"); if(m) m.textContent=t; else renderConv(); };
+  const base=n=>String(n||"converted").replace(/\.[^.]+$/,"").replace(/[^\w .-]+/g,"").trim()||"converted";
+  const pdfGo=async(f,word)=>{ if(!f) return; CV.name=f.name; CV.rows=null; CV.msg="Reading "+f.name+"…"; renderConv();
+    try{ const R=await convPdfPages(await f.arrayBuffer());
+      if(R.chars<20){ CV.msg="No text found: this looks like a scanned PDF (pictures). Open it in Word (File, Open) or ask for the original file."; renderConv(); return; }
+      if(word){ const html=convWordHtml(R.pages,f.name); await ofSave(new Blob(["﻿"+html],{type:"application/msword"}),base(f.name)+".doc"); CV.rows=R.pages[0].map(r=>r.cells); CV.msg=`Word file ready: ${R.n} page${R.n>1?"s":""}. It opens in Word; save it as .docx from there. Page 1 shown below.`; renderConv(); return; }
+      const sheets=R.pages.map((rows,i)=>["Page "+(i+1),rows.map(r=>r.cells.map(v=>convCell(v)))]); CV.rows=sheets[0][1]; CV.sheets=sheets; CV.kind="pdf";
+      await convXlsx(sheets,base(f.name)+".xlsx"); CV.msg=`Excel ready: ${sheets.length} sheet${sheets.length>1?"s":""}, one per page. Page 1 shown below; check merged cells by eye.`; renderConv(); }
+    catch(e){ CV.msg="This PDF could not be read here ("+(e.message||e)+")."; renderConv(); } };
+  const wireDrop=(lab,inp,fn)=>{ const L=p.querySelector(`label[for="${inp}"]`), I=$(inp); I.onchange=()=>fn(I.files[0]);
+    L.addEventListener("dragover",e=>{ e.preventDefault(); L.classList.add("over"); }); L.addEventListener("dragleave",()=>L.classList.remove("over"));
+    L.addEventListener("drop",e=>{ e.preventDefault(); L.classList.remove("over"); fn(e.dataTransfer.files[0]); }); };
+  wireDrop(0,"cvPdfX",f=>pdfGo(f,false)); wireDrop(0,"cvPdfW",f=>pdfGo(f,true));
+  wireDrop(0,"cvXls",async f=>{ if(!f) return; CV.name=f.name; CV.rows=null; CV.msg="Reading "+f.name+"…"; renderConv();
+    try{ const X=await loadXLSX(); const wb=X.read(new Uint8Array(await f.arrayBuffer()),{type:"array",cellDates:true}); if(wb.SheetNames.some(n=>/credential|password/i.test(n))) CV.msg="Skipped a sheet named like credentials or passwords. ";
+      const sheets=wb.SheetNames.filter(n=>!/credential|password/i.test(n)).map(n=>[n,X.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:true,defval:""})]); CV.sheets=sheets; CV.rows=sheets[0]?sheets[0][1]:[]; CV.kind="xls";
+      CV.msg=(CV.msg||"")+`${sheets.length} sheet${sheets.length>1?"s":""} read. Press Clean, then Download Excel.`; renderConv(); }catch(e){ CV.msg="This file could not be read here ("+(e.message||e)+")."; renderConv(); } });
+  let pastedHtml=null; $("cvPaste").addEventListener("paste",e=>{ try{ pastedHtml=e.clipboardData.getData("text/html")||null; }catch(x){ pastedHtml=null; } });
+  $("cvPasteGo").onclick=()=>{ const t=$("cvPaste").value; const rows=(pastedHtml&&convHtmlRows(pastedHtml))||convParseText(t); pastedHtml=null;
+    if(!rows.length){ CV.msg="Paste a table first."; CV.rows=null; renderConv(); return; } CV.name="Pasted table"; CV.rows=rows; CV.sheets=[["Table",rows]]; CV.kind="paste"; CV.msg=`${rows.length} rows, ${Math.max(...rows.map(r=>r.length))} columns. Press Clean if needed, then Download Excel.`; renderConv(); };
+  if($("cvClean")) $("cvClean").onclick=()=>{ const o={numbers:$("cvNum").checked,dates:$("cvDate").checked,dups:$("cvDup").checked}; let tot={emptyRows:0,emptyCols:0,dups:0};
+    CV.sheets=(CV.sheets||[["Table",CV.rows]]).map(([n,r])=>{ const C=convClean(r,o); tot.emptyRows+=C.stat.emptyRows; tot.emptyCols+=C.stat.emptyCols; tot.dups+=C.stat.dups; return [n,C.rows]; }); CV.rows=CV.sheets[0][1];
+    CV.msg=`Cleaned: ${tot.emptyRows} empty rows, ${tot.emptyCols} empty columns and ${tot.dups} duplicate rows removed; spaces trimmed${o.numbers?", numbers fixed":""}${o.dates?", dates as YYYY-MM-DD":""}.`; renderConv(); };
+  if($("cvDl")) $("cvDl").onclick=async()=>{ try{ await convXlsx(CV.sheets||[["Table",CV.rows]],base(CV.name)+(CV.kind==="xls"?" (clean)":"")+".xlsx"); msg("Excel downloaded."); }catch(e){ msg("Excel could not be made here ("+(e.message||e)+")."); } };
+}
 /* settings screens are view only for everyone but the admin */
 { const wrap=(get,set,id,keep)=>{ const o=get(); set(function(){ const r=o.apply(this,arguments); try{ lockPane(id,keep); }catch(e){} return r; }); };
   wrap(()=>renderSrc,f=>renderSrc=f,"p-src"); wrap(()=>dsRender,f=>dsRender=f,"p-dsrc"); wrap(()=>renderApps,f=>renderApps=f,"p-apps"); wrap(()=>renderDict,f=>renderDict=f,"p-dict","#kbT,#kbTry button"); wrap(()=>renderCmbx,f=>renderCmbx=f,"p-cmbx"); wrap(()=>renderTasks,f=>renderTasks=f,"p-tasks","[data-tkd],[data-tkp],[data-tkm]"); }
@@ -5127,7 +5224,7 @@ setTimeout(()=>{ try{ tdFocusWatch(); }catch(e){} try{ eodWatch(); histSnap(); s
     try{ csTick(); const D=wtDay(csDay(Date.now())); if(D) row=`<tr><td><b>${esc(csName("me"))}</b> (this browser)</td><td>${csTime(D.first)}</td><td>${csTime(D.last)}</td><td class="n">${asDur(D.active)}</td><td class="n">${asDur(D.away)}</td><td class="n">${asDur(D.brk)}</td><td class="n">${asDur(D.off)}</td></tr>`; }catch(e){}
     p.insertAdjacentHTML("beforeend",`<div class="card"><h3>Team working time <span class="dschip ds-off">Managers only</span></h3><p class="note">Active, Away, Break and Off in the tool, per person, today. In this demo each browser keeps only its own log, so only your row shows. On DP World servers every person's log goes to the team database and shows here. Each person sees only their own time. HR and Legal approve before real use.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Person</th><th>First seen</th><th>Last seen</th><th class="n">Active</th><th class="n">Away</th><th class="n">Break</th><th class="n">Off</th></tr></thead><tbody>${row||`<tr><td colspan="7" class="note">No time logged yet today.</td></tr>`}</tbody></table></div></div>`); }; }
-window.__rules = { gmTag, gmBoxFor, gmQuery, gmParseCompose, rateMoves, ddCost, aciCheck, rxTerms, ftDays, ckCustomers, ckForecast, decSet, decAll, smTarget, smOpts, smMargins, spRead, spRecipe, spLogAdd, kbImportRows, kbCheckRows, kbKnownPort, deptHealth, kpiStatus, deptMine, appName, applyBrand, ofCheck, ofVerify, ofRecord, ofNextNo, brandLogo, kbNorm, kbPort, kbAdd, kbAll, bm25Rank, kbMissAdd, gTraining, gAsk, GUIDE, teamScope, userLevel, execStats, execRisks, cycleStats, dirFind, fwdCase, DIR_MBX, isAdmin, tktNew, tktUpd, tktAll, errAdd, adminAlerts, lockPane, tkAll, tkMatrix, tkMark, tkDone, whoAmI, launchFacts, wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
+window.__rules = { convRows, convParseText, convHtmlRows, convCell, convClean, convWordHtml, gmTag, gmBoxFor, gmQuery, gmParseCompose, rateMoves, ddCost, aciCheck, rxTerms, ftDays, ckCustomers, ckForecast, decSet, decAll, smTarget, smOpts, smMargins, spRead, spRecipe, spLogAdd, kbImportRows, kbCheckRows, kbKnownPort, deptHealth, kpiStatus, deptMine, appName, applyBrand, ofCheck, ofVerify, ofRecord, ofNextNo, brandLogo, kbNorm, kbPort, kbAdd, kbAll, bm25Rank, kbMissAdd, gTraining, gAsk, GUIDE, teamScope, userLevel, execStats, execRisks, cycleStats, dirFind, fwdCase, DIR_MBX, isAdmin, tktNew, tktUpd, tktAll, errAdd, adminAlerts, lockPane, tkAll, tkMatrix, tkMark, tkDone, whoAmI, launchFacts, wtMgr, isDirector, navItems, mailDraft, apCfg, apActs, teamsChat, teamsMeet, telLink, QT, cyStage, teamStats, histSnap, histEod, myUrgent, eodModal, teamAlert, csLoad, rfqPlan, briefText, handOver, eodText, tdFocus, asScore, asNext, wtSeg, wtDay, wtMgr, tdParse, tdQuick, tdItems, dataCheck, buildLanes, npmMap, applyData, dataBoot, DL, marginStudy, maInputs, dsWhatsApp, dsNormalize, dsApply, dsRefresh, DS, rbSuspended, lastLaneMargin, QT, money, isStd, ruleMargin, gapInfo, expRows, impRows, endOfMonth, preChecks, MARGIN_RULES, CHINA_PORTS, MRG_DEF, quote, setOptRows:r=>{OPT_ROWS=r;}, setCargo:c=>{CARGO=c;} }; /* read-only hook for tests/rules.test.js */
 window.__route = route;
 })();
 </script>
