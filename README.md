@@ -102,7 +102,7 @@ Full table, one row per sub-screen: `TAB_MAP.csv`. Summary:
 
 ### 5.3 Browser-only storage (per user)
 
-Inbox cases and their settings (`csState_v2`, `csSet_v1`; `csMy_v1` only if "My shift" is ever switched on), which mailbox emails were answered or read (`ibxDone`, `ibxRead`), "My status" and leave plans (`csAvail_v1`), theme, last screen, view (pricing / sales).
+Inbox cases and their settings (`csState_v2`, `csSet_v1`; `csMy_v1` only if "My shift" is ever switched on), which mailbox emails were answered or read (`ibxDone`, `ibxRead`), "My status" and leave plans (`csAvail_v1`), handovers and ops account owners (`hoState_v1`), theme, last screen, view (pricing / sales).
 In production the cases must move to the database (see section 9).
 
 ## 6. Business rules built in
@@ -123,6 +123,7 @@ In production the cases must move to the database (see section 9).
 16. Rate history. In the Pricing view each standard buy rate shows how it moved since last month: ▲ and the amount (dearer, red), ▼ and the amount (cheaper, green), "= Oct" (no change) or "new". Sales never see it, because it is about buy rates. The last-month numbers in this pack are invented by a script.
 17. Lost quotes. A reason is required. For "Price too high" the competitor price is also required, or a tick that the customer did not say it. The sales person report then shows how far our sell was above the competitor price on average.
 18. Parts of a request. One email can ask for several things (FCL, LCL, EXW pickup, trucking, air). The tool finds the parts from words in the email; a person can add a part. Each part is answered on its own, or marked "cannot offer" with a reason. The request stays open and its SLA clock keeps running until every part is closed. An answer that covers only some parts says "Still to come: …" in the email, the list shows "Parts 1/3", and My day reminds the owner. An offer sent from Rates & offer closes the FCL part (and EXW pickup when the offer is EXW). LCL has no rates in this pack: the part can be tracked, but it is priced outside the tool.
+19. Handover to ops (Offers & feedback › Handover to ops). A quote marked Won shows as "no handover yet". Pricing starts the handover; it is filled from the quote. Fields: Scope (OFR / Pickup / Clearance / G-set), Shipper, Cnee, Incoterms, BKG#, UCR#, Volume, POL, POD, Buying rate, Selling rate, Payment term, Vessel ETD, Carrier, Billing party, Pricing PIC, Control party, and ticks for the attached BC, SD and client thread. Rules: one handover per booking; a real booking number is required (no number = PEN, it is not sent); Buying = line net; Selling = the number the client accepted, never TBC, also for collect shipments; internal only, never to the client. It goes to the ops person who owns the account (table kept by the leads), and the email opens as a draft. Ops accept it or send it back with what is missing. A handed-over booking becomes a row in Bookings (Carrier volumes), and the request timeline gets a fifth step, "Handed to ops". Ops see buying and selling; sales cannot open the screen.
 10. Spot rates only when the carrier says spot; valid for that sailing only.
 11. Sales never see buy rates, profit or the market band.
 
@@ -158,7 +159,7 @@ If these services are missing, the page still opens, shows the sample emails and
 ## 9. What we ask from IT (details in the IT Needs Map)
 
 1. Host the tool inside DP World, behind DP World login (Entra ID).
-2. Roles from Entra ID security groups (Pricing, Sales, Leads, Network), not from the email domain.
+2. Roles from Entra ID security groups (Pricing, Sales, Leads, Network, Ops), not from the email domain. Ops see buying and selling on the handover; sales do not.
 3. A database for team data (quotes, cases, feedback, logs) with an audit log.
 4. Read-only access to the pricing shared mailboxes and the Rate Bank files, limited to named items (Exchange RBAC for Applications, Graph Sites.Selected).
 5. Shared mailboxes: "Send As" for the team and a copy of sent mail saved in the shared box, so the SLA clock can stop.

@@ -120,7 +120,7 @@ body:not(.notes-on) #pgSub{display:none}
 .desk .deskSel{max-width:100%;min-width:0;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:13px}
 .desk .dfacts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px 14px;margin:12px 0 4px;font-size:13px}
 .desk .dfacts i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-bottom:1px}
-.desk .dtl{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.desk .dtl{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:6px}
 .desk .dtl li{position:relative;padding:10px 8px 0;border-top:3px solid var(--line);font-size:12px;min-width:0}
 .desk .dtl li.ok{border-top-color:var(--good,#1d7a4b)}.desk .dtl li b{display:block;font-size:12.5px}.desk .dtl li span{display:block;color:var(--muted);font-size:11.5px}
 .desk .dtl li em{display:block;font-style:normal;color:var(--muted);font-size:11.5px;overflow-wrap:anywhere}
@@ -186,6 +186,7 @@ textarea.ta,.ta{font-size:13px;line-height:1.45;resize:vertical}
 .nr{margin-top:10px;border:1px solid var(--line);border-left:4px solid var(--warn,#b7791f);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:12px}.nrS{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px}.nrN{width:22px;height:22px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:12px;font-weight:700}.nrS .list{margin-top:6px}.nrS .qal{padding:7px 10px}
 .rh{display:block;font:600 10.5px var(--f-body);color:var(--muted);white-space:nowrap;margin-top:1px}.rh.up{color:var(--bad)}.rh.dn{color:var(--good,#0a7a3e)}.rh.new{color:var(--accent)}
 .csParts{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0;display:flex;flex-direction:column;gap:6px}.csParts.one{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;border-style:dashed}.csParts .csSh{gap:8px}.csPAdd{margin-left:auto}.csPAdd select,.csPart select{width:auto;max-width:230px;padding:4px 8px;font-size:12.5px}.csPart{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.5px}.csPSt{color:var(--muted)}.csPAns{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:8px 0 2px}
+.hoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px 14px;margin-top:10px}.hoSc{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}.hoErr{margin:10px 0 0;padding:8px 12px 8px 28px;border:1px solid var(--bad);border-radius:10px;color:var(--bad);font-size:12.5px}.hoNote{margin:8px 0;padding:8px 12px;border-left:4px solid var(--bad);background:color-mix(in srgb,var(--bad) 8%,transparent);border-radius:8px;font-size:13px}.hoForm .csBtns{margin-top:12px;flex-wrap:wrap}
 details.whatif{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
 details.whatif summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);list-style:none;display:flex;align-items:center;gap:6px}
 details.whatif summary::-webkit-details-marker{display:none}
@@ -694,6 +695,7 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
     <section class="pane" id="p-ibx" hidden></section>
     <section class="pane" id="p-sheet" hidden></section>
     <section class="pane" id="p-plog" hidden></section>
+    <section class="pane" id="p-ho" hidden></section>
     <section class="pane" id="p-cases" hidden></section>
     <section class="pane" id="p-ckpi" hidden></section>
     <section class="pane" id="p-cmbx" hidden></section>
@@ -1222,9 +1224,10 @@ function renderDesk(){ const h=$("deskHead"); if(!h) return; const L=deskReqs(),
     ["Offer sent to sales",a?ibxWhen(a.created):"",!!a,a?`${a.car?esc(a.car)+" · ":""}sell USD ${money(a.sell||0)}`:"pricing prices it here"],
     ["Sent to the customer",a&&a.custAt?ibxWhen(a.custAt):"",!!(a&&(a.toCust!==false||a.status!=="pending")),a&&a.toCust===false&&a.status==="pending"?`waiting for ${esc(who.split(" ")[0])}`:"by sales"],
     ["Won or lost",a&&(st==="won"||st==="lost")?(a.closedAt?ibxWhen(a.closedAt):""):"",!!(a&&(st==="won"||st==="lost")),a&&st==="lost"&&a.reason?esc(a.reason):a&&st==="won"?"booking":"sales tells pricing"]];
+  try{ if(pr){ const hh=a?hoOf(a.id):null; T.push(["Handed to ops",hh&&hh.sentAt?csWhen(hh.sentAt):"",!!(hh&&hh.sentAt),hh?(hh.st==="accepted"?"accepted by "+esc(hoName(hh.ops)):hh.st==="missing"?"sent back: missing info":hh.st==="sent"?"waiting for "+esc(hoName(hh.ops)):hh.st==="pen"?"PEN: no booking number":"draft"):"after the booking"]); } }catch(x){}
   h.innerHTML=`<div class="dtop"><div><span class="qno">${esc(ibxNo(e))}</span><b class="dcust">${esc(r.cust||"Request")}</b><span class="pill ${stCls}">${stTxt}</span>${sl}</div>${pick}</div>
    <div class="dfacts"><span><i>Lane</i>${esc(r.pol||"?")} → ${esc(r.pod||"?")}</span><span><i>Containers</i>${r.qty} × ${r.size}' ${esc(r.type||"")}</span><span><i>Commodity</i>${esc(r.cmd||"—")}</span><span><i>${e.kind==="net"?"Network":"Sales"}</i>${esc(who)}</span><span><i>Target</i>${r.target?"USD "+money(r.target):"not given"}</span></div>
-   <ol class="dtl">${T.map(([t,w,ok,d])=>`<li class="${ok?"ok":""}"><b>${t}</b><span>${w||"&nbsp;"}</span><em>${d}</em></li>`).join("")}</ol><div id="deskFb" class="dfb"></div>`; try{ renderFbLane(); }catch(x){}
+   <ol class="dtl" style="--n:${T.length}">${T.map(([t,w,ok,d])=>`<li class="${ok?"ok":""}"><b>${t}</b><span>${w||"&nbsp;"}</span><em>${d}</em></li>`).join("")}</ol><div id="deskFb" class="dfb"></div>`; try{ renderFbLane(); }catch(x){}
   const sel=h.querySelector("#deskPick"); if(sel) sel.onchange=ev=>{ const x=IBX.items.find(y=>y.id===ev.target.value); if(x) ibxToQuote(x); }; }
 // ---------- Rates & offer in 3 steps: 1 lane and rates, 2 profit and checks, 3 offer email ----------
 let LSTEP=1;
@@ -2821,6 +2824,10 @@ function mdPricing(L){ const now=Date.now(), me=CSV.me, lead=avLead(me), open=L.
   const q=c=>`<span class="qno">${esc(c.id)}</span>${esc(c.subj.slice(0,60))}`;
   if(brM.length) I.push({sev:"exp",txt:`<b>${brM.length} of your requests ${brM.length>1?"are":"is"} over the SLA.</b> Most late: ${q(brM[0])} · ${csDur(-st(brM[0]).left)} over`,act:"case:"+brM[0].id});
   if(nextM){ const s=st(nextM); I.push({sev:s.st==="soon"?"warn":"fu",txt:`<b>Next for you:</b> ${q(nextM)} · ${s.paused?"clock paused, ":""}${csDur(s.left)} left`,act:"case:"+nextM.id}); }
+  try{ const HH=hoLoad().items, back=HH.filter(h=>h.st==="missing"), wonNo=QT.items.filter(x=>effStatus(x)==="won"&&!hoOf(x.id)), pen=HH.filter(h=>h.st==="pen");
+    if(back.length) I.push({sev:"exp",txt:`<b>${back.length} handover${back.length>1?"s":""} came back from ops:</b> ${back.slice(0,2).map(h=>esc(h.f.shipper)+" ("+esc(h.note)+")").join(", ")}`,act:"tab:ho",btn:"Fix"});
+    if(wonNo.length) I.push({sev:"warn",txt:`<b>${wonNo.length} won quote${wonNo.length>1?"s have":" has"} no handover to ops yet.</b>`,act:"tab:ho",btn:"Hand over"});
+    if(pen.length) I.push({sev:"fu",txt:`<b>${pen.length} booking${pen.length>1?"s are":" is"} PEN</b> (no booking number yet): the handover waits.`,act:"tab:ho",btn:"Open"}); }catch(e){}
   mine.forEach(c=>{ const P=csP(c); if(P&&P.some(x=>x.st!=="open")){ const rest=csPOpen(c); if(rest.length) I.push({sev:"warn",txt:`<b>${rest.length} part${rest.length>1?"s":""} still open</b> in ${q(c)}: ${esc(csPNames(rest))}. The customer has only part of the answer.`,act:"case:"+c.id}); } });
   if(CS_AVAIL_ON){ const c=avCur(me), S=CS_ST[c.t]; if(c.since&&S[2]&&(now-c.since)/6e4>S[2]) I.push({sev:"warn",txt:`<b>Your status is ${S[0]}</b> since ${csTime(c.since)} (usual length ${csDur(S[2])}). New requests are not assigned to you.`,act:"st:ok",btn:"I am back"}); }
   if(lead){ const brT=open.filter(c=>st(c).st==="breach"&&c.who!==me); if(brT.length) I.push({sev:"exp",txt:`<b>Team: ${brT.length} request${brT.length>1?"s":""} over the SLA</b> · ${[...new Set(brT.map(c=>c.who?csName(c.who):"no owner"))].join(", ")}`,act:"f:breach",btn:"Show"});
@@ -2943,6 +2950,88 @@ function csPartsHtml(c){ const P=csP(c), miss=Object.keys(CS_PART).filter(k=>!(P
      <span class="qact">${p.st==="open"?`<select data-pwhy="${p.k}" aria-label="Why ${CS_PART[p.k]} cannot be offered"><option value="">Cannot offer because…</option>${CS_PNA.map(w=>`<option>${esc(w)}</option>`).join("")}</select>`:c.sub?"":`<button class="mini" data-pre="${p.k}">Reopen</button>`}</span></div>`).join("")}</div>`; }
 // close the request when no part is open any more
 function csPClose(c,now,by){ const P=csP(c); if(!P||c.sub||P.some(p=>p.st==="open")) return false; c.sub=now; c.subBy=by; c.status="submitted"; c.log.push([now,"Every part is closed · clock stopped"]); return true; }
+
+// ---------- Handover to ops: pricing hands a won booking to the ops person who owns the account ----------
+// Rules: one handover per booking · a real booking number is required (no number = PEN, not sent) · internal only, never to the client ·
+// Buying = line net · Selling = the number the client accepted, never TBC (collect shipments too) · the email is a draft, a person sends it.
+// Ops see buying and selling. Sales never open this screen.
+const HO_K="hoState_v1";
+const HO_OPS=[{id:"farida",name:"Farida Nassar",mail:"farida.nassar@ops.dpw-demo"},{id:"tarek",name:"Tarek Mansour",mail:"tarek.mansour@ops.dpw-demo"}];
+const HO_OWN_DEF=[["Nile Valley Foods","farida"],["Gulf Home Retail","farida"],["Delta Ceramics","tarek"]];
+const HO_SCOPE=["OFR","Pickup","Clearance","G-set"], HO_PAY=["Prepaid","Collect","Credit 30 days","Cash against documents"], HO_INCO=["EXW","FCA","FOB","CFR","CIF","DAP","DDP"];
+const HO_F=[["shipper","Shipper"],["cnee","Cnee"],["inco","Incoterms"],["bkg","BKG#"],["ucr","UCR#"],["vol","Volume"],["pol","POL"],["pod","POD"],["buy","Buying rate"],["sell","Selling rate"],["pay","Payment term"],["etd","Vessel ETD"],["car","Carrier"],["bill","Billing party"],["pic","Pricing PIC"],["ctrl","Control party"]];
+const HO_ATT=[["bc","Booking confirmation (BC)"],["sd","Shipping declaration (SD)"],["thread","Client email thread"]];
+const HO_ST={draft:["Draft","seen"],pen:["PEN · no booking number","open"],sent:["Sent to ops","pending"],accepted:["Accepted by ops","won"],missing:["Missing info","lost"]};
+let HO=null; const HOV={as:"pricing",open:null,msg:"",errs:[]}, HO_BK=new Set();
+function hoLoad(){ if(HO) return HO; try{ HO=JSON.parse(localStorage.getItem(HO_K)||"null"); }catch(e){ HO=null; } if(!HO||!Array.isArray(HO.items)) HO={items:[],own:HO_OWN_DEF.map(x=>x.slice())}; return HO; }
+function hoSave(){ try{ localStorage.setItem(HO_K,JSON.stringify(HO)); }catch(e){} }
+function hoName(id){ return (HO_OPS.find(x=>x.id===id)||{}).name||"Ops"; }
+function hoOwner(cust){ const H=hoLoad(), s=String(cust||"").toLowerCase(), m=H.own.find(([k])=>k&&s.includes(String(k).toLowerCase())); if(m) return {id:m[1],why:"account owner of "+m[0]};
+  const load=id=>H.items.filter(x=>x.ops===id&&x.st==="sent").length; return {id:HO_OPS.slice().sort((a,b)=>load(a.id)-load(b.id))[0].id,why:"no account owner set: fewest open handovers"}; }
+function hoOf(qid){ return hoLoad().items.find(x=>x.qid===qid); }
+function hoMe(){ return HOV.as==="pricing"?(QT.meName||csName(CSV.me)):hoName(HOV.as); }
+function hoNew(q){ const o=hoOwner(q.customer), now=Date.now();
+  return {id:"h"+now.toString(36)+Math.random().toString(36).slice(2,5),qid:q.id,no:q.no||"",st:"draft",ops:o.id,opsWhy:o.why,created:now,sentAt:null,ackAt:null,note:"",att:{},scope:["OFR"].concat(q.inco==="EXW"?["Pickup"]:[]),log:[[now,"Handover started by "+hoMe()+" from the won quote "+(q.no||"")]],
+    f:{shipper:q.customer||"",cnee:"",inco:q.inco||"",bkg:q.booking||"",ucr:"",vol:(q.qty||1)+" x "+(q.eq||""),pol:q.pol||"",pod:q.pod||"",buy:q.buy!=null?String(q.buy):"",sell:q.sell!=null?String(q.sell):"",pay:"",etd:"",car:q.car||"",bill:q.customer||"",pic:q.pricedBy||"Pricing",ctrl:"",seller:q.seller||"",qty:q.qty||1,eq:q.eq||""}}; }
+function hoCheck(h){ const f=h.f, E=[]; if(!String(f.bkg||"").trim()||/wait|\bpen\b|tbc|tba|pending/i.test(f.bkg)) return {pen:true,E:["No booking number yet (waiting SD or waiting booking). This booking is PEN: the handover cannot be sent."]};
+  const dup=hoLoad().items.find(x=>x.id!==h.id&&String(x.f.bkg).trim().toLowerCase()===String(f.bkg).trim().toLowerCase()); if(dup) E.push("BKG# "+f.bkg+" already has a handover ("+(dup.no||dup.f.shipper)+"). One handover per booking.");
+  if(!h.scope.length) E.push("Tick the scope (OFR, Pickup, Clearance, G-set).");
+  HO_F.forEach(([k,l])=>{ if(k!=="ucr"&&k!=="buy"&&k!=="sell"&&!String(f[k]||"").trim()) E.push(l+" is missing."); });
+  if(!(parseFloat(f.buy)>0)) E.push("Buying rate must be a number: the line net rate.");
+  if(!(parseFloat(f.sell)>0)) E.push("Selling rate must be a number: the price the client accepted, never TBC (collect shipments too).");
+  HO_ATT.forEach(([k,l])=>{ if(!h.att[k]) E.push("Attach to the email and tick: "+l+"."); });
+  return {pen:false,E}; }
+function hoMail(h){ const f=h.f, o=HO_OPS.find(x=>x.id===h.ops)||HO_OPS[0];
+  const L=[["Scope",h.scope.join(" / ")]].concat(HO_F.map(([k,l])=>[l,k==="buy"||k==="sell"?"USD "+money(parseFloat(f[k]))+" per container":k==="etd"?fmtDate(f.etd):f[k]||"—"]));
+  return gmCompose(IBX_PRICING,o.mail,"Handover - "+f.shipper+" - BKG# "+f.bkg,"Dear "+o.name.split(" ")[0]+",\n\nPlease find the handover below.\n\n"+L.map(([l,v])=>l+": "+v).join("\n")+"\n\nAttached: "+HO_ATT.filter(([k])=>h.att[k]).map(([,l])=>l).join(", ")+"\n\nCarrier rate (line) - email below\n\nBest regards,\n"+f.pic+"\nPricing team\nDP World Logistics - Egypt\n\nDEMO email with dummy data. Internal: not for the client."); }
+// a handed-over booking is a row in Bookings (Carrier volumes), so no second sheet is needed
+function hoBookings(){ try{ hoLoad().items.filter(h=>h.sentAt&&!HO_BK.has(h.id)).forEach(h=>{ HO_BK.add(h.id); const f=h.f, is20=/^20/.test(f.eq||""), n=+f.qty||1;
+    (DATA.bookings=DATA.bookings||[]).push({m:new Date(h.sentAt).toLocaleDateString("en-GB",{month:"short"}),car:f.car,vol:n,eq:String(f.eq||"").replace(/['\s]/g,""),teu:n*(is20?1:2),cg:f.cnee,sh:f.shipper,src:f.seller||f.pic,own:f.pic,bkg:f.bkg,ho:true}); }); }catch(e){} }
+function hoRead(h,root){ root.querySelectorAll("[data-hf]").forEach(i=>{ h.f[i.dataset.hf]=i.value.trim(); }); h.scope=[...root.querySelectorAll("[data-hs]:checked")].map(i=>i.dataset.hs); HO_ATT.forEach(([k])=>{ const i=root.querySelector(`[data-ha="${k}"]`); if(i) h.att[k]=i.checked; }); const o=root.querySelector("#hoOps"); if(o&&o.value!==h.ops){ h.ops=o.value; h.opsWhy="chosen by hand"; } }
+function hoForm(h){ const f=h.f, ro=HOV.as!=="pricing"||h.st==="sent"||h.st==="accepted", dis=ro?" disabled":"";
+  const inp=(k,l)=>{ const v=esc(f[k]||""); if(k==="pay") return `<label class="f">${l}<select data-hf="pay"${dis}><option value=""></option>${HO_PAY.map(x=>`<option${f.pay===x?" selected":""}>${x}</option>`).join("")}</select></label>`;
+    if(k==="inco") return `<label class="f">${l}<select data-hf="inco"${dis}><option value=""></option>${HO_INCO.map(x=>`<option${f.inco===x?" selected":""}>${x}</option>`).join("")}</select></label>`;
+    if(k==="etd") return `<label class="f">${l}<input type="date" data-hf="etd" value="${v}"${dis}></label>`;
+    if(k==="buy"||k==="sell") return `<label class="f">${l}, USD per container <span class="note">${k==="buy"?"line net":"accepted by the client"}</span><input type="number" min="0" step="5" data-hf="${k}" value="${v}"${dis}></label>`;
+    return `<label class="f">${l}${k==="ucr"?' <span class="note">if there is one</span>':""}<input type="text" data-hf="${k}" value="${v}"${dis}></label>`; };
+  const buy=parseFloat(f.buy), sell=parseFloat(f.sell), n=+f.qty||1;
+  return `<div class="card hoForm" id="hoForm"><div class="csSh"><h3>Handover · ${esc(f.shipper||"—")} · BKG# ${esc(f.bkg||"—")}</h3>${h.no?`<span class="qno">${esc(h.no)}</span>`:""}<span class="pill ${HO_ST[h.st][1]}">${HO_ST[h.st][0]}${h.st==="sent"||h.st==="accepted"?" · "+esc(hoName(h.ops)):""}</span></div>
+   ${h.st==="missing"&&h.note?`<div class="hoNote"><b>${esc(hoName(h.ops))} sent it back:</b> ${esc(h.note)}</div>`:""}
+   <div class="hoSc"><b>Scope</b>${HO_SCOPE.map(s=>`<label class="csCk"><input type="checkbox" data-hs="${s}"${h.scope.includes(s)?" checked":""}${dis}> ${s}</label>`).join("")}</div>
+   <div class="hoGrid">${HO_F.map(([k,l])=>inp(k,l)).join("")}</div>
+   ${buy>0&&sell>0?`<p class="note" style="margin:8px 0 0">Buying USD ${money(buy)} + profit USD ${money(sell-buy)} = selling USD ${money(sell)} per container · ${n} container${n>1?"s":""}: profit USD ${money((sell-buy)*n)} in total. Numbers from the won quote; change them only if the booking confirmation says otherwise.</p>`:""}
+   <div class="hoSc" style="margin-top:10px"><b>Attached to the email</b>${HO_ATT.map(([k,l])=>`<label class="csCk"><input type="checkbox" data-ha="${k}"${h.att[k]?" checked":""}${dis}> ${l}</label>`).join("")}</div>
+   ${HOV.as==="pricing"?`<div class="hoSc" style="margin-top:10px"><b>Goes to</b><select id="hoOps"${dis} style="width:auto">${HO_OPS.map(o=>`<option value="${o.id}"${o.id===h.ops?" selected":""}>${esc(o.name)}</option>`).join("")}</select><span class="note">${esc(h.opsWhy||"")}</span></div>`:""}
+   ${HOV.errs.length?`<ul class="hoErr">${HOV.errs.map(e=>`<li>${esc(e)}</li>`).join("")}</ul>`:""}
+   <div class="csBtns">${HOV.as==="pricing"?(ro?`<a class="mini ok" target="_blank" rel="noopener" href="${esc(hoMail(h))}">Open the handover email draft</a><span class="note">A draft to ${esc(hoName(h.ops))} only. You attach the files and press Send. Never to the client.</span>`:`<button class="btn primary" id="hoSend">${h.st==="missing"?"Send to ops again":"Send to ops"}</button><button class="mini" id="hoSaveB">Save draft</button><button class="mini bad" id="hoDel">Delete draft</button>`)
+     :h.st==="sent"?`<button class="btn primary" id="hoAcc">Accept the booking</button><input type="text" id="hoMiss" placeholder="What is missing or wrong?" style="max-width:320px"><button class="mini bad" id="hoBack">Send back: missing info</button>`:`<span class="note">${h.st==="accepted"?"You accepted this booking "+csWhen(h.ackAt)+".":"Sent back to pricing."}</span>`}<span class="note" id="hoMsg" aria-live="polite">${esc(HOV.msg)}</span></div>
+   <details class="csLog"><summary>Handover history</summary><ul>${h.log.map(([t0,w])=>`<li><span class="note">${csWhen(t0)}</span> ${esc(w)}</li>`).join("")}</ul></details></div>`; }
+function renderHo(){ const p=$("p-ho"); if(!p) return; const H=hoLoad(), pr=HOV.as==="pricing", won=QT.items.filter(q=>effStatus(q)==="won"), wait=won.filter(q=>!hoOf(q.id));
+  const L=H.items.filter(h=>pr||(h.ops===HOV.as&&h.st!=="draft"&&h.st!=="pen")).sort((a,b)=>(b.sentAt||b.created)-(a.sentAt||a.created)), cur=L.find(h=>h.id===HOV.open)||null;
+  const row=h=>`<button class="csRow${HOV.open===h.id?" on":""}" data-ho="${h.id}"><span class="csT"><b>${esc(h.f.shipper||"—")} · ${esc(h.f.pol)} → ${esc(h.f.pod)}</b><span class="note">${h.no?`<span class="qno">${esc(h.no)}</span>`:""}BKG# ${esc(h.f.bkg||"—")} · ${esc(h.f.car)}</span></span><span class="csM"><span class="pill ${HO_ST[h.st][1]}">${HO_ST[h.st][0]}</span><span class="note">${pr?"to "+esc(hoName(h.ops)):"from "+esc(h.f.pic)} · ${csWhen(h.sentAt||h.created)}</span></span></button>`;
+  p.innerHTML=`<div class="csBar2"><div class="csF"><span class="note" style="align-self:center">View as (demo)</span><button class="mini${pr?" ok":""}" data-hv="pricing">Pricing</button>${HO_OPS.map(o=>`<button class="mini${HOV.as===o.id?" ok":""}" data-hv="${o.id}">Ops · ${esc(o.name)}</button>`).join("")}</div><span class="note">Internal only: pricing and ops. Ops see buying and selling. Sales do not open this screen.</span></div>
+  ${pr?`<div class="card"><h3>Won quotes with no handover yet <span class="note">· ${wait.length}</span></h3>${wait.length?`<div class="list">${wait.map(q=>`<div class="qal ${q.booking?"warn":"fu"}"><span><i class="sev"></i>${q.no?`<span class="qno">${esc(q.no)}</span>`:""}<b>${esc(q.customer||"—")}</b> · ${esc(q.pol)} → ${esc(q.pod)} · ${q.qty||1} × ${esc(q.eq||"")} · ${esc(q.car||"")}<br><small>${q.booking?"booking "+esc(q.booking):"no booking number yet: PEN"} · sales ${esc(q.seller||"—")} · priced by ${esc(q.pricedBy||"—")}</small></span><span class="qact"><button class="mini ok" data-hon="${esc(q.id)}">Start handover</button></span></div>`).join("")}</div>`:'<p class="note">Nothing waiting. A quote shows here when sales mark it Won.</p>'}</div>`:""}
+  <div class="csWrap"><div class="csList">${L.length?L.map(row).join(""):`<p class="note" style="padding:12px">${pr?"No handovers yet.":"No handover for "+esc(hoName(HOV.as))+" yet."}</p>`}</div><div>${cur?hoForm(cur):`<div class="card"><p class="note">Pick a handover on the left${pr?", or start one from a won quote above":""}.</p></div>`}</div></div>
+  ${pr?`<div class="card"><h3>Who owns which account in ops</h3><p class="note" style="margin:0 0 8px">If the shipper name has one of these words, the handover goes to that person. Checked from the top. If nothing fits, it goes to the ops person with the fewest open handovers.</p>
+    <div class="csTblW"><table class="csTbl"><thead><tr><th>If the shipper has</th><th>Ops owner</th><th></th></tr></thead><tbody>${H.own.map(([k,w],i)=>`<tr><td><input type="text" data-hok="${i}" value="${esc(k)}" placeholder="e.g. Nile Valley Foods"></td><td><select data-how="${i}">${HO_OPS.map(o=>`<option value="${o.id}"${o.id===w?" selected":""}>${esc(o.name)}</option>`).join("")}</select></td><td><button class="mini bad" data-hod="${i}">Remove</button></td></tr>`).join("")}</tbody></table></div>
+    <div class="csBtns"><button class="mini" id="hoOwnAdd">Add a line</button><button class="btn primary" id="hoOwnSave">Save owners</button><span class="note" id="hoOwnMsg"></span></div></div>`:""}`;
+  HOV.msg=""; const again=()=>renderHo(), now=()=>Date.now();
+  p.querySelectorAll("[data-hv]").forEach(b=>b.onclick=()=>{ HOV.as=b.dataset.hv; HOV.open=null; HOV.errs=[]; again(); });
+  p.querySelectorAll("[data-ho]").forEach(b=>b.onclick=()=>{ HOV.open=b.dataset.ho; HOV.errs=[]; again(); });
+  p.querySelectorAll("[data-hon]").forEach(b=>b.onclick=()=>{ const q=QT.items.find(x=>x.id===b.dataset.hon); if(!q||hoOf(q.id)) return; const h=hoNew(q); H.items.unshift(h); HOV.open=h.id; HOV.errs=[]; hoSave(); again(); const el=$("hoForm"); if(el) el.scrollIntoView({block:"start"}); });
+  const F=$("hoForm");
+  if(cur&&F){ const sv=$("hoSaveB"), sd=$("hoSend"), dl=$("hoDel"), ac=$("hoAcc"), bk=$("hoBack");
+    if(sv) sv.onclick=()=>{ hoRead(cur,F); const c=hoCheck(cur); cur.st=c.pen?"pen":cur.st==="missing"?"missing":"draft"; HOV.errs=[]; HOV.msg="Saved."; hoSave(); again(); };
+    if(dl) dl.onclick=()=>{ H.items=H.items.filter(x=>x.id!==cur.id); HOV.open=null; HOV.errs=[]; hoSave(); again(); };
+    if(sd) sd.onclick=()=>{ hoRead(cur,F); const c=hoCheck(cur); if(c.pen){ cur.st="pen"; HOV.errs=c.E; hoSave(); again(); return; } if(c.E.length){ if(cur.st==="pen") cur.st="draft"; HOV.errs=c.E; hoSave(); again(); return; }
+      const t0=now(), first=!cur.sentAt; cur.st="sent"; cur.sentAt=cur.sentAt||t0; cur.note=""; cur.log.push([t0,(first?"Sent to ":"Sent again to ")+hoName(cur.ops)+" by "+hoMe()+" ("+(cur.opsWhy||"")+")"]); HOV.errs=[]; HOV.msg="Handed over. Now open the email draft, attach the files and press Send."; hoSave(); hoBookings(); again(); };
+    if(ac) ac.onclick=()=>{ const t0=now(); cur.st="accepted"; cur.ackAt=t0; cur.log.push([t0,"Accepted by "+hoName(cur.ops)]); hoSave(); again(); };
+    if(bk) bk.onclick=()=>{ const n=($("hoMiss")||{}).value.trim(); if(!n){ HOV.msg="Write what is missing first."; again(); return; } const t0=now(); cur.st="missing"; cur.note=n; cur.log.push([t0,"Sent back by "+hoName(cur.ops)+": "+n]); hoSave(); again(); }; }
+  const rd=()=>[...p.querySelectorAll("[data-hok]")].map(i=>[i.value.trim(),p.querySelector(`[data-how="${i.dataset.hok}"]`).value]);
+  if($("hoOwnAdd")) $("hoOwnAdd").onclick=()=>{ H.own=rd(); H.own.push(["",HO_OPS[0].id]); again(); };
+  if($("hoOwnSave")) $("hoOwnSave").onclick=()=>{ H.own=rd().filter(([k])=>k); hoSave(); again(); $("hoOwnMsg").textContent="Saved. New handovers use these owners."; };
+  p.querySelectorAll("[data-hod]").forEach(b=>b.onclick=()=>{ H.own=rd(); H.own.splice(+b.dataset.hod,1); hoSave(); again(); }); }
+try{ hoBookings(); }catch(e){}
 
 // ---------- Cases page ----------
 const CSV={box:"all",f:"open",open:null,cat:null,me:"me"};
@@ -3100,15 +3189,15 @@ const NAV={
          ["Reference",[["trk","Trucking rates","truck"],["info","Help","help"]],"everyone"]]
 };
 // merged tabs: one nav item, a small switch on top of the page
-const SUBS={cases:[["cases","Inbox"],["ckpi","Team KPIs"],["cmbx","Mailboxes & SLA"]],q:[["q","Offers & quotes"],["fb","Sales feedback"]],lane:[["lane","Rates & offer"],["svc","Alliance loops"]],sheet:[["sheet","Rate Data Base"],["trk","Trucking rates"],["off","Carrier offers"],["req","Ask carriers"],["plog","Pricing log"],["hl","Rate check"]],home:[["home","Overview"],["dem","Customer requests"],["gw","Market alerts"],["vol","Carrier volumes"]],info:[["info","Help"],["src","Settings & sources"]]};
+const SUBS={cases:[["cases","Inbox"],["ckpi","Team KPIs"],["cmbx","Mailboxes & SLA"]],q:[["q","Offers & quotes"],["fb","Sales feedback"],["ho","Handover to ops"]],lane:[["lane","Rates & offer"],["svc","Alliance loops"]],sheet:[["sheet","Rate Data Base"],["trk","Trucking rates"],["off","Carrier offers"],["req","Ask carriers"],["plog","Pricing log"],["hl","Rate check"]],home:[["home","Overview"],["dem","Customer requests"],["gw","Market alerts"],["vol","Carrier volumes"]],info:[["info","Help"],["src","Settings & sources"]]};
 const SUBS_SALES={q:"My offers & quotes",fb:"Feedback to pricing"};
 const PAR={}; Object.keys(SUBS).forEach(k=>SUBS[k].forEach(([c])=>PAR[c]=k));
 function navKey(t){ const k=PAR[t]; try{ return k&&navItems().some(g=>g[1].some(x=>x[0]===k))?k:t; }catch(e){ return k||t; } }
 function renderSub(t){ let bar=$("subsw"); const pk=navKey(t), L=SUBS[pk]; if(!bar){ bar=document.createElement("div"); bar.id="subsw"; bar.className="subsw"; bar.setAttribute("role","group"); bar.setAttribute("aria-label","Part of this page"); const w=$("work"); w.insertBefore(bar,w.firstChild); }
-  const ok=L&&(isPricing()||pk!=="info"); bar.hidden=!ok; if(!ok) return; bar.innerHTML=L.map(([k,l])=>`<button type="button" data-sk="${k}" aria-pressed="${k===t}">${esc((!isPricing()&&SUBS_SALES[k])||l)}</button>`).join(""); bar.querySelectorAll("[data-sk]").forEach(x=>x.onclick=()=>openTab(x.dataset.sk)); }
+  const ok=L&&(isPricing()||pk!=="info"); bar.hidden=!ok; if(!ok) return; bar.innerHTML=L.filter(([k])=>isPricing()||k!=="ho").map(([k,l])=>`<button type="button" data-sk="${k}" aria-pressed="${k===t}">${esc((!isPricing()&&SUBS_SALES[k])||l)}</button>`).join(""); bar.querySelectorAll("[data-sk]").forEach(x=>x.onclick=()=>openTab(x.dataset.sk)); }
 const NAVOPEN=new Set(["Data and reports","Reference"]);
 const PAGE={cases:["Inbox","Every email is one request: one number, an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
-  q:["Offers & quotes","Offers pricing sent to sales, and quotes sales sent to customers"],fb:["Sales feedback","What sales hear from customers, with pricing's replies"],off:["Carrier offers","A carrier email or Excel turned into Rate Bank rows"],
+  ho:["Handover to ops","A won quote with a booking number goes to the ops person who owns the account · internal only · demo with dummy data"],q:["Offers & quotes","Offers pricing sent to sales, and quotes sales sent to customers"],fb:["Sales feedback","What sales hear from customers, with pricing's replies"],off:["Carrier offers","A carrier email or Excel turned into Rate Bank rows"],
   req:["Ask carriers","Monthly “Rate Idea” emails to the lines"],svc:["Alliance loops","Reference list of liner rotations that call Egypt, 19 Oct 2026"],vol:["Carrier volumes","What we booked with each line, for contract and volume talks"],trk:["Trucking rates","Pickup in Egypt for EXW requests, and cross-border trucks"],hl:["Rate Bank check","Rows in the Rate Bank that are wrong or easy to misread"],gw:["Market alerts","Disruptions, rate-increase notices and the weekly market index"],info:["Help","How the platform works and where the numbers come from"]};
 const PAGE_SALES={ibx:["Inbox","Your customer requests from email · demo with dummy data"],lane:["Find a rate","Route, carrier rates, customer offer and quotation"],q:["My offers & quotes","Pricing's offers to you, your quotes to customers, follow-ups and hit ratio"],fb:["Feedback to pricing","Tell pricing what the customer said and read their answer"]};
 const SHORT={cases:"Inbox",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
@@ -3138,9 +3227,10 @@ function setTitle(t){ const P=(!isPricing()&&PAGE_SALES[t])||PAGE[t]||["",""]; $
 document.addEventListener("click",e=>{ const c=e.target.closest&&e.target.closest(".cmt"); if(!c) return; e.stopPropagation(); c.classList.toggle("open"); c.title=c.classList.contains("open")?"Click to shorten":"Click to read the full note"; },true);
 function openTab(t,quiet){
   // one Inbox: pricing works in the merged list (cases), sales keep "my requests" (ibx)
+  if(t==="ho"&&!isPricing()) t="q";   // the handover shows buy rates: pricing and ops only, never sales
   if(t==="ibx"&&isPricing()) t="cases"; else if((t==="cases"||t==="ckpi"||t==="cmbx")&&!isPricing()) t="ibx";
   if(!allowed(t)) t="lane";
-  const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
+  const panes=["ho","cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
   panes.forEach(k=>{ const p=$("p-"+k); if(p) p.hidden=k!==t; });
   { const wasNo=document.body.classList.contains("nomap"); const noMap=!["home","lane","dem","svc"].includes(t); document.body.classList.toggle("nomap",noMap); if(wasNo&&!noMap) setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
   document.querySelectorAll("#nav button[data-k],#bnav button[data-k]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.k===navKey(t)))); renderSub(t);
@@ -3163,7 +3253,7 @@ function openTab(t,quiet){
   if(t==="gw") renderGw();
   if(t==="src") renderSrc();
   if(t==="plog") renderPlog();
-  if(t==="cases") renderCases(); if(t==="ckpi") renderCkpi(); if(t==="cmbx") renderCmbx();
+  if(t==="cases") renderCases(); if(t==="ckpi") renderCkpi(); if(t==="cmbx") renderCmbx(); if(t==="ho") renderHo();
   lsSet("rg-tab",t);
 }
 function setTheme(th){ document.documentElement.setAttribute("data-theme",th); lsSet("rg-theme",th); $("themeIc").setAttribute("href",th==="dark"?"#i-sun":"#i-moon"); }
