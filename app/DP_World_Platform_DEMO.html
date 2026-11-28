@@ -175,7 +175,8 @@ textarea.ta,.ta{font-size:13px;line-height:1.45;resize:vertical}
 #of-mkt:not([hidden])~#mktEmpty{display:none}#p-lane:not([data-step="1"]) #deskHead .dtl,#p-lane:not([data-step="1"]) #deskHead .dfb{display:none}#mktSlot .ofmkt{margin-top:0}
 .card.fold>h3{cursor:pointer;margin-bottom:0}.card.fold>h3::before{content:"▸ ";color:var(--muted)}.card.fold.open>h3{margin-bottom:10px}.card.fold.open>h3::before{content:"▾ "}.card.fold:not(.open)>*:not(h3){display:none!important}
 @media(max-width:560px){.lsteps button .t span{display:none}.lsteps button{padding:8px}}
-.avBar{margin:12px 0;padding:12px 16px}.avRow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}.avChips{display:flex;flex-wrap:wrap;gap:6px;margin-right:auto}.avChips .csChip{padding:5px 11px}.avChips .csChip:disabled{opacity:.45;cursor:default}.avLv{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px}.csTbl input[type=time]{width:auto;padding:3px 6px}
+.avBar{margin:12px 0;padding:10px 16px}.csOff{padding:8px 16px}.avRow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}.avChips{display:flex;flex-wrap:wrap;gap:6px;margin-right:auto}.avChips .csChip{padding:5px 11px}.avChips .csChip:disabled{opacity:.45;cursor:default}.avLv{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px}.csTbl input[type=time]{width:auto;padding:3px 6px}
+.mdCard{padding:14px 16px}.mdH{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-bottom:10px}.mdH h3{margin:0}.mdCard .qal{padding:7px 12px}.mdCard .qal .qno{margin:0 6px 0 0}.qal.ok .sev{background:var(--good,#0a7a3e)}.mdMore{margin-top:8px}.mdMore>summary{cursor:pointer}#p-ibx .mdCard{margin:0}
 details.whatif{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
 details.whatif summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);list-style:none;display:flex;align-items:center;gap:6px}
 details.whatif summary::-webkit-details-marker{display:none}
@@ -2723,7 +2724,8 @@ async function ibxDoReset(){ if(!QT.db) return 0; let n=0; for(const c of ["extr
 
 (function(){ const _r=renderIbx; renderIbx=function(){ const v=_r.apply(this,arguments);
   try{ if(typeof CUR_TAB!=="undefined"&&CUR_TAB==="cases"&&isPricing()){ const a=document.activeElement, busy=(a&&a.closest&&a.closest("#csDet textarea,#csNewF,.demoMenu[open]"))||document.querySelector("#p-cases .demoMenu[open]")||($("csNewF")&&!$("csNewF").hidden);
-    if(busy) csLive(); else renderCases(); } }catch(e){} return v; }; })();
+    if(busy) csLive(); else renderCases(); } }catch(e){}
+  try{ if(!isPricing()){ const h=document.querySelector("#p-ibx>.card"); if(h&&!document.querySelector("#p-ibx .mdCard")) h.insertAdjacentHTML("afterend",mdSales()); } }catch(e){} return v; }; })();
 
 // ---------- My status: each person says where they are (lunch, prayer, break, mission, coaching, training, Q meeting, annual leave) ----------
 // Self-declared only: the person presses a button. Nothing is measured from the mouse, keyboard or screen (that is "My shift", which stays off).
@@ -2762,7 +2764,7 @@ function avBar(pid){ if(!CS_AVAIL_ON) return ""; const A=avLoad(), c=avCur(pid),
   return `<div class="card avBar"><div class="avRow"><b>My status</b><div class="avChips">${CS_ST_PICK.map(k=>`<button class="csChip" data-av="${k}" aria-pressed="${c.t===k}"${c.t==="al"?" disabled":""}>${CS_ST[k][0]}</button>`).join("")}</div>
     <details class="demoMenu right avAl"><summary>Leave plan${al.length?" · "+al.length:""}</summary><div class="demoPop"><b>My annual leave plan</b>${al.length?al.map(x=>`<span class="avLv">${esc(avLeaveTxt(x))}<button class="mini bad" data-avx="${x.id}">Remove</button></span>`).join(""):'<span class="note">No leave planned.</span>'}
       <label class="f">From<input type="date" id="avF" min="${A.day}"></label><label class="f">To<input type="date" id="avT" min="${A.day}"></label><button class="mini ok" id="avAdd">Add leave</button><span class="note" id="avMsg" aria-live="polite">On leave days new requests are not auto-assigned to you.</span></div></details></div>
-   <p class="note" style="margin:8px 0 0">${c.t==="al"?"<b>You are on annual leave today.</b>":c.t==="ok"?"You are available.":`<b>${S[0]}${wth}</b> since ${csTime(c.since)}${S[2]?` · usual length ${csDur(S[2])}`:""}. Press Available when you are back.`}${tot?` Today: ${tot}.`:""} You set this yourself; nothing is tracked automatically. Your lead sees lunch, prayer and break as “Break”.</p></div>`; }
+   <p class="note" style="margin:8px 0 0">${c.t==="al"?"<b>You are on annual leave today.</b>":c.t==="ok"?"":`<b>${S[0]}${wth}</b> since ${csTime(c.since)}${S[2]?` · usual length ${csDur(S[2])}`:""}. Press Available when you are back.`}${tot?` Today: ${tot}.`:""} <span class="avHint">You set this yourself; nothing is tracked automatically. Your lead sees lunch, prayer and break as “Break”.</span></p></div>`; }
 function avTeam(viewer){ if(!CS_AVAIL_ON) return ""; const A=avLoad(), lead=avLead(viewer), now=Date.now();
   const rows=CS_PEOPLE.map(p=>{ const own=p.id===viewer, c=avCur(p.id), M=avMins(p.id), see=lead||own, al=A.al.filter(x=>x.pid===p.id&&x.to>=A.day).sort((a,b)=>a.from.localeCompare(b.from));
     const act=!lead||own||c.t==="al"?"":c.t==="qm"&&c.with===viewer?`<button class="mini" data-avqe="${p.id}">End Q meeting</button>`:c.t==="qm"?"":`<button class="mini ok" data-avq="${p.id}">Start Q meeting</button>`;
@@ -2786,12 +2788,67 @@ function avWire(root,rer){ if(!CS_AVAIL_ON||!root) return; const me=CSV.me, A=av
     if(from>now||(to!=null&&(to<=from||to>now))){ if(msg) msg.textContent="Not saved: the start must be before the end, and neither can be in the future."; return; }
     if(L){ L.from=from; L.to=to; L.editedBy=me; } else { C.since=from; C.editedBy=me; } avSave(); rer(); }); }
 
+// ---------- My day: what matters to this viewer now. Plain rules on the tool's own data, no AI model. ----------
+const MD={more:false};
+function mdLane(c){ try{ const e=csIbxEmail(c); if(e){ if(e.kind==="offer") return null; const r=ibxReq(e), pol=egyPort(r.pol)||r.pol; return pol&&r.pod?{pol,pod:r.pod}:null; }
+    if(c.rt==="line"||c.mbx==="trk"||c.mbx==="air"||c.mbx==="int") return null; const s=(c.subj+" "+c.body).toLowerCase();
+    const find=L=>L.map(k=>[k,s.indexOf(k.toLowerCase())]).filter(x=>x[1]>=0).sort((a,b)=>a[1]-b[1]||b[0].length-a[0].length)[0];
+    const a=find(EG), b=find(Object.keys(DATA.ports).filter(k=>!EG.includes(k))); return a&&b&&a[1]<b[1]?{pol:a[0],pod:b[0]}:null; }catch(e){ return null; } }
+// standard dry rates only (no contract type), as for "lowest rate"
+function mdRate(l){ const t=todayISO(), rows=(DATA.rates||[]).filter(r=>r.pol===l.pol&&r.pod===l.pod&&!r.type), ok=rows.filter(r=>!r.valid||r.valid>=t);
+  if(!ok.length) return {none:true}; const low=ok.slice().sort((a,b)=>(a.r40??a.r20??9e9)-(b.r40??b.r20??9e9))[0]; return low.valid&&low.valid<=addDays(t,3)?{soon:low}:{}; }
+function mdRow(x){ return `<div class="qal ${x.sev}"><span><i class="sev"></i>${x.txt}</span>${x.act?`<span class="qact"><button class="mini${x.sev==="exp"?" ok":""}" data-md="${esc(x.act)}">${esc(x.btn||"Open")}</button></span>`:""}</div>`; }
+function mdCard(title,sub,items){ const top=items.slice(0,3), rest=items.slice(3);
+  return `<div class="card mdCard"><div class="mdH"><h3>${title}</h3><span class="note">${sub}</span></div>${items.length?`<div class="list">${top.map(mdRow).join("")}</div>`:'<p class="note" style="margin:6px 0 0">Nothing urgent now.</p>'}${rest.length?`<details class="mdMore"${MD.more?" open":""}><summary class="note">${rest.length} more</summary><div class="list" style="margin-top:8px">${rest.map(mdRow).join("")}</div></details>`:""}</div>`; }
+function mdPricing(L){ const now=Date.now(), me=CSV.me, lead=avLead(me), open=L.filter(c=>!c.sub), st=c=>csState(c,now), I=[];
+  const mine=open.filter(c=>c.who===me).sort((a,b)=>st(a).left-st(b).left), brM=mine.filter(c=>st(c).st==="breach"), nextM=mine.filter(c=>st(c).st!=="breach")[0];
+  const q=c=>`<span class="qno">${esc(c.id)}</span>${esc(c.subj.slice(0,60))}`;
+  if(brM.length) I.push({sev:"exp",txt:`<b>${brM.length} of your requests ${brM.length>1?"are":"is"} over the SLA.</b> Most late: ${q(brM[0])} · ${csDur(-st(brM[0]).left)} over`,act:"case:"+brM[0].id});
+  if(nextM){ const s=st(nextM); I.push({sev:s.st==="soon"?"warn":"fu",txt:`<b>Next for you:</b> ${q(nextM)} · ${s.paused?"clock paused, ":""}${csDur(s.left)} left`,act:"case:"+nextM.id}); }
+  if(CS_AVAIL_ON){ const c=avCur(me), S=CS_ST[c.t]; if(c.since&&S[2]&&(now-c.since)/6e4>S[2]) I.push({sev:"warn",txt:`<b>Your status is ${S[0]}</b> since ${csTime(c.since)} (usual length ${csDur(S[2])}). New requests are not assigned to you.`,act:"st:ok",btn:"I am back"}); }
+  if(lead){ const brT=open.filter(c=>st(c).st==="breach"&&c.who!==me); if(brT.length) I.push({sev:"exp",txt:`<b>Team: ${brT.length} request${brT.length>1?"s":""} over the SLA</b> · ${[...new Set(brT.map(c=>c.who?csName(c.who):"no owner"))].join(", ")}`,act:"f:breach",btn:"Show"});
+    if(CS_AVAIL_ON){ const away=open.filter(c=>c.who&&c.who!==me&&!avFree(c.who)), who=[...new Set(away.map(c=>c.who))];
+      if(away.length) I.push({sev:"warn",txt:`<b>${away.length} open request${away.length>1?"s belong":" belongs"} to people who are not available:</b> ${who.map(w=>esc(csName(w))+" ("+avWord(avCur(w).t,false)+")").join(", ")}. Reassign the urgent ones.`,act:"f:away",btn:"Show"}); } }
+  const un=open.filter(c=>!c.who); if(un.length) I.push({sev:lead?"warn":"fu",txt:`<b>${un.length} request${un.length>1?"s have":" has"} no owner</b> in your mailboxes.`,act:"f:new",btn:lead?"Show":"Take one"});
+  const seen=new Set(); mine.forEach(c=>{ const l=mdLane(c); if(!l) return; const k=l.pol+"|"+l.pod; if(seen.has(k)) return; seen.add(k); const r=mdRate(l);
+    if(r.none) I.push({sev:"exp",txt:`<b>No valid standard rate</b> for ${esc(l.pol)} → ${esc(l.pod)}, and ${q(c)} is open.`,act:"tab:req",btn:"Ask carriers"});
+    else if(r.soon) I.push({sev:"warn",txt:`<b>Lowest rate ends ${esc(fmtDate(r.soon.valid))}</b> on ${esc(l.pol)} → ${esc(l.pod)} (${esc(r.soon.car)}), and ${q(c)} is open.`,act:"case:"+c.id}); });
+  try{ const due=chaseAll().filter(c=>chaseState(c).due).length; if(due) I.push({sev:"warn",txt:`<b>${due} carrier${due>1?"s have":" has"} not answered.</b> A reminder is due.`,act:"chase",btn:"Show"}); }catch(e){}
+  try{ const fresh=FB.items.filter(f=>(f.status||"new")==="new").length; if(fresh) I.push({sev:"fu",txt:`<b>${fresh} new note${fresh>1?"s":""} from sales</b> on what customers said.`,act:"tab:fb",btn:"Read"}); }catch(e){}
+  if(lead&&CS_AVAIL_ON){ const A=avLoad(), ppl=CS_PEOPLE.filter(x=>x.id!==me), free=ppl.filter(x=>avFree(x.id)), not=ppl.filter(x=>!avFree(x.id));
+    I.push({sev:"ok",txt:`<b>Available now:</b> ${free.length?free.map(x=>esc(x.name)).join(", "):"nobody"}${not.length?` · <b>not available:</b> ${not.map(x=>esc(x.name)+" ("+avWord(avCur(x.id).t,false)+")").join(", ")}`:""}`,act:"tab:ckpi",btn:"Team status"});
+    const lim=avISO(now+7*864e5), lv=A.al.filter(x=>x.pid!==me&&x.to>=A.day&&x.from<=lim); if(lv.length) I.push({sev:"ok",txt:`<b>Leave in the next 7 days:</b> ${lv.map(x=>esc(csName(x.pid))+" "+esc(avLeaveTxt(x))).join(", ")}`}); }
+  const br=open.filter(c=>st(c).st==="breach").length, soon=open.filter(c=>st(c).st==="soon").length, done=L.filter(c=>c.sub&&csDay(c.sub)===csDay(now)).length;
+  return mdCard("My day · "+esc(csName(me)),`${mine.length} open with you · team inbox: ${open.length} open, ${br} over the SLA, ${soon} due soon, ${done} answered today`,I); }
+function mdSales(){ const sp=DEMO_SP, t=todayISO(), I=[], Q=QT.items.filter(q=>q.seller===sp);
+  const wait=Q.filter(q=>q.toCust===false&&effStatus(q)==="pending").sort((a,b)=>String(a.created).localeCompare(String(b.created)));
+  if(wait.length) I.push({sev:"warn",txt:`<b>${wait.length} offer${wait.length>1?"s":""} from pricing ${wait.length>1?"are":"is"} waiting for you</b> to send to the customer. Oldest: ${wait[0].no?`<span class="qno">${esc(wait[0].no)}</span>`:""}${esc(wait[0].customer||"")} · ${esc(wait[0].pol)} → ${esc(wait[0].pod)}`,act:"tab:q",btn:"Open"});
+  const A=alertsFor(Q.filter(q=>q.toCust!==false)), n=k=>A.filter(a=>a.kind===k).length;
+  if(n("exp")) I.push({sev:"exp",txt:`<b>${n("exp")} quote${n("exp")>1?"s":""} ended with no result.</b> Mark won or lost, or ask for a new rate.`,act:"tab:q",btn:"Open"});
+  if(n("fu")) I.push({sev:"fu",txt:`<b>${n("fu")} follow-up${n("fu")>1?"s":""} due today.</b>`,act:"tab:q",btn:"Open"});
+  if(n("warn")) I.push({sev:"warn",txt:`<b>${n("warn")} quote${n("warn")>1?"s end":" ends"} soon.</b> Push the customer before the rate ends.`,act:"tab:q",btn:"Open"});
+  const req=ibxVisible().filter(e=>!ibxAns(e)&&!e.replied&&!IBX.done.has(e.id)).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  if(req.length) I.push({sev:"fu",txt:`<b>${req.length} of your requests ${req.length>1?"are":"is"} with pricing.</b> Oldest: <span class="qno">${esc(ibxNo(req[0]))}</span>${esc(ibxReq(req[0]).cust||"")} · sent ${esc(ibxWhen(req[0].date))}`,act:"ibx:"+req[0].id,btn:"Show"});
+  try{ const u=unreadReplies().length; if(u) I.push({sev:"fu",txt:`<b>Pricing answered ${u} of your feedback note${u>1?"s":""}.</b>`,act:"tab:fb",btn:"Read"}); }catch(e){}
+  try{ const last={}; (DATA.requests||[]).filter(r=>r.sales===sp&&r.c&&r.rec).forEach(r=>{ if(!last[r.c]||r.rec>last[r.c]) last[r.c]=r.rec; }); const lim=addDays(t,-60), quiet=Object.entries(last).filter(([,d])=>d<lim).sort((a,b)=>a[1].localeCompare(b[1])).slice(0,3);
+    if(quiet.length) I.push({sev:"ok",txt:`<b>No request for 60 days or more from:</b> ${quiet.map(([c,d])=>esc(c)+" (last "+esc(fmtDate(d))+")").join(", ")}. Worth a call.`}); }catch(e){}
+  return mdCard("My day · "+esc(sp),`${Q.filter(q=>effStatus(q)==="pending").length} open quotes · ${Q.filter(q=>q.status==="won").length} won`,I); }
+document.addEventListener("click",ev=>{ const b=ev.target.closest&&ev.target.closest("[data-md]"); if(!b) return; const a=b.dataset.md, i=a.indexOf(":"), k=i<0?a:a.slice(0,i), v=i<0?"":a.slice(i+1);
+  try{ if(k==="tab") openTab(v);
+    else if(k==="ibx"){ IBX.open=v; renderIbx(); const r=document.querySelector("#p-ibx .ibx2"); if(r) r.scrollIntoView({block:"start"}); }
+    else if(k==="st"){ avSet(CSV.me,v,CSV.me); renderCases(); }
+    else { if(CUR_TAB!=="cases") openTab("cases"); CSV.box="all";
+      if(k==="case"){ const c=csLoad().cases.find(x=>x.id===v); CSV.f=c&&c.sub?"all":"open"; CSV.open=v; CSV.cat=null; } else if(k==="f") CSV.f=v; else if(k==="chase") CSV.chase=true;
+      renderCases(); const el=k==="chase"?$("csChase"):k==="case"?$("csDet"):document.querySelector("#p-cases .csWrap"); if(el) el.scrollIntoView({block:"start"}); } }catch(e){} });
+document.addEventListener("toggle",ev=>{ const d=ev.target; if(d&&d.classList&&d.classList.contains("mdMore")) MD.more=d.open; },true);
+
 // ---------- Cases page ----------
 const CSV={box:"all",f:"open",open:null,cat:null,me:"me"};
 function csVisible(L){ const A=new Set(csAcc(CSV.me)); return L.filter(c=>A.has(c.mbx)||c.who===CSV.me); }
-function csKpis(L){ const now=Date.now(), open=L.filter(c=>!c.sub), br=open.filter(c=>csState(c,now).st==="breach"), soon=open.filter(c=>csState(c,now).st==="soon");
+function csKpis(L){ return mdPricing(L); }
+function csKpis0(L){ const now=Date.now(), open=L.filter(c=>!c.sub), br=open.filter(c=>csState(c,now).st==="breach"), soon=open.filter(c=>csState(c,now).st==="soon");
   return `<div class="kpis">${kpi("Open cases",open.length,`${open.filter(c=>!c.who).length} not assigned`,open.length?"warn":"good")}${kpi("Breached now",br.length,"over the SLA, not submitted",br.length?"bad":"good")}${kpi("Due soon",soon.length,"less than a quarter of the time left",soon.length?"warn":"")}${kpi("Submitted today",L.filter(c=>c.sub&&csDay(c.sub)===csDay(now)).length,"clock stopped","good")}</div>`; }
-function csFilter(L){ return L.filter(c=>(CSV.box==="all"||c.mbx===CSV.box)&&(CSV.f==="all"||(CSV.f==="open"&&!c.sub)||(CSV.f==="mine"&&c.who===CSV.me&&!c.sub)||(CSV.f==="new"&&!c.who)||(CSV.f==="breach"&&!c.sub&&csState(c).st==="breach")||(CSV.f==="done"&&c.sub)))
+function csFilter(L){ return L.filter(c=>(CSV.box==="all"||c.mbx===CSV.box)&&(CSV.f==="all"||(CSV.f==="open"&&!c.sub)||(CSV.f==="mine"&&c.who===CSV.me&&!c.sub)||(CSV.f==="new"&&!c.who)||(CSV.f==="breach"&&!c.sub&&csState(c).st==="breach")||(CSV.f==="done"&&c.sub)||(CSV.f==="away"&&!c.sub&&c.who&&!avFree(c.who))))
   .sort((a,b)=>CSV.f==="done"?b.sub-a.sub:(csState(a).left-csState(b).left)); }
 function csListHtml(){ const D=csLoad(), L=csFilter(csVisible(D.cases));
   return L.length?L.map(c=>`<button class="csRow${CSV.open===c.id?" on":""}" data-cs="${c.id}"><span class="csT"><b>${esc(c.subj)}</b><span class="note"><span class="qno">${esc(c.id)}</span> ${esc(c.from)}</span></span>
@@ -2818,12 +2875,10 @@ function csSendMsg(c,submit){ const txt=($("csTxt")||{}).value||"", cat=($("csCa
 function renderCases(){ const p=$("p-cases"); if(!p) return; ibxAuto(); csSyncIbx(); const D=csLoad(), ALL=D.cases, L=csVisible(ALL), now=Date.now(), S=csSet(), acc=csAcc(CSV.me);
   if(CSV.box!=="all"&&!acc.includes(CSV.box)) CSV.box="all"; if(CSV.open&&!L.some(c=>c.id===CSV.open)) CSV.open=null;
   const boxes=[["all",acc.length>1?"All my mailboxes":"My mailbox",L.filter(c=>!c.sub).length],...CS_MBX.filter(m=>acc.includes(m.id)).map(m=>[m.id,m.name,L.filter(c=>c.mbx===m.id&&!c.sub).length])];
-  const fs=[["open","Open"],["mine","My cases"],["new","Not assigned"],["breach","Breached"],["done","Submitted"],["all","All"]];
-  p.innerHTML=`<div class="csBar2 csHead"><button class="mini ok" id="csGo">${IBX.state==="loading"?"Reading…":"Check inbox"}</button><span class="note" aria-live="polite" style="margin-right:auto">${ibxStatusTxt()}</span>
+  const fs=[["open","Open"],["mine","My cases"],["new","Not assigned"],["breach","Breached"]].concat(CS_AVAIL_ON&&avLead(CSV.me)?[["away","Owner away"]]:[],[["done","Submitted"],["all","All"]]);
+  p.innerHTML=`<div class="csBar2 csHead"><button class="mini ok" id="csGo">${IBX.state==="loading"?"Reading…":"Check inbox"}</button><span class="note" aria-live="polite" style="margin-right:auto">${ibxStatusTxt()}${csInHours(now)?"":` · <b>Outside working hours:</b> SLA clocks are paused until ${String(S.start).padStart(2,"0")}:00 (Sun to Thu, Cairo)`}</span>
     <button class="mini" id="csAuto">Auto-assign new cases</button><details class="demoMenu right"><summary>Demo tools · ${esc(csName(CSV.me))}</summary><div class="demoPop"><label class="f">Signed in as<select id="csMe">${CS_PEOPLE.map(x=>`<option value="${x.id}"${x.id===CSV.me?" selected":""}>${esc(x.name)} · ${esc(x.mail)}</option>`).join("")}</select></label><span class="note">Opens: ${acc.map(m=>esc(csMbx(m).addr)).join(", ")}</span><button class="mini" id="csNew">Send a test email</button><button class="mini" id="csOffl">Use offline copy</button><button class="mini" id="csReset" title="Puts the sample cases back and removes rates, quotes and feedback added during a rehearsal">Reset demo</button><span class="note">For rehearsals only. Not part of the real tool.</span></div></details></div>
-  ${csInHours(now)?"":`<div class="card csOff"><b>Outside working hours.</b> <span class="note">SLA clocks are paused until ${String(S.start).padStart(2,"0")}:00 (Sun to Thu, Cairo).</span></div>`}
-  <div id="csK">${csKpis(L)}</div>
-  ${csChaseHtml()}
+    <div id="csK">${csKpis(L)}</div>
   ${CS_SHIFT_ON&&CSV.me==="me"?`<div class="csTop">${csShiftCard()}</div>`:""}
   ${avBar(CSV.me)}
   <div class="csChips">${boxes.map(([k,l,n])=>`<button class="csChip" data-box="${k}" aria-pressed="${CSV.box===k}">${esc(l)} <span class="cnt">${n}</span></button>`).join("")}</div>
@@ -2835,7 +2890,8 @@ function renderCases(){ const p=$("p-cases"); if(!p) return; ibxAuto(); csSyncIb
    <label class="f" style="margin-top:8px">Email<textarea id="cnB" rows="2">Please quote 2x40HC Sokhna to Jeddah, ready next week.</textarea></label>
    <div class="csBtns"><button class="btn primary" id="cnGo">Send to ${CS_GROUP}</button><span class="note">Try the words truck, by air, or a sender like DP World Mumbai office.</span></div></div>
   ${CSV.msg?`<div class="card csMsgOk">${CSV.msg}</div>`:""}
-  <div class="csWrap"><div class="csList" id="csList">${csListHtml()}</div><div id="csDet">${csDetHtml(L.find(c=>c.id===CSV.open))}</div></div>`;
+  <div class="csWrap"><div class="csList" id="csList">${csListHtml()}</div><div id="csDet">${csDetHtml(L.find(c=>c.id===CSV.open))}</div></div>
+  ${csChaseHtml()}`;
   csWireShift(p); $("csMe").onchange=()=>{ CSV.me=$("csMe").value; CSV.open=null; CSV.box="all"; renderCases(); };
   p.querySelectorAll("[data-box]").forEach(b=>b.onclick=()=>{ CSV.box=b.dataset.box; renderCases(); });
   p.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{ CSV.f=b.dataset.f; renderCases(); });
