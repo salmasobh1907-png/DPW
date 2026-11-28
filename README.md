@@ -59,7 +59,7 @@ Full table, one row per sub-screen: `TAB_MAP.csv`. Summary:
 | Screen | Takes data from | Shows / does | Feeds |
 | --- | --- | --- | --- |
 | Inbox (Inbox, Team KPIs, Mailboxes & SLA) | Test mailbox (or sample emails inside the page) + sample cases + routing rules + mailbox list in the page | One list for every email: carrier offers and customer / sales / network requests. Each has one request number (Q-…), an owner and an SLA clock in working hours (Sun–Thu, Cairo). "Price it", "Read it into Carrier offers", reassign with log, work distribution (customer → owner), waiting-for-carriers list, KPIs by consignee / sales / network request. Sales see only their own requests and pricing's answers | Rates & offer, Offers & quotes, Carrier offers, Overview, manager KPIs |
-| Rates & offer | Rate data + offers added from email + route map data | Map, all carrier rates on the lane, lowest standard 40', buy + profit = sell, checks, offer email and PDF | Offers & quotes, decline log |
+| Rates & offer | Rate data + offers added from email + route map data | Three steps on one screen. 1 Lane and rates: map, all carrier rates on the lane, lowest standard 40', tick rates. 2 Profit and checks: buy + profit = sell for the container size of the request, terms, checks. 3 Offer email: email, PDF, send to sales. Sales see the same steps without buy and profit | Offers & quotes, decline log |
 | Offers & feedback | Shared store: quotes, feedback | Offers, quotes, won / lost, hit ratio, sales feedback and replies | Overview, Carrier volumes |
 | Rate Bank (Rate Data Base, Carrier offers, Ask carriers, Pricing log, Rate check) | Dummy Rate Bank + files dropped on the page (Excel, PDF, .msg, .eml) | Rate sheet, offer → rows, monthly rate request emails, log of pricing asks, row checks | Rates & offer |
 | Trucking rates | Dummy trucking tables + rates added in the tool | Pickup in Egypt (EXW) and cross-border trucks | EXW part of the offer |
@@ -169,8 +169,8 @@ If these services are missing, the page still opens, shows the sample emails and
 ## 11. How to test (about 10 minutes)
 
 1. Open `app/DP_World_Platform_DEMO.html` in Chrome or Edge (or the online link).
-2. Inbox → open request Q-1002 → **Price it** → **Send offer to sales**. Back in the Inbox the request is under **Submitted** with the clock stopped. (The offline copy of the emails loads by itself; it is also under **Demo tools**.)
-3. Rates & offer: check the route, the rate cards, buy / profit / sell, the checks, then the offer email.
+2. Inbox → open request Q-1002 → **Price it** → step 1 shows the rates → **Next** to step 2 (profit and checks) → **Next** to step 3 → **Send offer to sales**. Back in the Inbox the request is under **Submitted** with the clock stopped. (The offline copy of the emails loads by itself; it is also under **Demo tools**.)
+3. Rates & offer: step 1 the route and the rate cards; step 2 buy / profit / sell and the checks; step 3 the offer email. "Alternatives" and "Truck all the way" open with a click on their title.
 4. Switch to **Sales** at the top: buy rates and profit disappear.
 5. Inbox: reassign a request, open Team KPIs, change an SLA in Mailboxes & SLA.
 6. Rate Bank → Carrier offers: drop an Excel or PDF offer, see the rows it finds.

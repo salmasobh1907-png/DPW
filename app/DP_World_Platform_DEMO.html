@@ -164,6 +164,17 @@ textarea.ta,.ta{font-size:13px;line-height:1.45;resize:vertical}
 .csHead{margin-bottom:12px}.csChase{margin:12px 0;padding:10px 16px}.csChase>summary{cursor:pointer;font-size:13px;list-style:none}.csChase>summary::-webkit-details-marker{display:none}.csChase>summary::before{content:"▸ ";color:var(--muted)}.csChase[open]>summary::before{content:"▾ "}
 .csChase .cnt{display:inline-block;min-width:20px;text-align:center;font-size:11.5px;font-weight:700;padding:1px 6px;border-radius:10px;background:var(--line);margin-left:4px}
 .csIbx{margin:4px 0 12px}.csIbx .ibxGrid{padding:12px 0 0}.csIbx .ibxAns{margin:12px 0 0}.csRow .qno{margin-right:4px}
+.lsteps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:sticky;top:-18px;z-index:20;padding:8px 0;margin:-8px 0;background:var(--bg)}
+.lsteps button{display:flex;align-items:center;gap:10px;text-align:left;font:inherit;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 12px;cursor:pointer;min-width:0}
+.lsteps button .n{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12.5px;background:var(--line);color:var(--ink)}
+.lsteps button .t{display:flex;flex-direction:column;min-width:0;line-height:1.25}.lsteps button .t b{font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lsteps button .t span{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lsteps button[aria-current="step"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.lsteps button[aria-current="step"] .n{background:var(--accent);color:#fff}
+.lsteps button.done .n{background:var(--good,#0a7a3e);color:#fff}
+.lnav{display:flex;gap:8px;align-items:center;justify-content:space-between}.lnav .btn{margin:0}.lnav span{flex:1}
+#p-lane[data-step="1"]>[data-st]:not([data-st="1"]),#p-lane[data-step="2"]>[data-st]:not([data-st="2"]),#p-lane[data-step="3"]>[data-st]:not([data-st="3"]){display:none!important}
+#of-mkt:not([hidden])~#mktEmpty{display:none}#p-lane:not([data-step="1"]) #deskHead .dtl,#p-lane:not([data-step="1"]) #deskHead .dfb{display:none}#mktSlot .ofmkt{margin-top:0}
+.card.fold>h3{cursor:pointer;margin-bottom:0}.card.fold>h3::before{content:"▸ ";color:var(--muted)}.card.fold.open>h3{margin-bottom:10px}.card.fold.open>h3::before{content:"▾ "}.card.fold:not(.open)>*:not(h3){display:none!important}
+@media(max-width:560px){.lsteps button .t span{display:none}.lsteps button{padding:8px}}
 details.whatif{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
 details.whatif summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);list-style:none;display:flex;align-items:center;gap:6px}
 details.whatif summary::-webkit-details-marker{display:none}
@@ -506,6 +517,7 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
     <!-- Rates & quote -->
     <section class="pane" id="p-lane">
       <div class="card desk" id="deskHead"></div>
+      <div class="lsteps" id="laneSteps" role="group" aria-label="Steps of the offer"></div>
       <div class="card">
         <div class="seg wide" role="group" aria-label="Direction"><button id="d-exp" aria-pressed="true">Export · Egypt to world</button><button id="d-imp" aria-pressed="false">Import · world to Egypt</button></div>
         <div class="two" id="lanePair" style="margin-top:12px">
@@ -532,7 +544,10 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
         <div class="two" style="margin:10px 0 2px"><label class="f">Leave out carriers<input type="text" id="exCar" placeholder="e.g. MSC, CMA" autocomplete="off"></label><label class="f">Customer target rate, USD<input type="text" id="tgt" inputmode="decimal" placeholder="e.g. 400"></label></div>
         <div id="optBody"></div><div id="optDecl"></div>
       </div>
+      <div class="card" id="pickCard"><div class="qact" id="pickAct" style="margin:0"><b>Rates for the offer</b><span class="note" id="pickN" aria-live="polite"></span></div>
+        <p class="note" style="margin:6px 0 0">Tick 1 to 4 rates in the table above, or let the platform suggest them. Then go to the next step.</p></div>
       <div class="card" id="routeCard"></div>
+      <div class="card pr-only" id="mktCard"><h3>Profit <span class="note">· buy + profit = sell, on ocean freight only</span></h3><div id="mktSlot"></div><p class="note" id="mktEmpty" style="margin:0">No rate is ticked yet. Go back to step 1 and tick a rate, or press Suggest 3 options.</p></div>
       <div class="card" id="offerCard">
         <h3>Offer email <span class="note">· 1 to 4 options for the customer</span></h3>
         <p class="note xp" style="margin:0 0 10px">Use this when the customer should choose between carriers or ports. Tick rates in the table above, or let the platform suggest them. The customer sees sell rates only.</p>
@@ -573,6 +588,7 @@ body{background:radial-gradient(900px 520px at 30% 5%,rgba(62,60,144,.30),transp
       <div class="card pr-only" id="dataCard"></div>
       <div class="card" id="svcCard"></div>
       <p class="note xp">Distances follow a simplified sea network (about ±10%). Sailing days exclude port calls, transhipment and canal waiting. Rates and requests come from the team's Rate Bank on SharePoint, <span id="asof"></span>.</p>
+    <div class="lnav" id="laneNav"></div>
     </section>
 
     <!-- Requests (demand) -->
@@ -1126,7 +1142,7 @@ function mktBand(col){ const V=OPT_ROWS.filter(r=>r.ok!==false&&r[col]!=null).ma
   const r5=v=>Math.round(v/5)*5; return {lo:r5(mn*0.96),avg:r5(av*1.06),hi:r5(Math.max(mx*1.14,mn*1.3))}; }
 function renderMkt(M){ const k=$("of-mkt"); if(!k) return; try{ const MA=offerModel(); if(MA&&MA.list&&MA.list.length) M=MA; }catch(e){}
   if(!isPricing()||!M||!M.list.length){ k.hidden=true; return; }
-  const rf=CARGO==="rf", sz=M.has40?[rf?"rf40":"r40","40'",false]:[rf?"rf20":"r20","20'",true], B=mktBand(sz[0]); if(!B){ k.hidden=true; return; }
+  const rf=CARGO==="rf", z20=$("z-20"), want20=M.has20&&(!M.has40||(z20&&z20.getAttribute("aria-pressed")==="true")), sz=!want20?[rf?"rf40":"r40","40'",false]:[rf?"rf20":"r20","20'",true], B=mktBand(sz[0]); if(!B){ k.hidden=true; return; }
   const pos=v=>Math.max(0,Math.min(100,(v-B.lo)/(B.hi-B.lo)*100)), L=M.list.filter(x=>x.r[sz[0]]!=null);
   const R=L.map(x=>{ const buy=+x.r[sz[0]], m=ofProfit(x.r,sz[2],buy), pk=rowKey(x.r)+"|"+(sz[2]?20:40); return {x,buy,m,sell:buy+m,pk,own:OFP.has(pk),g:gapInfo(buy,sz[2])}; });
   const nm=o=>showCarSafe()?o.x.r.car:o.x.label;
@@ -1187,7 +1203,7 @@ function deskReqs(){ return ibxVisible().filter(e=>e.kind!=="offer").slice().sor
 function renderDesk(){ const h=$("deskHead"); if(!h) return; const L=deskReqs(), e=IBX.req&&L.some(x=>x.id===IBX.req.id)?IBX.req:null, pr=isPricing();
   const pick=L.length?`<select id="deskPick" class="deskSel" aria-label="Open a request"><option value="">${e?"Open another request…":"Open a request…"}</option>${L.map(x=>{ const r=ibxReq(x); return `<option value="${esc(x.id)}"${e&&x.id===e.id?" selected":""}>${esc(ibxNo(x))} · ${esc(r.cust||"—")} · ${esc(r.pol||"?")} → ${esc(r.pod||"?")}</option>`; }).join("")}</select>`:"";
   if(!e){ h.innerHTML=`<div class="dtop"><div><span class="qno">Quick check</span><b class="dcust">${pr?"No request open":"Check a rate"}</b></div>${pick}</div>`; h.querySelector("#deskPick")&&(h.querySelector("#deskPick").onchange=ev=>{ const x=IBX.items.find(y=>y.id===ev.target.value); if(x) ibxToQuote(x); }); return; }
-  const r=ibxReq(e), a=ibxAns(e), who=ibxWho(e)||"—", st=a?effStatus(a):null; let sl=""; try{ sl=slaPill(slaOf(e))||""; }catch(x){}
+  const r=ibxReq(e), a=ibxAns(e), who=ibxWho(e)||"—", st=a?effStatus(a):null; let sl=""; try{ csSyncIbx(); const cc=csLoad().cases.find(x=>x.ibx===e.id); sl=cc?csPill(cc):(slaPill(slaOf(e))||""); }catch(x){ try{ sl=slaPill(slaOf(e))||""; }catch(y){} }
   const stTxt=!a?(pr?"New: price it":"Waiting for pricing"):(a.toCust===false&&a.status==="pending")?"Offer sent to sales":st==="won"?"Won":st==="lost"?"Lost":st==="expired"?"Expired":"Quoted to customer";
   const stCls=!a?"new":st==="won"?"won":st==="lost"||st==="expired"?"lost":"pending";
   const T=[["Request received",ibxWhen(e.date),true,`by email from ${who}`],
@@ -1198,7 +1214,24 @@ function renderDesk(){ const h=$("deskHead"); if(!h) return; const L=deskReqs(),
    <div class="dfacts"><span><i>Lane</i>${esc(r.pol||"?")} → ${esc(r.pod||"?")}</span><span><i>Containers</i>${r.qty} × ${r.size}' ${esc(r.type||"")}</span><span><i>Commodity</i>${esc(r.cmd||"—")}</span><span><i>${e.kind==="net"?"Network":"Sales"}</i>${esc(who)}</span><span><i>Target</i>${r.target?"USD "+money(r.target):"not given"}</span></div>
    <ol class="dtl">${T.map(([t,w,ok,d])=>`<li class="${ok?"ok":""}"><b>${t}</b><span>${w||"&nbsp;"}</span><em>${d}</em></li>`).join("")}</ol><div id="deskFb" class="dfb"></div>`; try{ renderFbLane(); }catch(x){}
   const sel=h.querySelector("#deskPick"); if(sel) sel.onchange=ev=>{ const x=IBX.items.find(y=>y.id===ev.target.value); if(x) ibxToQuote(x); }; }
-function renderOffer(){
+// ---------- Rates & offer in 3 steps: 1 lane and rates, 2 profit and checks, 3 offer email ----------
+let LSTEP=1;
+const LSTEP_OF={mktCard:2,exwCard:2,quoteCard:2,fbCard:2,offerCard:3}, LFOLD=["altCard","lbCard","truckCard"];
+function laneStepsUI(){ const P=$("p-lane"), bar=$("laneSteps"); if(!P||!bar) return; const pr=isPricing();
+  [...P.children].forEach(c=>{ if(c.id==="deskHead"||c.id==="laneSteps"||c.id==="laneNav") return; const s=String(LSTEP_OF[c.id]||1); if(c.dataset.st!==s) c.dataset.st=s; if(LFOLD.includes(c.id)) c.classList.add("fold"); });
+  if(P.dataset.step!==String(LSTEP)) P.dataset.step=String(LSTEP);
+  let n=0; try{ n=OFFER.size; }catch(e){}
+  const S=[[pr?"Lane and rates":"Rates",n?n+" rate"+(n>1?"s":"")+" ticked":"pick the lane, tick rates"],[pr?"Profit and checks":"Terms and checks",pr?"buy + profit = sell":"terms, checks before you send"],[pr?"Offer email":"Customer offer",pr?"check it, then send to sales":"check it, then send"]];
+  const h=S.map(([t,d],i)=>`<button type="button" data-ls="${i+1}"${LSTEP===i+1?' aria-current="step"':""} class="${i+1<LSTEP?"done":""}"><span class="n">${i+1<LSTEP?"✓":i+1}</span><span class="t"><b>${t}</b><span>${d}</span></span></button>`).join("");
+  if(bar._h!==h){ bar._h=h; bar.innerHTML=h; bar.querySelectorAll("[data-ls]").forEach(b=>b.onclick=()=>laneStep(+b.dataset.ls)); }
+  const nav=$("laneNav"), nh=`${LSTEP>1?`<button type="button" class="svc btn" data-ls="${LSTEP-1}">← Back: ${S[LSTEP-2][0]}</button>`:""}<span></span>${LSTEP<3?`<button type="button" class="svc btn primary" data-ls="${LSTEP+1}">Next: ${S[LSTEP][0]} →</button>`:""}`;
+  if(nav&&nav._h!==nh){ nav._h=nh; nav.innerHTML=nh; nav.querySelectorAll("[data-ls]").forEach(b=>b.onclick=()=>laneStep(+b.dataset.ls)); }
+  const pn=$("pickN"); if(pn) pn.textContent=n?"· "+n+" ticked":"· none ticked yet"; }
+function laneStep(n){ LSTEP=Math.max(1,Math.min(3,n|0)); laneStepsUI(); const w=$("p-lane"); if(w) w.scrollTop=0; const k=$("work"); if(k) k.scrollTop=0; if(LSTEP===1) setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
+(function(){ try{ const a=$("pickAct"), n=$("pickN"); if(a&&n){ a.insertBefore($("of-clr"),n); a.insertBefore($("of-sug"),$("of-clr")); } const s=$("mktSlot"), m=$("of-mkt"); if(s&&m) s.appendChild(m); const e=$("mktEmpty"); if(s&&e) s.appendChild(e);
+  document.addEventListener("click",ev=>{ const h=ev.target.closest&&ev.target.closest("#p-lane .card.fold>h3"); if(h&&!ev.target.closest("button,a,input,select,label")) h.parentNode.classList.toggle("open"); }); }catch(e){} })();
+function renderOffer(){ const v=renderOffer0.apply(this,arguments); try{ laneStepsUI(); }catch(e){} return v; }
+function renderOffer0(){
   const box=$("of-prev"); if(!box) return; const M0=offerModel(); ofTabs(M0); const M=ofView(M0), q=quote; const showCar=$("of-car").checked; try{ renderMkt(M); }catch(e){ const k=$("of-mkt"); if(k) k.hidden=true; }
   const imp=q.dir==="imp", pols=[...new Set(M.list.map(x=>x.r.pol))], pods=[...new Set(M.list.map(x=>x.r.pod))];
   const origin=imp?(pols.length===1?pols[0]:(q.dest||"")):(pols.length===1?pols[0]+", Egypt":"Egypt"), target=imp?(pods.length===1?pods[0]+", Egypt":"Egypt"):(q.dest||"");
@@ -2293,7 +2326,7 @@ function renderIbx(){
 }
 function ibxToOffer(e){ if(!e) return; IBX.cur=e.subject.replace(/^DEMO\s*\|\s*/i,""); openTab("off"); $("o-clear").click(); const t=e.subject+"\n\n"+e.body.split(/\n--\s*\n/)[0];
   OFF.pasteHtml=/<table/i.test(e.html||"")?e.html:null; $("o-txt").value=t; $("o-car").value=guessCarrier(t)||""; $("o-read").click(); $("work").scrollTop=0; }
-function ibxToQuote(e){ if(!e) return; IBX.req=e; setTimeout(()=>{ try{ renderDesk(); }catch(x){} },0); const r=ibxReq(e); const pol=egyPort(r.pol)||r.pol, pod=r.pod;
+function ibxToQuote(e){ if(!e) return; LSTEP=1; IBX.req=e; setTimeout(()=>{ try{ renderDesk(); }catch(x){} },0); const r=ibxReq(e); const pol=egyPort(r.pol)||r.pol, pod=r.pod;
   if(DIR!=="exp") setDir("exp",pod); if(EG.includes(pol)) $("from").value=pol; $("to").value=pod; openTab("lane"); updateLane();
   setTimeout(()=>{ try{ const z=$(r.size==="20"?"z-20":"z-40"); if(z&&z.getAttribute("aria-pressed")!=="true") z.click();
     $("tgt").value=r.target||""; $("tgt").dispatchEvent(new Event("input",{bubbles:true}));
@@ -2884,7 +2917,7 @@ function openTab(t,quiet){
   { const nb=document.querySelector('#nav button[data-k="'+navKey(t)+'"]'); if(nb&&nb.closest(".gi[hidden]")) renderNav(); }
   setTitle(t); $("work").scrollTop=0; if(!quiet) window.scrollTo&&window.scrollTo(0,0);
   const cap={home:["Top requested lanes","Line width = requests in the last 3 months"],lane:["Route map","Drag to turn · scroll to zoom"],dem:["Customer requests","Top lanes · pick one to see it"],svc:["Service rotation","Ports in red are Egyptian"]}[t]||["Route map","Drag to turn · scroll to zoom"];
-  $("mapTtl").textContent=cap[0]; $("mapSub").textContent=cap[1]; $("mapcap").classList.remove("rt"); if(t==="lane"){ routeLine(); try{ renderDesk(); }catch(x){} }
+  $("mapTtl").textContent=cap[0]; $("mapSub").textContent=cap[1]; $("mapcap").classList.remove("rt"); if(t==="lane"){ routeLine(); try{ renderDesk(); }catch(x){} try{ laneStepsUI(); }catch(x){} }
   if(t==="home"||t==="dem"){ scene.opt=null; scene.main=null; scene.alt=null; scene.svc=null; scene.from=null; scene.to=null; if(t==="dem"&&DEMS.open){ renderDemDetail(); } else { if(t==="dem") renderDem(); drawDemand(); flyTo(22,48,1.0); } }
   if(t==="home") renderHome();
   if(t==="lane"){ scene.svc=null; scene.extra=[]; updateLane(prevTab!=="lane"); }
@@ -3332,7 +3365,7 @@ function renderTrk(){
   p.innerHTML=pick+xb;
   $("tk-pf").onchange=()=>{ TRK.port=$("tk-pf").value; renderTrk(); };
   p.querySelectorAll("[data-tkuse]").forEach(b=>b.onclick=()=>{ const r=rowsS[+b.dataset.tkuse]; if(!r) return; const f=$("from"); if(f&&[...f.options].some(o=>o.value===r.port)&&f.value!==r.port){ f.value=r.port; f.dispatchEvent(new Event("change",{bubbles:true})); }
-    openTab("lane"); setTimeout(()=>{ $("q-inco").value="EXW"; $("q-pk").value=r.from; EXW_MANUAL=false; try{ buildQuote(); renderOffer(); }catch(e){} const c=$("quoteCard"); if(c) c.scrollIntoView({behavior:"smooth",block:"start"}); const m=$("q-exw-h"); if(m&&!quote.dest) m.textContent="Pickup set: "+r.from+" to "+r.port+". Now choose the destination above and click a carrier rate."; },350); });
+    openTab("lane"); setTimeout(()=>{ $("q-inco").value="EXW"; $("q-pk").value=r.from; EXW_MANUAL=false; try{ buildQuote(); renderOffer(); }catch(e){} try{ laneStep(2); }catch(e){} const c=$("exwCard")||$("quoteCard"); if(c) c.scrollIntoView({behavior:"smooth",block:"start"}); const m=$("q-exw-h"); if(m&&!quote.dest) m.textContent="Pickup set: "+r.from+" to "+r.port+". Now choose the destination above and click a carrier rate."; },350); });
   $("tk-q").oninput=()=>{ TRK.q=$("tk-q").value; clearTimeout(TRK.t); TRK.t=setTimeout(()=>{ renderTrk(); const e=$("tk-q"); e.focus(); e.setSelectionRange(e.value.length,e.value.length); },250); };
   if(pr){ $("tk-fx").onchange=()=>{ const v=parseFloat($("tk-fx").value); lsSet("rg-fx",isFinite(v)&&v>0?v:""); renderTrk(); try{ buildQuote(); renderOffer(); }catch(e){} };
     $("tk-add").onclick=async()=>{ const g=id=>$(id).value.trim(), n=id=>{ const v=parseFloat(g(id).replace(/,/g,"")); return isFinite(v)&&v>0?v:null; }, msg=$("tk-msg");
