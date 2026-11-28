@@ -12,11 +12,11 @@ Rate Bank,Carrier offers,Pricing,Carrier email / Excel / PDF / .msg dropped on t
 Rate Bank,Ask carriers,Pricing,DATA.contacts (dummy carrier emails),Monthly Rate Idea email per carrier (copy to clipboard),Pricing log,Page only,Draft in Outlook (drafts only; person presses Send)
 Rate Bank,Pricing log,Pricing,db: plog,What pricing asked for / from whom / when / reminders,Overview,db: plog,Data store
 Rate Bank,Rate check,Pricing,DATA.health (checks on Rate Data Base rows),Rows that are wrong or easy to misread (missing validity / THC / transit),Message to the Rate Bank owner,Page data,Same check run by the scheduled job
-Trucking rates,Trucking rates,Pricing + Sales,Dummy trucking tables in the page (TRK_LOCAL / TRK_XB) + rates added in the tool (db: truckRates),Pickup in Egypt for EXW requests and cross-border trucks,EXW pickup inside the quotation,db: truckRates,Trucking offers list in the data store
+Rate Bank,Trucking rates,Pricing + Sales,Dummy trucking tables in the page (TRK_LOCAL / TRK_XB) + rates added in the tool (db: truckRates),Pickup in Egypt for EXW requests and cross-border trucks,EXW pickup inside the quotation,db: truckRates,Trucking offers list in the data store
 Overview,Overview,Managers,All of the above,Today at a glance: requests / offers / won / SLA,Management view,—,Data store + optional Power BI
 Overview,Customer requests,Managers,Demo Rate Bank Export > Reference Sheet (DATA.requests),Every request grouped by lane; edits in the tool,Overview counts,Page data + db: edits,Reference Sheet replacement in the data store
 Overview,Market alerts,Pricing,Entered by pricing (db: gwWatch / gwGri / gwMkt),Disruptions / rate-increase notices / weekly market index,Warning on Rates & offer,db: gwWatch / gwGri / gwMkt,Data store + allowed news sources
 Overview,Carrier volumes,Managers,Demo Rate Bank Export > Bookings (DATA.bookings),What we booked with each line,Contract and volume talks,Page data,Bookings data (CARGOES later)
-Alliance loops,Alliance loops,Everyone,DATA.services (reference list of liner rotations),Which services call Egypt,Route choice,Page data,Same list (kept by pricing)
+Rates & offer,Alliance loops,Everyone,DATA.services (reference list of liner rotations),Which services call Egypt,Route choice,Page data,Same list (kept by pricing)
 Help & settings,Help,Everyone,Text in the page,How the tool works and where numbers come from,—,—,—
 Help & settings,Settings & sources,Pricing,db: config/sources and db: edits,Which Excel file is the source; fix a rate or a request inside the tool,Rates & offer / Customer requests,db: config / edits,Data store with audit log

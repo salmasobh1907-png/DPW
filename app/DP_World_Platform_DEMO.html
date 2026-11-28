@@ -3045,20 +3045,19 @@ try{ csStartTimer(); }catch(e){}
 const ICON=n=>`<svg class="ic sm" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 const NAV={
   pricing:[["Daily work",[["cases","Inbox","inbox"],["lane","Rates & offer","map"],["q","Offers & feedback","file"]],"pricing + sales"],
-           ["Rate Bank",[["sheet","Rate Bank","db"],["trk","Trucking rates","truck"]],"pricing"],
-           ["Reports",[["home","Overview","home"]],"managers"],
-           ["Reference",[["svc","Alliance loops","ship"],["info","Help & settings","help"]],"everyone"]],
+           ["Data and reports",[["sheet","Rate Bank","db"],["home","Overview","home"]],"pricing + managers"],
+           ["Reference",[["info","Help & settings","help"]],"everyone"]],
   sales:[["Daily work",[["ibx","Inbox","inbox"],["lane","Find a rate","map"],["q","My offers & feedback","file"]],"sales"],
-         ["Reference",[["trk","Trucking rates","truck"],["svc","Alliance loops","ship"],["info","Help","help"]],"everyone"]]
+         ["Reference",[["trk","Trucking rates","truck"],["info","Help","help"]],"everyone"]]
 };
 // merged tabs: one nav item, a small switch on top of the page
-const SUBS={cases:[["cases","Inbox"],["ckpi","Team KPIs"],["cmbx","Mailboxes & SLA"]],q:[["q","Offers & quotes"],["fb","Sales feedback"]],sheet:[["sheet","Rate Data Base"],["off","Carrier offers"],["req","Ask carriers"],["plog","Pricing log"],["hl","Rate check"]],home:[["home","Overview"],["dem","Customer requests"],["gw","Market alerts"],["vol","Carrier volumes"]],info:[["info","Help"],["src","Settings & sources"]]};
+const SUBS={cases:[["cases","Inbox"],["ckpi","Team KPIs"],["cmbx","Mailboxes & SLA"]],q:[["q","Offers & quotes"],["fb","Sales feedback"]],lane:[["lane","Rates & offer"],["svc","Alliance loops"]],sheet:[["sheet","Rate Data Base"],["trk","Trucking rates"],["off","Carrier offers"],["req","Ask carriers"],["plog","Pricing log"],["hl","Rate check"]],home:[["home","Overview"],["dem","Customer requests"],["gw","Market alerts"],["vol","Carrier volumes"]],info:[["info","Help"],["src","Settings & sources"]]};
 const SUBS_SALES={q:"My offers & quotes",fb:"Feedback to pricing"};
 const PAR={}; Object.keys(SUBS).forEach(k=>SUBS[k].forEach(([c])=>PAR[c]=k));
-function navKey(t){ return PAR[t]||t; }
+function navKey(t){ const k=PAR[t]; try{ return k&&navItems().some(g=>g[1].some(x=>x[0]===k))?k:t; }catch(e){ return k||t; } }
 function renderSub(t){ let bar=$("subsw"); const pk=navKey(t), L=SUBS[pk]; if(!bar){ bar=document.createElement("div"); bar.id="subsw"; bar.className="subsw"; bar.setAttribute("role","group"); bar.setAttribute("aria-label","Part of this page"); const w=$("work"); w.insertBefore(bar,w.firstChild); }
   const ok=L&&(isPricing()||pk!=="info"); bar.hidden=!ok; if(!ok) return; bar.innerHTML=L.map(([k,l])=>`<button type="button" data-sk="${k}" aria-pressed="${k===t}">${esc((!isPricing()&&SUBS_SALES[k])||l)}</button>`).join(""); bar.querySelectorAll("[data-sk]").forEach(x=>x.onclick=()=>openTab(x.dataset.sk)); }
-const NAVOPEN=new Set();
+const NAVOPEN=new Set(["Data and reports","Reference"]);
 const PAGE={cases:["Inbox","Every email is one request: one number, an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
   q:["Offers & quotes","Offers pricing sent to sales, and quotes sales sent to customers"],fb:["Sales feedback","What sales hear from customers, with pricing's replies"],off:["Carrier offers","A carrier email or Excel turned into Rate Bank rows"],
   req:["Ask carriers","Monthly “Rate Idea” emails to the lines"],svc:["Alliance loops","Reference list of liner rotations that call Egypt, 19 Oct 2026"],vol:["Carrier volumes","What we booked with each line, for contract and volume talks"],trk:["Trucking rates","Pickup in Egypt for EXW requests, and cross-border trucks"],hl:["Rate Bank check","Rows in the Rate Bank that are wrong or easy to misread"],gw:["Market alerts","Disruptions, rate-increase notices and the weekly market index"],info:["Help","How the platform works and where the numbers come from"]};
@@ -3094,7 +3093,7 @@ function openTab(t,quiet){
   if(!allowed(t)) t="lane";
   const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
   panes.forEach(k=>{ const p=$("p-"+k); if(p) p.hidden=k!==t; });
-  { const wasNo=document.body.classList.contains("nomap"); document.body.classList.toggle("nomap",t==="trk"||t==="sheet"||t==="ibx"||t==="cases"||t==="ckpi"||t==="cmbx"); if(wasNo&&t!=="trk"&&t!=="sheet"&&t!=="ibx"&&t!=="cases"&&t!=="ckpi"&&t!=="cmbx") setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
+  { const wasNo=document.body.classList.contains("nomap"); const noMap=!["home","lane","dem","svc"].includes(t); document.body.classList.toggle("nomap",noMap); if(wasNo&&!noMap) setTimeout(()=>window.dispatchEvent(new Event("resize")),30); }
   document.querySelectorAll("#nav button[data-k],#bnav button[data-k]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.k===navKey(t)))); renderSub(t);
   { const nb=document.querySelector('#nav button[data-k="'+navKey(t)+'"]'); if(nb&&nb.closest(".gi[hidden]")) renderNav(); }
   setTitle(t); $("work").scrollTop=0; if(!quiet) window.scrollTo&&window.scrollTo(0,0);

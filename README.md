@@ -198,6 +198,7 @@ python3 make_dummy_ratebank.py ../data/demo_data.json ../data
 
 ## 13. Known limits of the prototype
 
+- Menu (pricing): Inbox, Rates & offer (with Alliance loops), Offers & feedback, Rate Bank (with Trucking rates), Overview, Help & settings. Sales: Inbox, Find a rate (with Alliance loops), My offers & feedback, Trucking rates, Help. The map shows only on Rates & offer, Alliance loops, Overview and Customer requests.
 - One HTML page; roles are a switch, not real security.
 - Inbox cases (owner, SLA clock, history) live in each browser, not shared.
 - Sample emails and dummy data only; no connection to DP World systems.
