@@ -175,6 +175,7 @@ textarea.ta,.ta{font-size:13px;line-height:1.45;resize:vertical}
 #of-mkt:not([hidden])~#mktEmpty{display:none}#p-lane:not([data-step="1"]) #deskHead .dtl,#p-lane:not([data-step="1"]) #deskHead .dfb{display:none}#mktSlot .ofmkt{margin-top:0}
 .card.fold>h3{cursor:pointer;margin-bottom:0}.card.fold>h3::before{content:"▸ ";color:var(--muted)}.card.fold.open>h3{margin-bottom:10px}.card.fold.open>h3::before{content:"▾ "}.card.fold:not(.open)>*:not(h3){display:none!important}
 @media(max-width:560px){.lsteps button .t span{display:none}.lsteps button{padding:8px}}
+.avBar{margin:12px 0;padding:12px 16px}.avRow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}.avChips{display:flex;flex-wrap:wrap;gap:6px;margin-right:auto}.avChips .csChip{padding:5px 11px}.avChips .csChip:disabled{opacity:.45;cursor:default}.avLv{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px}.csTbl input[type=time]{width:auto;padding:3px 6px}
 details.whatif{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
 details.whatif summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);list-style:none;display:flex;align-items:center;gap:6px}
 details.whatif summary::-webkit-details-marker{display:none}
@@ -2724,6 +2725,67 @@ async function ibxDoReset(){ if(!QT.db) return 0; let n=0; for(const c of ["extr
   try{ if(typeof CUR_TAB!=="undefined"&&CUR_TAB==="cases"&&isPricing()){ const a=document.activeElement, busy=(a&&a.closest&&a.closest("#csDet textarea,#csNewF,.demoMenu[open]"))||document.querySelector("#p-cases .demoMenu[open]")||($("csNewF")&&!$("csNewF").hidden);
     if(busy) csLive(); else renderCases(); } }catch(e){} return v; }; })();
 
+// ---------- My status: each person says where they are (lunch, prayer, break, mission, coaching, training, Q meeting, annual leave) ----------
+// Self-declared only: the person presses a button. Nothing is measured from the mouse, keyboard or screen (that is "My shift", which stays off).
+// A lead sees lunch, prayer and break as one word, "Break". A lead can start, end and correct a Q meeting that is with them.
+// Real use needs a staff notice and HR agreement first (README section 8).
+const CS_AVAIL_ON=true, CS_AVK="csAvail_v1";
+const CS_ST={ok:["Available","won",0,""],lunch:["Lunch break","open",60,"brk"],pray:["Prayer","open",15,"brk"],brk:["Break","open",15,"brk"],mission:["Mission","pending",120,"work"],coach:["Coaching","pending",60,"work"],train:["Training","pending",120,"work"],qm:["Q meeting","pending",30,"work"],al:["Annual leave","seen",0,"leave"]};
+const CS_ST_PICK=["ok","lunch","pray","brk","mission","coach","train","qm"];
+function avLead(pid){ return /@lead\./.test(csMail(pid)); }
+function avId(){ return "a"+Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+function avISO(t){ return new Date(t).toISOString().slice(0,10); }
+let AV=null;
+function avLoad(){ const today=csDay(Date.now()); if(AV&&AV.day===today) return AV; try{ AV=JSON.parse(localStorage.getItem(CS_AVK)||"null"); }catch(e){ AV=null; }
+  if(!AV||!Array.isArray(AV.al)){ const now=Date.now(); AV={day:today,cur:{omar:{id:avId(),t:"train",since:now-40*6e4,with:null,by:"omar"},ahmed:{id:avId(),t:"lunch",since:now-20*6e4,with:null,by:"ahmed"}},
+      log:[{id:avId(),pid:"nour",t:"qm",from:now-180*6e4,to:now-150*6e4,with:"me",by:"me"}],al:[{id:avId(),pid:"mariam",from:avISO(now+6*864e5),to:avISO(now+8*864e5),by:"mariam"}]}; avSave(); }
+  else if(AV.day!==today){ AV.day=today; AV.cur={}; AV.log=[]; avSave(); }
+  return AV; }
+function avSave(){ try{ localStorage.setItem(CS_AVK,JSON.stringify(AV)); }catch(e){} }
+function avOnLeave(pid){ const A=avLoad(), d=A.day; return A.al.some(x=>x.pid===pid&&x.from<=d&&x.to>=d); }
+function avCur(pid){ if(avOnLeave(pid)) return {t:"al",since:null}; return avLoad().cur[pid]||{t:"ok",since:null}; }
+function avFree(pid){ return !CS_AVAIL_ON||avCur(pid).t==="ok"; }
+function avSet(pid,t,by,withId){ const A=avLoad(), now=Date.now(), c=A.cur[pid]; if(c&&c.t===t) return;
+  if(c){ A.log.push({id:c.id,pid,t:c.t,from:c.since,to:now,with:c.with||null,by:c.by}); delete A.cur[pid]; }
+  if(t!=="ok") A.cur[pid]={id:avId(),t,since:now,with:withId||null,by}; avSave(); }
+function avMins(pid){ const A=avLoad(), now=Date.now(), M={}; A.log.filter(x=>x.pid===pid).forEach(x=>{ M[x.t]=(M[x.t]||0)+Math.max(0,(x.to-x.from)/6e4); }); const c=A.cur[pid]; if(c) M[c.t]=(M[c.t]||0)+Math.max(0,(now-c.since)/6e4); return M; }
+function avGrp(M,g){ return Object.entries(M).filter(([k])=>CS_ST[k]&&CS_ST[k][3]===g).reduce((a,[,v])=>a+v,0); }
+// what a viewer may read about a person's status: the person sees the exact word, everyone else sees "Break" for lunch / prayer / break
+function avWord(t,own){ return !own&&CS_ST[t][3]==="brk"?"Break":CS_ST[t][0]; }
+function avTag(pid,viewer){ if(!CS_AVAIL_ON||!pid) return ""; const c=avCur(pid); return c.t==="ok"?"":` <span class="pill ${CS_ST[c.t][1]}">${avWord(c.t,pid===viewer)}</span>`; }
+function avHM(t){ try{ return new Date(t).toLocaleTimeString("en-GB",{timeZone:"Africa/Cairo",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}); }catch(e){ return ""; } }
+function avShift(t,hm){ const o=avHM(t).split(":"), n=String(hm||"").split(":"); if(n.length<2||o.length<2) return t; return t+((+n[0]*60+ +n[1])-(+o[0]*60+ +o[1]))*6e4; }
+function avLeaveTxt(x){ const f=d=>{ const D=new Date(d+"T12:00:00Z"); return D.toLocaleDateString("en-GB",{day:"numeric",month:"short",timeZone:"UTC"}); }; return x.from===x.to?f(x.from):f(x.from)+" to "+f(x.to); }
+function avBar(pid){ if(!CS_AVAIL_ON) return ""; const A=avLoad(), c=avCur(pid), M=avMins(pid), S=CS_ST[c.t];
+  const tot=Object.entries(M).filter(([k,v])=>v>=1&&CS_ST[k]).map(([k,v])=>CS_ST[k][0].toLowerCase()+" "+csDur(v)).join(" · ");
+  const al=A.al.filter(x=>x.pid===pid&&x.to>=A.day).sort((a,b)=>a.from.localeCompare(b.from)), wth=c.with?` with ${esc(csName(c.with))}`:"";
+  return `<div class="card avBar"><div class="avRow"><b>My status</b><div class="avChips">${CS_ST_PICK.map(k=>`<button class="csChip" data-av="${k}" aria-pressed="${c.t===k}"${c.t==="al"?" disabled":""}>${CS_ST[k][0]}</button>`).join("")}</div>
+    <details class="demoMenu right avAl"><summary>Leave plan${al.length?" · "+al.length:""}</summary><div class="demoPop"><b>My annual leave plan</b>${al.length?al.map(x=>`<span class="avLv">${esc(avLeaveTxt(x))}<button class="mini bad" data-avx="${x.id}">Remove</button></span>`).join(""):'<span class="note">No leave planned.</span>'}
+      <label class="f">From<input type="date" id="avF" min="${A.day}"></label><label class="f">To<input type="date" id="avT" min="${A.day}"></label><button class="mini ok" id="avAdd">Add leave</button><span class="note" id="avMsg" aria-live="polite">On leave days new requests are not auto-assigned to you.</span></div></details></div>
+   <p class="note" style="margin:8px 0 0">${c.t==="al"?"<b>You are on annual leave today.</b>":c.t==="ok"?"You are available.":`<b>${S[0]}${wth}</b> since ${csTime(c.since)}${S[2]?` · usual length ${csDur(S[2])}`:""}. Press Available when you are back.`}${tot?` Today: ${tot}.`:""} You set this yourself; nothing is tracked automatically. Your lead sees lunch, prayer and break as “Break”.</p></div>`; }
+function avTeam(viewer){ if(!CS_AVAIL_ON) return ""; const A=avLoad(), lead=avLead(viewer), now=Date.now();
+  const rows=CS_PEOPLE.map(p=>{ const own=p.id===viewer, c=avCur(p.id), M=avMins(p.id), see=lead||own, al=A.al.filter(x=>x.pid===p.id&&x.to>=A.day).sort((a,b)=>a.from.localeCompare(b.from));
+    const act=!lead||own||c.t==="al"?"":c.t==="qm"&&c.with===viewer?`<button class="mini" data-avqe="${p.id}">End Q meeting</button>`:c.t==="qm"?"":`<button class="mini ok" data-avq="${p.id}">Start Q meeting</button>`;
+    return `<tr${own?' class="me"':""}><td><b>${esc(p.name)}</b></td><td><span class="pill ${CS_ST[c.t][1]}">${avWord(c.t,own)}</span>${c.with?` <span class="note">with ${esc(csName(c.with))}</span>`:""}</td><td>${c.since?csTime(c.since):"—"}</td><td>${see?csDur(avGrp(M,"brk")):"—"}</td><td>${see?csDur(avGrp(M,"work")):"—"}</td><td>${al.length?al.map(x=>esc(avLeaveTxt(x))).join(", "):"—"}</td>${lead?`<td>${act}</td>`:""}</tr>`; }).join("");
+  const Q=A.log.filter(x=>x.t==="qm").map(x=>Object.assign({run:false},x)).concat(Object.entries(A.cur).filter(([,c])=>c.t==="qm").map(([pid,c])=>({id:c.id,pid,t:"qm",from:c.since,to:null,with:c.with,by:c.by,run:true}))).sort((a,b)=>a.from-b.from);
+  const qrows=Q.map(x=>{ const can=x.with===viewer, mine=x.pid===viewer; if(!can&&!mine&&!lead) return "";
+    return `<tr><td><b>${esc(csName(x.pid))}</b></td><td>${esc(x.with?csName(x.with):"—")}</td><td>${can?`<input type="time" data-avf="${x.id}" value="${avHM(x.from)}">`:avHM(x.from)}</td><td>${x.run?'<span class="pill pending">running</span>':can?`<input type="time" data-avt="${x.id}" value="${avHM(x.to)}">`:avHM(x.to)}</td><td>${csDur(((x.to||now)-x.from)/6e4)}</td><td>${can?`<button class="mini ok" data-avs="${x.id}">Save times</button>`:'<span class="note">only the lead in the meeting can change it</span>'}</td></tr>`; }).join("");
+  return `<div class="card"><h3>Team status today <span class="note">· set by each person, not tracked</span></h3><div class="csTblW"><table class="csTbl"><thead><tr><th>Person</th><th>Now</th><th>Since</th><th>Break today</th><th>Mission, coaching, training, Q meeting today</th><th>Leave plan</th>${lead?"<th>Q meeting</th>":""}</tr></thead><tbody>${rows}</tbody></table></div>
+   <p class="note" style="margin:8px 0 0">${lead?"As a lead you see totals for the team. Lunch, prayer and break show as “Break”. You can start or end a Q meeting with a person.":"You see who is available now. Totals are shown to you for your own row only."} Auto-assign skips anyone who is not Available. SLA clocks do not pause for a status: the customer is still waiting.</p>
+   ${qrows?`<h3 style="margin-top:14px">Q meetings today</h3><div class="csTblW"><table class="csTbl"><thead><tr><th>Person</th><th>With</th><th>From</th><th>To</th><th>Length</th><th></th></tr></thead><tbody>${qrows}</tbody></table></div><span class="note" id="avQMsg" aria-live="polite"></span>`:""}</div>`; }
+function avWire(root,rer){ if(!CS_AVAIL_ON||!root) return; const me=CSV.me, A=avLoad();
+  root.querySelectorAll("[data-av]").forEach(b=>b.onclick=()=>{ const k=b.dataset.av, ld=CS_PEOPLE.find(x=>avLead(x.id)&&x.id!==me); avSet(me,k,me,k==="qm"&&ld?ld.id:null); rer(); });
+  const add=root.querySelector("#avAdd"); if(add) add.onclick=()=>{ const f=root.querySelector("#avF").value, t=root.querySelector("#avT").value||f, m=root.querySelector("#avMsg"); if(!f||t<f||f<A.day){ if(m) m.textContent="Choose a From date (today or later) and a To date on or after it."; return; } A.al.push({id:avId(),pid:me,from:f,to:t,by:me}); avSave(); rer(); };
+  root.querySelectorAll("[data-avx]").forEach(b=>b.onclick=()=>{ A.al=A.al.filter(x=>!(x.id===b.dataset.avx&&x.pid===me)); avSave(); rer(); });
+  if(!avLead(me)) return;
+  root.querySelectorAll("[data-avq]").forEach(b=>b.onclick=()=>{ avSet(b.dataset.avq,"qm",me,me); rer(); });
+  root.querySelectorAll("[data-avqe]").forEach(b=>b.onclick=()=>{ const c=A.cur[b.dataset.avqe]; if(c&&c.t==="qm"&&c.with===me){ avSet(b.dataset.avqe,"ok",me); rer(); } });
+  root.querySelectorAll("[data-avs]").forEach(b=>b.onclick=()=>{ const id=b.dataset.avs, now=Date.now(), fi=root.querySelector(`[data-avf="${id}"]`), ti=root.querySelector(`[data-avt="${id}"]`), msg=root.querySelector("#avQMsg");
+    const L=A.log.find(x=>x.id===id), C=Object.values(A.cur).find(x=>x.id===id), e=L||C; if(!e||e.with!==me) return;
+    const from=avShift(L?L.from:C.since,fi&&fi.value), to=L?avShift(L.to,ti&&ti.value):null;
+    if(from>now||(to!=null&&(to<=from||to>now))){ if(msg) msg.textContent="Not saved: the start must be before the end, and neither can be in the future."; return; }
+    if(L){ L.from=from; L.to=to; L.editedBy=me; } else { C.since=from; C.editedBy=me; } avSave(); rer(); }); }
+
 // ---------- Cases page ----------
 const CSV={box:"all",f:"open",open:null,cat:null,me:"me"};
 function csVisible(L){ const A=new Set(csAcc(CSV.me)); return L.filter(c=>A.has(c.mbx)||c.who===CSV.me); }
@@ -2733,7 +2795,7 @@ function csFilter(L){ return L.filter(c=>(CSV.box==="all"||c.mbx===CSV.box)&&(CS
   .sort((a,b)=>CSV.f==="done"?b.sub-a.sub:(csState(a).left-csState(b).left)); }
 function csListHtml(){ const D=csLoad(), L=csFilter(csVisible(D.cases));
   return L.length?L.map(c=>`<button class="csRow${CSV.open===c.id?" on":""}" data-cs="${c.id}"><span class="csT"><b>${esc(c.subj)}</b><span class="note"><span class="qno">${esc(c.id)}</span> ${esc(c.from)}</span></span>
-    <span class="csM"><span class="pill seen">${esc(csMbx(c.mbx).name)}</span>${c.direct?`<span class="pill new">Direct to ${esc(csName(c.direct))}</span>`:""}${csPill(c)}<span class="note">${esc(c.who?csName(c.who):"Not assigned")} · ${csWhen(c.recv)}</span></span></button>`).join(""):`<p class="note" style="padding:12px">No cases here.</p>`; }
+    <span class="csM"><span class="pill seen">${esc(csMbx(c.mbx).name)}</span>${c.direct?`<span class="pill new">Direct to ${esc(csName(c.direct))}</span>`:""}${csPill(c)}<span class="note">${esc(c.who?csName(c.who):"Not assigned")}${avTag(c.who,CSV.me)} · ${csWhen(c.recv)}</span></span></button>`).join(""):`<p class="note" style="padding:12px">No cases here.</p>`; }
 function csDetHtml(c){ if(!c) return `<div class="card"><p class="note">Pick a case on the left to open it.</p></div>`;
   const s=csState(c), S=csSet(), mine=c.who===CSV.me, cat=CSV.cat||c.rt;
   const ppl=CS_PEOPLE.map(p=>`<option value="${p.id}"${c.who===p.id?" selected":""}>${esc(p.name)}</option>`).join("");
@@ -2763,6 +2825,7 @@ function renderCases(){ const p=$("p-cases"); if(!p) return; ibxAuto(); csSyncIb
   <div id="csK">${csKpis(L)}</div>
   ${csChaseHtml()}
   ${CS_SHIFT_ON&&CSV.me==="me"?`<div class="csTop">${csShiftCard()}</div>`:""}
+  ${avBar(CSV.me)}
   <div class="csChips">${boxes.map(([k,l,n])=>`<button class="csChip" data-box="${k}" aria-pressed="${CSV.box===k}">${esc(l)} <span class="cnt">${n}</span></button>`).join("")}</div>
   <div class="csBar2"><div class="csF">${fs.map(([k,l])=>`<button class="mini${CSV.f===k?" ok":""}" data-f="${k}">${l}</button>`).join("")}</div></div>
   <div class="card csNewF" id="csNewF" hidden><h3>Test email to ${CS_GROUP}</h3><div class="trkform">
@@ -2778,7 +2841,7 @@ function renderCases(){ const p=$("p-cases"); if(!p) return; ibxAuto(); csSyncIb
   p.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{ CSV.f=b.dataset.f; renderCases(); });
   csWireList(p);
   $("csAuto").onclick=()=>{ const load=id=>ALL.filter(c=>c.who===id&&!c.sub).length; let n=0;
-    L.filter(c=>!c.who&&!c.sub).sort((a,b)=>a.recv-b.recv).forEach(c=>{ const avail=CS_PEOPLE.filter(x=>x.id!=="me"&&csAcc(x.id).includes(c.mbx)).map(x=>x.id); if(!avail.length) avail.push("me"); const d=csDist(c.from+"\n"+c.subj+"\n"+c.body); const id=d?d.who:avail.slice().sort((a,b)=>load(a)-load(b))[0]; c.who=id; c.status="assigned"; c.ab=d?"Work distribution: "+d.key+" → "+csName(id):"Auto: fewest open cases"; c.log.push([Date.now(),"Auto-assigned to "+csName(id)+(d?" (work distribution: "+d.key+")":" (fewest open cases)")]); n++; });
+    L.filter(c=>!c.who&&!c.sub).sort((a,b)=>a.recv-b.recv).forEach(c=>{ let avail=CS_PEOPLE.filter(x=>x.id!=="me"&&csAcc(x.id).includes(c.mbx)&&avFree(x.id)).map(x=>x.id); if(!avail.length) avail=CS_PEOPLE.filter(x=>x.id!=="me"&&csAcc(x.id).includes(c.mbx)).map(x=>x.id); if(!avail.length) avail.push("me"); let d=csDist(c.from+"\n"+c.subj+"\n"+c.body); if(d&&!avFree(d.who)){ c.log.push([Date.now(),"Work distribution owner "+csName(d.who)+" is not available now, so the fewest-open rule was used"]); d=null; } const id=d?d.who:avail.slice().sort((a,b)=>load(a)-load(b))[0]; c.who=id; c.status="assigned"; c.ab=d?"Work distribution: "+d.key+" → "+csName(id):"Auto: fewest open cases"; c.log.push([Date.now(),"Auto-assigned to "+csName(id)+(d?" (work distribution: "+d.key+")":" (fewest open cases)")]); n++; });
     csStore(); renderCases(); };
   CSV.msg="";
   $("csNew").onclick=()=>{ const f=$("csNewF"); f.hidden=!f.hidden; };
@@ -2790,9 +2853,9 @@ function renderCases(){ const p=$("p-cases"); if(!p) return; ibxAuto(); csSyncIb
     if(D0) c.log.push([now,"Assigned to "+csName(D0.who)+" by work distribution ("+D0.key+")"]);
     ALL.unshift(c); CSV.f="open"; const can=acc.includes(R.box)||c.who===CSV.me; CSV.open=can?c.id:null;
     CSV.msg=`<b>${to?"Pulled in from "+esc(csName(to))+"'s own inbox":"Routed"} to ${esc(csMbx(R.box).name)}${to?", assigned to "+esc(csName(to)):D0?", assigned to "+esc(csName(D0.who))+" (work distribution: "+esc(D0.key)+")":", not assigned yet"}</b> <span class="note">· ${esc(R.why)}${can?"":` · ${esc(csName(CSV.me))} cannot open this box, so it is not in this list`}</span>`; csStore(); const m=CSV.msg; renderCases(); CSV.msg=m; };
-  $("csReset").onclick=async()=>{ try{ ["chase","chaseSeed","ibxRead","ibxDone"].forEach(k=>localStorage.removeItem(k)); }catch(e){} IBX.read=new Set(); IBX.done=new Set();
+  $("csReset").onclick=async()=>{ try{ ["chase","chaseSeed","ibxRead","ibxDone",CS_AVK].forEach(k=>localStorage.removeItem(k)); }catch(e){} AV=null; IBX.read=new Set(); IBX.done=new Set();
     let n=0; if(QT.isOwner||!QT.shared) n=await ibxDoReset(); CS=csSeed(); CSV.open=null; csStore(); renderCases(); CSV.msg=`<b>Demo reset.</b> <span class="note">Sample cases are back${n?" and "+n+" rehearsal items were removed":""}.</span>`; const m=CSV.msg; renderCases(); CSV.msg=m; };
-  $("csGo").onclick=()=>ibxLoad(); $("csOffl").onclick=()=>ibxUse(IBX_OFFLINE,"offline"); csWireChase(p);
+  $("csGo").onclick=()=>ibxLoad(); $("csOffl").onclick=()=>ibxUse(IBX_OFFLINE,"offline"); csWireChase(p); avWire(p,renderCases);
   csWireDet(); }
 function csWireList(root){ root.querySelectorAll("[data-cs]").forEach(b=>b.onclick=()=>{ CSV.open=b.dataset.cs; CSV.cat=null; renderCases(); }); }
 function csWireDet(){ const c=csLoad().cases.find(x=>x.id===CSV.open); if(!c) return;
@@ -2829,7 +2892,7 @@ function renderCkpi(){ const p=$("p-ckpi"); if(!p) return; const D=csLoad(), S=c
   <div class="card"><h3>Per person</h3><div class="csTblW"><table class="csTbl"><thead><tr><th>Person</th><th>Cases</th><th>Submitted</th><th>On time</th><th>Breached</th><th>Avg first answer</th><th>Emails submitted (all)</th>${S.count.map(k=>`<th>${esc(CS_CAT[k])}</th>`).join("")}<th>Counted</th>${CS_SHIFT_ON?"<th>Active</th><th>Away / break</th>":""}</tr></thead>
    <tbody>${rows.map(r=>`<tr${r.pp.id==="me"?' class="me"':""}><td><b>${esc(r.pp.name)}</b></td><td>${r.n}</td><td>${r.subd}</td><td>${r.pct==null?"—":r.pct+"%"}</td><td>${r.late+r.brOpen?`<span class="pill lost">${r.late+r.brOpen}</span>`:"0"}${r.brOpen?` <span class="note">${r.brOpen} open</span>`:""}</td><td>${r.avg==null?"—":csDur(r.avg)}</td><td>${r.sent}</td>${S.count.map(k=>`<td>${r.by(k)}</td>`).join("")}<td><b>${r.counted}</b></td>${CS_SHIFT_ON?`<td>${csDur(r.a.active)}${CKV.per!=="today"?' <span class="note">today</span>':""}</td><td>${csDur(r.a.away)}</td>`:""}</tr>`).join("")}</tbody></table></div>
    <p class="note" style="margin:8px 0 0">Every email a person sends is logged. Only the request types ticked above are counted. A breach counts for the person the case is assigned to. Avg first answer = working time from arrival to Send and submit.</p></div>
-  <div class="card"><h3>Breaches in this period</h3>${(()=>{ const B=cs.filter(c=>["breach","late"].includes(csState(c,now).st)); return B.length?`<div class="csTblW"><table class="csTbl"><thead><tr><th>Case</th><th>Mailbox</th><th>Assigned to</th><th>SLA</th><th>Used</th><th>Status</th></tr></thead><tbody>${B.map(c=>{ const s=csState(c,now); return `<tr><td>${esc(c.id)} · ${esc(c.subj)}</td><td>${esc(csMbx(c.mbx).name)}</td><td>${esc(csName(c.who))}</td><td>${csSla(c.mbx)}h</td><td>${csDur(s.used)}</td><td>${csPill(c)}</td></tr>`; }).join("")}</tbody></table></div>`:`<p class="note">No breaches.</p>`; })()}</div>`;
+  <div class="card"><h3>Breaches in this period</h3>${(()=>{ const B=cs.filter(c=>["breach","late"].includes(csState(c,now).st)); return B.length?`<div class="csTblW"><table class="csTbl"><thead><tr><th>Case</th><th>Mailbox</th><th>Assigned to</th><th>SLA</th><th>Used</th><th>Status</th></tr></thead><tbody>${B.map(c=>{ const s=csState(c,now); return `<tr><td>${esc(c.id)} · ${esc(c.subj)}</td><td>${esc(csMbx(c.mbx).name)}</td><td>${esc(csName(c.who))}</td><td>${csSla(c.mbx)}h</td><td>${csDur(s.used)}</td><td>${csPill(c)}</td></tr>`; }).join("")}</tbody></table></div>`:`<p class="note">No breaches.</p>`; })()}</div>${avTeam(CSV.me)}`; avWire(p,renderCkpi);
   p.querySelectorAll("[data-per]").forEach(b=>b.onclick=()=>{ CKV.per=b.dataset.per; renderCkpi(); });
   p.querySelectorAll("[data-ck]").forEach(b=>b.onchange=()=>{ const o=csSet(); const set=new Set(o.count); b.checked?set.add(b.dataset.ck):set.delete(b.dataset.ck); o.count=Object.keys(CS_CAT).filter(k=>set.has(k)); csSave(o); renderCkpi(); }); }
 

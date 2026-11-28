@@ -100,7 +100,7 @@ Full table, one row per sub-screen: `TAB_MAP.csv`. Summary:
 
 ### 5.3 Browser-only storage (per user)
 
-Inbox cases and their settings (`csState_v2`, `csSet_v1`; `csMy_v1` only if "My shift" is ever switched on), which mailbox emails were answered or read (`ibxDone`, `ibxRead`), theme, last screen, view (pricing / sales).
+Inbox cases and their settings (`csState_v2`, `csSet_v1`; `csMy_v1` only if "My shift" is ever switched on), which mailbox emails were answered or read (`ibxDone`, `ibxRead`), "My status" and leave plans (`csAvail_v1`), theme, last screen, view (pricing / sales).
 In production the cases must move to the database (see section 9).
 
 ## 6. Business rules built in
@@ -144,6 +144,7 @@ If these services are missing, the page still opens, shows the sample emails and
 - In production: buy rates must stay on the server and reach Pricing users only; role switch in the page is not protection.
 - "My shift" (active / away time inside the tool) must stay OFF until HR and Legal approve (Egypt Personal Data Protection Law 151 of 2020).
   In the page it is switched off by `const CS_SHIFT_ON=false`: no shift card, no Active / Away columns, no activity recorded or stored. Set it to `true` only after written approval.
+- "My status" (Inbox) is different from "My shift": each person presses a button to say where they are (Available, Lunch break, Prayer, Break, Mission, Coaching, Training, Q meeting) and adds their annual leave plan. Nothing is measured from the mouse, keyboard or screen. A lead sees lunch, prayer and break as one word, "Break", because a prayer status can show a person's religion (sensitive personal data). A lead can start, end and correct the times of a Q meeting only when the meeting is with them; every change keeps who made it. Auto-assign skips people who are not Available; SLA clocks do not pause. Switch: `const CS_AVAIL_ON`. It is still staff data about working time, so real use needs a staff notice and HR agreement first.
 - Rehearsal controls (offline copy, reset, test email, "Signed in as") sit in one **Demo tools** menu on the Inbox. They are not part of the real tool.
 
 ## 9. What we ask from IT (details in the IT Needs Map)
