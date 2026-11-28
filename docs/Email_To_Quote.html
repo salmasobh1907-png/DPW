@@ -1,0 +1,187 @@
+<title>Email to Quote</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* VOICE work, a looping showcase scene for management, in the Showcase's ocean look
+   IDEA one real-looking customer email, answered twice: the old way, then with the tool
+   PICTURE the email on the left; on the right the work happens: windows piling up, then fields flying into a request card, the carrier table, the margin and the reply typing itself
+   COLOUR abyss ground, sea #3BE3D2 for the tool, alarm #FF6B5A for the old way, road #FFB23F for the result
+   TYPE Archivo (wide) + IBM Plex Sans / Mono
+   LAYOUT fixed 16:9 stage scaled to the window: title strip with act tabs and clock, email left, work area right, savings strip at the bottom */
+:root{color-scheme:dark;--abyss:#030B17;--panel:rgba(8,24,46,.8);--line:rgba(120,190,220,.2);--ink:#EAF4FA;--mute:#8FA9BE;--sea:#3BE3D2;--alarm:#FF6B5A;--road:#FFB23F}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(1200px 800px at 70% 40%,#0B2747 0%,#05142A 45%,var(--abyss) 80%);color:var(--ink);font:16px/1.4 "IBM Plex Sans",system-ui,sans-serif;overflow:hidden}
+#wrap{position:fixed;inset:0;display:grid;place-items:center}
+#stage{position:relative;width:1600px;height:900px;transform-origin:center center;flex:none}
+.top{position:absolute;left:56px;right:56px;top:26px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px}
+.eyebrow{font:600 14px/1 "IBM Plex Mono",monospace;color:var(--sea);margin:0 0 10px}
+h1{margin:0;white-space:nowrap;font:800 38px/1.02 "Archivo",sans-serif;font-variation-settings:"wdth" 115}
+.acts{display:flex;gap:8px;align-items:center}
+.act{white-space:nowrap;font:600 14px/1 "IBM Plex Mono",monospace;padding:11px 16px;border-radius:999px;border:1px solid var(--line);color:var(--mute);background:rgba(3,14,30,.6);cursor:pointer;min-height:44px}
+.act.on{color:#02201d;background:var(--sea);border-color:var(--sea)}
+.act.b.on{background:var(--alarm);border-color:var(--alarm);color:#2a0803}
+.act:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.clock{margin-left:14px;text-align:right;font:500 12px/1.2 "IBM Plex Mono",monospace;color:var(--mute)}
+.clock b{display:block;font:800 40px/1 "Archivo",sans-serif;font-variant-numeric:tabular-nums;color:var(--ink)}
+.clock.b b{color:var(--alarm)}.clock.a b{color:var(--sea)}
+/* email */
+.mail{position:absolute;left:56px;top:140px;width:520px;height:560px;background:#F4F7FA;color:#14202e;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.mbar{background:#0f6cbd;color:#fff;padding:10px 16px;font:600 13px/1 "IBM Plex Sans",sans-serif;display:flex;justify-content:space-between}
+.mhd{padding:16px 20px 10px;border-bottom:1px solid #dbe3ea}
+.mhd b{display:block;font:700 19px/1.25 "IBM Plex Sans",sans-serif;margin-bottom:8px}
+.mhd span{display:block;font-size:13px;color:#4b5d70}
+.mbody{padding:14px 20px;font-size:16px;line-height:1.75}
+.f{padding:1px 4px;border-radius:5px;transition:background .3s,box-shadow .3s}
+.f.hit{background:#c8f6f1;box-shadow:0 0 0 2px #1fb5a7}
+.mail.read .f{background:#fff2c9}
+/* work area */
+.work{position:absolute;left:616px;top:140px;width:928px;height:560px}
+.scene{position:absolute;inset:0;opacity:0;transition:opacity .5s;pointer-events:none}
+.scene.on{opacity:1}
+.win{position:absolute;background:#f4f6f8;color:#1d1d1d;border-radius:10px;overflow:hidden;box-shadow:0 16px 44px rgba(0,0,0,.55);border:1px solid #2b3d52;opacity:0;transform:translateY(16px) scale(.97);transition:opacity .4s,transform .4s}
+.win.on{opacity:1;transform:none}
+.wt{display:flex;align-items:center;gap:8px;padding:8px 12px;font:600 13px/1 "IBM Plex Sans",sans-serif;color:#fff}
+.wt small{margin-left:auto;font-weight:400;opacity:.85}
+.xlg{background:#107c41}.olk{background:#0f6cbd}.pdf{background:#b4282f}.calc{background:#3b3b3b}
+.wb{padding:10px 12px;font-size:13.5px}
+.xt{width:100%;border-collapse:collapse;font-size:12.5px}
+.xt td,.xt th{border:1px solid #dfe5ea;padding:4px 6px;white-space:nowrap}
+.xt th{background:#e9eef2;font-weight:600;text-align:left}
+.xt tr.scan td{background:#e6f3ff}.xt tr.x td{color:#b9c2c9;text-decoration:line-through}
+.typing::after{content:"";display:inline-block;width:2px;height:15px;background:#0f6cbd;margin-left:2px;vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.pain{position:absolute;font:600 13px/1.3 "IBM Plex Mono",monospace;color:#FFD9D2;background:rgba(255,107,90,.16);border:1px solid rgba(255,107,90,.5);border-radius:999px;padding:7px 12px;opacity:0;transition:opacity .35s}
+.pain.on{opacity:1}
+/* after */
+.card{position:absolute;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px;opacity:0;transform:translateY(12px);transition:opacity .4s,transform .4s}
+.card.on{opacity:1;transform:none}
+.card h3{margin:0 0 10px;font:700 15px/1 "IBM Plex Mono",monospace;color:var(--sea);letter-spacing:.04em}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 15px/1 "IBM Plex Sans",sans-serif;padding:9px 12px;border-radius:10px;background:#0c2643;border:1px solid rgba(59,227,210,.45);opacity:0;transform:translateX(-30px);transition:opacity .35s,transform .45s cubic-bezier(.2,.8,.2,1)}
+.chip.on{opacity:1;transform:none}
+.chip i{font-style:normal;display:block;font:500 11px/1 "IBM Plex Mono",monospace;color:var(--mute);margin-bottom:5px}
+.ct{width:100%;border-collapse:collapse;font-size:15px}
+.ct th{font:600 12px/1 "IBM Plex Mono",monospace;color:var(--mute);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+.ct td{padding:9px 8px;border-bottom:1px solid rgba(120,190,220,.1);white-space:nowrap}
+.ct td.n{text-align:right;font-variant-numeric:tabular-nums;font-family:"IBM Plex Mono",monospace}
+.ct tr{opacity:0;transition:opacity .35s,background .35s}
+.ct tr.on{opacity:1}
+.ct tr.best{background:rgba(59,227,210,.14)}
+.tag{font:600 11.5px/1 "IBM Plex Mono",monospace;padding:4px 7px;border-radius:999px;white-space:nowrap}
+.tg{background:rgba(59,227,210,.18);color:var(--sea)}.tw{background:rgba(255,178,63,.18);color:var(--road)}.tb{background:rgba(255,107,90,.18);color:var(--alarm)}
+.sum{display:flex;align-items:center;gap:12px;font:800 34px/1 "Archivo",sans-serif;font-variation-settings:"wdth" 112;font-variant-numeric:tabular-nums}
+.sum span{opacity:0;transition:opacity .3s}.sum span.on{opacity:1}
+.sum .sell{color:var(--road)}
+.sum small{font:500 13px/1.3 "IBM Plex Sans",sans-serif;color:var(--mute);display:block}
+.reply{font-size:14px;line-height:1.55;color:#14202e;background:#F4F7FA;border-radius:12px;padding:12px 14px;min-height:150px;white-space:pre-wrap}
+.stamp{position:absolute;right:18px;bottom:14px;font:800 20px/1 "Archivo",sans-serif;padding:10px 14px;border-radius:10px;background:var(--sea);color:#02201d;opacity:0;transform:scale(.7);transition:opacity .3s,transform .35s cubic-bezier(.3,1.6,.5,1)}
+.stamp.on{opacity:1;transform:none}
+/* savings */
+.save{position:absolute;left:56px;right:56px;top:724px;height:120px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.sv{background:rgba(3,14,30,.7);border:1px solid var(--line);border-radius:16px;padding:14px 20px;opacity:.22;transition:opacity .5s,border-color .5s}
+.sv.on{opacity:1;border-color:rgba(255,178,63,.6)}
+.sv b{display:block;font:800 38px/1 "Archivo",sans-serif;font-variation-settings:"wdth" 118;color:var(--road)}
+.sv span{display:block;margin-top:7px;font-size:14.5px;color:#C5D8E6}
+.foot{position:absolute;left:56px;right:56px;bottom:14px;display:flex;justify-content:space-between;gap:20px;font:500 12px/1.3 "IBM Plex Mono",monospace;color:var(--mute)}
+.prog{position:absolute;left:56px;right:56px;top:712px;height:3px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--alarm) 0 42%,var(--sea) 42% 88%,var(--road) 88%)}
+</style>
+
+<div id="wrap"><div id="stage" role="img" aria-label="Animation: a customer rate request email answered the old way with Excel, PDFs and a calculator, then with the tool, which reads the lane, compares carriers, adds the profit and drafts the reply">
+  <div class="top">
+    <div><p class="eyebrow">DP World Egypt · Pricing tool · quoting from the email</p><h1>From the customer’s email to the quote</h1></div>
+    <div class="acts">
+      <button class="act b" id="actB" type="button">1 · Before</button><button class="act" id="actA" type="button">2 · With the tool</button><button class="act" id="pp" type="button">Pause</button>
+      <div class="clock" id="clk"><b id="clkN">00:00</b>minutes*</div>
+    </div>
+  </div>
+
+  <div class="mail" id="mail">
+    <div class="mbar"><span>Outlook · pricing shared mailbox</span><span>09:02</span></div>
+    <div class="mhd"><b>Rate request Sokhna → Jeddah 2x40HC</b><span>From: Mona Adel (Sales) · To: Pricing</span><span>Ref: Q-1042</span></div>
+    <div class="mbody">Dear Pricing team,<br>Please share your best ocean freight rate:<br>
+      POL: <span class="f" id="f1">Sokhna (DP World terminal)</span><br>
+      POD: <span class="f" id="f2">Jeddah</span><br>
+      Equipment: <span class="f" id="f3">2 x 40' HC</span>, furniture<br>
+      Ready: <span class="f" id="f4">10 Dec 2026</span><br>
+      Customer: <span class="f" id="f5">Gulf Home Retail</span><br>
+      Target: <span class="f" id="f6">USD 900 per 40'</span><br>Thanks, Mona</div>
+  </div>
+
+  <div class="work">
+    <div class="scene" id="scB">
+      <div class="win" id="w1" style="left:0;top:0;width:600px"><div class="wt xlg">Rate Bank.xlsx<small>filter: POL = Sokhna, POD = Jeddah</small></div><div class="wb"><table class="xt"><tr><th>Carrier</th><th>POL</th><th>POD</th><th>40HC</th><th>Valid</th><th>Type</th></tr><tr id="r1"><td>Gulf Bridge</td><td>Sokhna</td><td>Hamad</td><td>1,875</td><td>31 Oct</td><td></td></tr><tr id="r2"><td>Sahara Feeder</td><td>Sokhna</td><td>Jeddah</td><td>850</td><td>18 Dec</td><td></td></tr><tr id="r3"><td>Gulf Bridge</td><td>Sokhna</td><td>Jeddah</td><td>1,025</td><td>18 Dec</td><td></td></tr><tr id="r4"><td>Aurora Lines</td><td>Sokhna</td><td>Jeddah</td><td>560</td><td>28 Nov</td><td>Spot?</td></tr></table></div></div>
+      <div class="win" id="w2" style="left:488px;top:200px;width:430px"><div class="wt pdf">Carrier offer.pdf<small>page 3 of 7</small></div><div class="wb">Aurora Lines · DEMO STAR / 046E · spot · terminal: ?<br>Free time: not stated · valid this sailing only</div></div>
+      <div class="win" id="w3" style="left:40px;top:250px;width:280px"><div class="wt calc">Calculator</div><div class="wb" style="font:600 26px/1.3 'IBM Plex Mono',monospace;text-align:right" id="calc">850 + ?</div></div>
+      <div class="win" id="w4" style="left:330px;top:360px;width:560px"><div class="wt olk">New email · Re: Rate request<small>typed by hand</small></div><div class="wb" style="min-height:110px"><span id="typeB" class="typing"></span></div></div>
+      <div class="pain" id="p1" style="left:610px;top:10px">Which row is valid? Which is spot?</div>
+      <div class="pain" id="p2" style="left:640px;top:310px">Terminal not stated</div>
+      <div class="pain" id="p3" style="left:40px;top:205px">Profit by feel</div>
+      <div class="pain" id="p4" style="left:560px;top:520px">Copy, paste, format</div>
+    </div>
+
+    <div class="scene" id="scA">
+      <div class="card" id="cReq" style="left:0;top:0;width:928px"><h3>Request read from the email</h3><div class="chips"><div class="chip" id="c1"><i>POL</i>Sokhna · DP World terminal</div><div class="chip" id="c2"><i>POD</i>Jeddah</div><div class="chip" id="c3"><i>Boxes</i>2 × 40'HC</div><div class="chip" id="c4"><i>Ready</i>10 Dec</div><div class="chip" id="c5"><i>Customer</i>Gulf Home Retail</div><div class="chip" id="c6"><i>Target</i>USD 900</div></div></div>
+      <div class="card" id="cCar" style="left:0;top:112px;width:560px"><h3>Carriers on the lane · Rate Bank</h3><table class="ct"><tr id="h0" class="on"><th>Carrier</th><th>Terminal</th><th>40HC</th><th>Valid</th><th></th></tr><tr id="k1"><td>Sahara Feeder</td><td>DP World</td><td class="n">850</td><td>18 Dec</td><td><span class="tag tg">Lowest standard</span></td></tr><tr id="k2"><td>Gulf Bridge</td><td>DP World</td><td class="n">1,025</td><td>18 Dec</td><td><span class="tag tw">Standard</span></td></tr><tr id="k3"><td>Aurora Lines</td><td>Other</td><td class="n">560</td><td>28 Nov</td><td><span class="tag tb">Spot · other terminal</span></td></tr></table><p style="margin:10px 0 0;font-size:13px;color:var(--mute)">Spot and special rates are shown, never counted as the lowest.</p></div>
+      <div class="card" id="cMar" style="left:584px;top:112px;width:344px"><h3>Buy + profit = sell</h3><div class="sum"><span id="s1">850</span><span id="s2">+ 50</span><span id="s3" class="sell">= 900</span></div><p style="margin:10px 0 0;font-size:13.5px;color:#C5D8E6" id="sNote">Profit from the gap to the next carrier (1,025). Hits the customer’s target. THC at cost.</p></div>
+      <div class="card" id="cChk" style="left:584px;top:292px;width:344px"><h3>Before you send</h3><div class="chips"><div class="chip" id="k_a">Rate move ✓</div><div class="chip" id="k_b">Free time 21 days ✓</div><div class="chip" id="k_c">ACI: export, not needed</div><div class="chip" id="k_d">USD · FX date ✓</div></div></div>
+      <div class="card" id="cRep" style="left:0;top:350px;width:560px;height:210px"><h3>Reply to Mona, sell only</h3><div class="reply" id="typeA"></div><div class="stamp" id="stA">Draft saved ✓</div></div>
+    </div>
+  </div>
+
+  <div class="prog"><i id="bar"></i></div>
+  <div class="save">
+    <div class="sv" id="v1"><b>30 → 12 min</b><span>per quote, example*</span></div>
+    <div class="sv" id="v2"><b>4 → 1</b><span>windows: Excel, PDFs, calculator, email → one screen</span></div>
+    <div class="sv" id="v3"><b>Flagged</b><span>spot and other-terminal rates never count as the lowest</span></div>
+    <div class="sv" id="v4"><b>Q-1042</b><span>same reference from email to quote, every step logged</span></div>
+  </div>
+  <div class="foot"><span>* Example times to show the idea; the pilot measures the real ones.</span><span>Dummy data from the demo Rate Bank · plain rules, no AI · a person presses Send</span></div>
+</div></div>
+
+<script>
+{
+const T={B0:0,B1:11500,A0:11500,A1:24500,S0:24500,END:29000};
+const $=id=>document.getElementById(id);
+const on=(id,v)=>{ const e=$(id); if(e) e.classList.toggle("on",!!v); };
+const TB="Dear Mona,\nRate Sokhna to Jeddah, 40HC: USD 9",
+      TA="Dear Mona,\nSokhna (DP World terminal) → Jeddah, 2 × 40'HC\nUSD 900 per 40'HC, ocean freight\nValid until 18 Dec 2026 · transit about 5 days\nFree time 21 days combined. All rates in USD.\nBest regards, Pricing";
+function fit(){ const s=Math.min(innerWidth/1600,innerHeight/900); $("stage").style.transform="scale("+s+")"; }
+addEventListener("resize",fit); fit();
+const mm=m=>{ const s=Math.round(m*60); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); };
+function frame(t){
+  const b=t<T.B1, a=t>=T.A0&&t<T.A1, s=t>=T.S0;
+  on("scB",b); on("scA",!b); on("actB",b); on("actA",!b);
+  $("clk").className="clock "+(b?"b":"a");
+  $("clkN").textContent=b?mm(30*Math.min(1,t/T.B1)):mm(12*Math.min(1,(t-T.A0)/(T.A1-T.A0-1500)));
+  // Before: windows pile up, the row scan, pains, slow typing
+  const tb=t-T.B0;
+  on("w1",b&&tb>300); on("w2",b&&tb>3300); on("w3",b&&tb>5600); on("w4",b&&tb>7200);
+  ["r1","r2","r3","r4"].forEach((r,i)=>{ const e=$(r); e.className=(b&&tb>900+i*550&&tb<1450+i*550)?"scan":(b&&i===0&&tb>1450)?"x":""; });
+  on("p1",b&&tb>2700); on("p2",b&&tb>4300); on("p3",b&&tb>6300); on("p4",b&&tb>8600);
+  $("calc").textContent=tb>6500?"850 + ?? = ???":"850 + ?";
+  const nB=b&&tb>7600?Math.min(TB.length,Math.floor((tb-7600)/150)):0; $("typeB").textContent=TB.slice(0,nB);
+  // With the tool
+  const ta=t-T.A0, A=!b;
+  ["f1","f2","f3","f4","f5","f6"].forEach((f,i)=>{ $(f).classList.toggle("hit",A&&ta>400+i*380&&ta<4600); });
+  on("cReq",A&&ta>300); ["c1","c2","c3","c4","c5","c6"].forEach((c,i)=>on(c,A&&ta>600+i*380));
+  on("cCar",A&&ta>3200); ["k1","k2","k3"].forEach((k,i)=>on(k,A&&ta>3500+i*450)); $("k1").classList.toggle("best",A&&ta>5000);
+  on("cMar",A&&ta>5400); on("s1",A&&ta>5600); on("s2",A&&ta>6100); on("s3",A&&ta>6600);
+  on("cChk",A&&ta>7000); ["k_a","k_b","k_c","k_d"].forEach((k,i)=>on(k,A&&ta>7200+i*300));
+  on("cRep",A&&ta>8300); const nA=A&&ta>8600?Math.min(TA.length,Math.floor((ta-8600)/14)):0; $("typeA").textContent=TA.slice(0,nA);
+  on("stA",A&&ta>11800);
+  ["v1","v2","v3","v4"].forEach((v,i)=>on(v,s&&t>T.S0+i*300));
+  $("bar").style.width=(100*t/T.END)+"%";
+}
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let t0=performance.now(), paused=false, pAt=0, jump=0;
+function tick(now){ if(!paused) frame(((now-t0)+jump)%T.END); requestAnimationFrame(tick); }
+if(reduce){ frame(T.END-1); } else requestAnimationFrame(tick);
+const go=ms=>{ t0=performance.now(); jump=ms; if(paused){ paused=false; $("pp").textContent="Pause"; } if(reduce) frame(ms===0?T.B1-1:T.END-1); };
+$("actB").onclick=()=>go(0); $("actA").onclick=()=>go(T.A0);
+$("pp").onclick=()=>{ if(!paused){ paused=true; pAt=performance.now(); $("pp").textContent="Play"; } else { t0+=performance.now()-pAt; paused=false; $("pp").textContent="Pause"; } };
+addEventListener("keydown",e=>{ if(e.code==="Space"){ e.preventDefault(); $("pp").click(); } if(e.key==="1") go(0); if(e.key==="2") go(T.A0); });
+}
+</script>

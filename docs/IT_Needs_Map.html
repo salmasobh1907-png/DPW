@@ -1,0 +1,431 @@
+<title>IT Needs Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one reading column; a task x IT-piece matrix up top, then one card per task with its end-to-end flow. */
+:root{
+  --bg:#f5f7f9; --surface:#ffffff; --ink:#14212b; --muted:#56656f; --line:#d9e0e5; --line-2:#c3ccd3;
+  --accent:#0b5c86; --accent-soft:#e2eef5; --accent-ink:#ffffff;
+  --c-id:#5b4bb7; --c-host:#0b5c86; --c-data:#1d7a55; --c-mail:#b4521f; --c-auto:#8a6a00; --c-pol:#b0304a; --c-int:#43606f;
+  --good:#1d7a55; --warn:#8a6a00;
+  --f-head:"IBM Plex Sans",system-ui,sans-serif; --f-body:"IBM Plex Sans",system-ui,sans-serif;
+  --f-ar:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f171d; --surface:#16222b; --ink:#e4ebf0; --muted:#9aabb6; --line:#26353f; --line-2:#344652;
+  --accent:#5fb3e0; --accent-soft:#18354a; --accent-ink:#0f171d;
+  --c-id:#a99cf0; --c-host:#5fb3e0; --c-data:#5cc79a; --c-mail:#f09a6a; --c-auto:#e0c04f; --c-pol:#f07f95; --c-int:#9fbccb;
+  --good:#5cc79a; --warn:#e0c04f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f171d; --surface:#16222b; --ink:#e4ebf0; --muted:#9aabb6; --line:#26353f; --line-2:#344652;
+  --accent:#5fb3e0; --accent-soft:#18354a; --accent-ink:#0f171d;
+  --c-id:#a99cf0; --c-host:#5fb3e0; --c-data:#5cc79a; --c-mail:#f09a6a; --c-auto:#e0c04f; --c-pol:#f07f95; --c-int:#9fbccb;
+  --good:#5cc79a; --warn:#e0c04f; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body)}
+.wrap{max-width:1080px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{font-family:var(--f-head);text-wrap:balance;margin:0;line-height:1.25}
+h1{font-size:30px;font-weight:700}
+h2{font-size:21px;font-weight:600}
+h3{font-size:17px;font-weight:600}
+p{margin:0;max-width:72ch}
+.eyebrow{font:600 11.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ar{font-family:var(--f-ar);direction:rtl;text-align:right;color:var(--muted);font-size:14.5px}
+section{display:flex;flex-direction:column;gap:14px}
+.lede{display:flex;flex-direction:column;gap:10px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+a{color:var(--accent)}
+.note{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:12px 14px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.note.key{border-color:var(--accent);background:var(--accent-soft)}
+
+/* IT pieces */
+.pieces{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.piece{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--fam);border-radius:6px;padding:11px 13px;display:flex;flex-direction:column;gap:4px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.piece:hover{border-color:var(--fam)}
+.piece:focus-visible,.chip:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.piece[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--fam)}
+.piece .top{display:flex;gap:8px;align-items:baseline}
+.code{font:600 12px var(--f-mono);color:var(--fam)}
+.piece .nm{font-weight:600;font-size:14.5px}
+.piece .tech{font:12px var(--f-mono);color:var(--muted)}
+.piece .why{font-size:13.5px}
+.fam-id{--fam:var(--c-id)}.fam-host{--fam:var(--c-host)}.fam-data{--fam:var(--c-data)}.fam-mail{--fam:var(--c-mail)}.fam-auto{--fam:var(--c-auto)}.fam-pol{--fam:var(--c-pol)}.fam-int{--fam:var(--c-int)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;background:var(--fam);display:inline-block}
+.filterbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13.5px}
+.filterbar button{font:600 12.5px var(--f-body);border:1px solid var(--line-2);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
+
+/* Matrix */
+.mx{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.mx table{border-collapse:collapse;width:100%;min-width:820px;font-size:13px}
+.mx th,.mx td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:center}
+.mx thead th{font:600 11.5px var(--f-mono);color:var(--fam);vertical-align:bottom;border-bottom:2px solid var(--line-2)}
+.mx th.task{text-align:left;font:600 13px var(--f-body);color:var(--ink);white-space:nowrap;padding-left:12px}
+.mx th.task a{color:inherit;text-decoration:none}
+.mx th.task a:hover{text-decoration:underline}
+.mx tr.dim td,.mx tr.dim th{opacity:.28}
+.mx td.hl{background:var(--accent-soft)}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;background:var(--fam)}
+.ring{display:inline-block;width:11px;height:11px;border-radius:50%;border:2px solid var(--fam);box-sizing:border-box}
+.mx tbody tr:last-child th,.mx tbody tr:last-child td{border-bottom:0}
+
+/* Task cards */
+.task{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;scroll-margin-top:16px}
+.task.dim{opacity:.35}
+.task header{display:flex;flex-direction:column;gap:4px}
+.task .tn{font:600 12px var(--f-mono);color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--fam);color:var(--ink);border-radius:999px;padding:3px 10px 3px 8px;font-size:12.5px;background:transparent;cursor:pointer;font-family:var(--f-body)}
+.chip b{font:600 11.5px var(--f-mono);color:var(--fam)}
+.chip.later{border-style:dashed}
+.flow{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;counter-reset:st}
+.st{flex:1 1 150px;min-width:0;position:relative;padding:10px 14px 10px 12px;background:var(--bg);border:1px solid var(--line);font-size:13.5px;display:flex;flex-direction:column;gap:3px;margin:0 14px 8px 0}
+.st::before{counter-increment:st;content:counter(st);font:600 11px var(--f-mono);color:var(--accent)}
+.st:not(:last-child)::after{content:"";position:absolute;right:-12px;top:50%;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:9px solid var(--line-2);transform:translateY(-50%)}
+.st small{color:var(--muted);font-size:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.two>div{min-width:0;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.lbl{font:600 11px var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+ul.clean{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+@media(max-width:720px){.two{grid-template-columns:1fr}}
+
+/* Sub-feature table */
+.tblw{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table.sf{border-collapse:collapse;width:100%;min-width:760px;font-size:13.5px}
+table.sf th,table.sf td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.sf thead th{font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+table.sf td:first-child{font-weight:600;width:150px}
+table.sf tr:last-child td{border-bottom:0}
+.risk{display:inline-block;font:600 11px var(--f-mono);padding:1px 7px;border-radius:4px;border:1px solid currentColor}
+.risk.hi{color:var(--c-pol)}.risk.md{color:var(--warn)}.risk.lo{color:var(--good)}
+
+/* Diagram */
+.dia{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:8px}
+.dia svg{display:block;min-width:860px;width:100%;height:auto}
+.dia text{font-family:var(--f-body);fill:var(--ink)}
+.dia .sm{font-size:11px;fill:var(--muted)}
+.dia .md{font-size:12.5px;font-weight:600}
+.dia .num{font:600 11px var(--f-mono);fill:var(--accent-ink)}
+.dia .box{fill:var(--surface);stroke:var(--line-2);stroke-width:1.2}
+.dia .zone{fill:none;stroke:var(--line-2);stroke-dasharray:4 4}
+.dia .ln{stroke:var(--muted);stroke-width:1.4;fill:none}
+.dia .badge{fill:var(--accent)}
+.dia .tag{font:600 10.5px var(--f-mono)}
+
+/* Path & asks */
+.path{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.path>div{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:6px;padding:12px;font-size:13.5px;display:flex;flex-direction:column;gap:5px}
+.path b{font-size:14.5px}
+@media(max-width:820px){.path{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.path{grid-template-columns:1fr}}
+ol.asks{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px;font-size:14.5px}
+ol.asks li span.ar{display:block;margin-top:2px}
+footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+@media (prefers-reduced-motion:no-preference){.task,.piece{transition:opacity .2s,background .2s}}
+</style>
+
+<div class="wrap">
+
+<div class="lede">
+  <div class="eyebrow">DP World Egypt · Ocean Freight Pricing · for the IT, AI and security meeting, Tue 24 Nov 2026</div>
+  <h1>What IT needs to give, task by task</h1>
+  <p>The pricing tool today is a demo page with dummy data. To run it for real, each task needs a few building blocks that only IT can provide. This page lists those blocks once, then maps every task to them and shows how each task would work end to end.</p>
+  <p class="ar">الصفحة دي بتقول: كل حاجة في الأداة محتاجة إيه من IT، وهتشتغل إزاي من الأول للآخر.</p>
+  <div class="meta"><span><b>Contact</b> Salma Ismail, Ocean Freight Pricing</span><span><b>Status</b> proposal, nothing built in DP World systems yet</span></div>
+  <div class="note key">
+    <b>The short version for IT</b>
+    <span>1. Put the page behind DP World login, with roles from Entra ID groups. 2. Give the app a safe place to store team data. 3. Let the app read the pricing shared mailboxes and the Rate Bank, read-only and limited to named items. 4. Run the jobs on a company account, not on any one person's computer. 5. Decide with HR and Legal whether "My shift" time tracking is allowed.</span>
+  </div>
+</div>
+
+<section id="pieces">
+  <div class="eyebrow">Part 1</div>
+  <h2>The building blocks IT provides</h2>
+  <p>Each block has a short code. Click a block to see which tasks need it, in the map and in the task cards below.</p>
+  <div class="legend">
+    <span class="fam-id"><i></i>Login and roles</span><span class="fam-host"><i></i>Hosting</span><span class="fam-data"><i></i>Data</span><span class="fam-mail"><i></i>Email</span><span class="fam-auto"><i></i>Automation</span><span class="fam-pol"><i></i>Policy and approvals</span><span class="fam-int"><i></i>Company systems</span>
+  </div>
+  <div class="pieces" id="pieceList"></div>
+  <div class="filterbar" id="filterBar" hidden><span id="filterText"></span><button type="button" id="clearF">Show all tasks</button></div>
+</section>
+
+<section id="map">
+  <div class="eyebrow">Part 2</div>
+  <h2>The map: which task needs which block</h2>
+  <p>A full dot means the task needs the block to go live. A ring means later or optional. Click a task name to jump to its flow.</p>
+  <div class="mx"><table id="mx"></table></div>
+</section>
+
+<section id="tasks">
+  <div class="eyebrow">Part 3</div>
+  <h2>How each task works, end to end</h2>
+
+  <article class="task" id="t-cases" data-blocks="ID1 ID2 H1 D1 M1 M2 M3 A1 P1 S1">
+    <header>
+      <span class="tn">Task 1 · in the demo</span>
+      <h3>Shared inbox cases: SLA, routing, reassign, Team KPIs, My shift</h3>
+      <p>Every email that reaches a pricing mailbox becomes a case with an owner and an SLA clock. The clock runs in working hours (Sun to Thu, Cairo) until the first reply goes out. Managers see Team KPIs, and each person sees their own shift.</p>
+      <p class="ar">كل إيميل بيوصل للـ pricing بيبقى "case" ليها صاحب وعداد وقت (SLA). العداد يقف أول ما الرد يطلع.</p>
+    </header>
+    <div class="chips" data-chips></div>
+
+    <div class="dia" role="img" aria-label="Flow of an email from the customer to a case, a reply and the KPIs">
+      <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker></defs>
+        <!-- zones -->
+        <rect class="zone" x="8" y="26" width="190" height="300" rx="8"/>
+        <text class="sm" x="18" y="18">Outside DP World</text>
+        <rect class="zone" x="216" y="26" width="236" height="300" rx="8"/>
+        <text class="sm" x="226" y="18">Microsoft 365 (Exchange Online)</text>
+        <rect class="zone" x="470" y="26" width="520" height="300" rx="8"/>
+        <text class="sm" x="480" y="18">Our tool, hosted behind DP World login</text>
+        <!-- customers -->
+        <rect class="box" x="22" y="50" width="162" height="58" rx="6"/>
+        <text class="md" x="34" y="74">Customer or sales</text><text class="sm" x="34" y="92">writes to pricing@</text>
+        <rect class="box" x="22" y="132" width="162" height="58" rx="6"/>
+        <text class="md" x="34" y="156">Customer</text><text class="sm" x="34" y="174">writes to one person direct</text>
+        <rect class="box" x="22" y="214" width="162" height="58" rx="6"/>
+        <text class="md" x="34" y="238">DP World office abroad</text><text class="sm" x="34" y="256">writes to network@</text>
+        <!-- mailboxes -->
+        <rect class="box" x="232" y="50" width="204" height="58" rx="6"/>
+        <text class="md" x="244" y="74">pricing@ shared mailbox</text><text class="tag" x="244" y="94" style="fill:var(--c-mail)">M1 shared mailbox</text>
+        <rect class="box" x="232" y="132" width="204" height="58" rx="6"/>
+        <text class="md" x="244" y="156">Person's own mailbox</text><text class="tag" x="244" y="176" style="fill:var(--c-mail)">M2 needs consent or a rule</text>
+        <rect class="box" x="232" y="214" width="204" height="58" rx="6"/>
+        <text class="md" x="244" y="238">network@ and other boxes</text><text class="tag" x="244" y="258" style="fill:var(--c-mail)">M1 one SLA per box</text>
+        <!-- connector -->
+        <rect class="box" x="486" y="112" width="140" height="96" rx="6"/>
+        <text class="md" x="498" y="136">Mail connector</text>
+        <text class="sm" x="498" y="154">new email alert</text>
+        <text class="sm" x="498" y="170">(Graph or Power</text><text class="sm" x="498" y="184">Automate)</text>
+        <text class="tag" x="498" y="200" style="fill:var(--c-auto)">M2 + A1</text>
+        <!-- case store -->
+        <rect class="box" x="650" y="112" width="148" height="96" rx="6"/>
+        <text class="md" x="662" y="136">Case store</text>
+        <text class="sm" x="662" y="154">box, sender, owner,</text><text class="sm" x="662" y="170">arrival time, SLA due,</text><text class="sm" x="662" y="186">full history log</text>
+        <text class="tag" x="662" y="200" style="fill:var(--c-data)">D1</text>
+        <!-- screens -->
+        <rect class="box" x="822" y="44" width="154" height="70" rx="6"/>
+        <text class="md" x="834" y="68">Cases screen</text><text class="sm" x="834" y="86">owner, clock, reassign</text><text class="tag" x="834" y="104" style="fill:var(--c-id)">ID1 ID2</text>
+        <rect class="box" x="822" y="126" width="154" height="70" rx="6"/>
+        <text class="md" x="834" y="150">Team KPIs</text><text class="sm" x="834" y="168">cases, breaches, per person</text><text class="tag" x="834" y="186" style="fill:var(--c-id)">ID2 managers</text>
+        <rect class="box" x="822" y="208" width="154" height="70" rx="6"/>
+        <text class="md" x="834" y="232">My shift</text><text class="sm" x="834" y="250">active / away in the tool</text><text class="tag" x="834" y="268" style="fill:var(--c-pol)">P1 HR + Legal first</text>
+        <!-- reply path -->
+        <rect class="box" x="486" y="250" width="312" height="62" rx="6"/>
+        <text class="md" x="498" y="274">Reply goes out "as pricing@"</text>
+        <text class="sm" x="498" y="292">copy lands in Sent Items, same conversation, clock stops</text>
+        <text class="tag" x="498" y="306" style="fill:var(--c-mail)">M1 Send As + sent copy · M3</text>
+        <!-- lines -->
+        <path class="ln" d="M184 79H232" marker-end="url(#ar)"/>
+        <path class="ln" d="M184 161H232" marker-end="url(#ar)"/>
+        <path class="ln" d="M184 243H232" marker-end="url(#ar)"/>
+        <path class="ln" d="M436 79C462 79 462 140 486 140" marker-end="url(#ar)"/>
+        <path class="ln" d="M436 161H486" marker-end="url(#ar)"/>
+        <path class="ln" d="M436 243C462 243 462 182 486 182" marker-end="url(#ar)"/>
+        <path class="ln" d="M626 160H650" marker-end="url(#ar)"/>
+        <path class="ln" d="M798 140C810 140 810 79 822 79" marker-end="url(#ar)"/>
+        <path class="ln" d="M798 160H822" marker-end="url(#ar)"/>
+
+        <path class="ln" d="M822 104C760 120 820 225 770 250" marker-end="url(#ar)"/>
+        <path class="ln" d="M486 281C330 281 340 108 340 108" marker-end="url(#ar)"/>
+        <path class="ln" d="M724 250V208" marker-end="url(#ar)"/>
+        <!-- step badges -->
+        <circle class="badge" cx="208" cy="64" r="9"/><text class="num" x="204.5" y="68">1</text>
+        <circle class="badge" cx="466" cy="112" r="9"/><text class="num" x="462.5" y="116">2</text>
+        <circle class="badge" cx="638" cy="148" r="9"/><text class="num" x="634.5" y="152">3</text>
+        <circle class="badge" cx="810" cy="62" r="9"/><text class="num" x="806.5" y="66">4</text>
+        <circle class="badge" cx="476" cy="268" r="9"/><text class="num" x="472.5" y="272">5</text>
+        <circle class="badge" cx="736" cy="232" r="9"/><text class="num" x="732.5" y="236">6</text>
+        <circle class="badge" cx="810" cy="178" r="9"/><text class="num" x="806.5" y="182">7</text>
+        <!-- caption -->
+        <text class="sm" x="12" y="352">1 Email arrives · 2 Connector sees it within a minute · 3 A case is saved with its box, sender and SLA due time · 4 Rules pick the owner, the team sees it</text>
+        <text class="sm" x="12" y="372">5 The owner replies from the tool or Outlook as pricing@ · 6 The sent copy is matched to the case and the clock stops · 7 KPIs count cases, breaches and replies per person</text>
+      </svg>
+    </div>
+
+    <div class="tblw"><table class="sf">
+      <thead><tr><th>Part of the feature</th><th>What it does (in the demo)</th><th>What IT must give</th><th>How it works for real</th><th>Sensitivity</th></tr></thead>
+      <tbody>
+        <tr><td>Auto-routing from pricing@</td><td>Email to the group box becomes a case in the right queue (Rates, Key accounts, Trucking, Air, Network, Internal).</td><td><b>M1</b> list of shared mailboxes. <b>M2</b> read access for the app, limited to those boxes only. <b>A1</b> the job that listens.</td><td>A Graph "change notification" (or a Power Automate "new email in a shared mailbox" flow) tells the app about each new email. Rules route by mailbox first, then by customer domain (for example a key account's domain goes to Key accounts).</td><td><span class="risk md">Medium</span> reads customer emails</td></tr>
+        <tr><td>Direct-to-person emails</td><td>An email sent to one person directly is pulled in and assigned to that person.</td><td>One of two options. A: each person signs in and agrees that the tool reads only their own inbox (delegated access). B: an Outlook rule that copies pricing requests to pricing@.</td><td>Option B is the simplest and keeps the app away from personal mailboxes. Option A needs each person's consent and a security review.</td><td><span class="risk hi">High</span> personal mailboxes</td></tr>
+        <tr><td>SLA per mailbox</td><td>Each box has its own SLA in working hours (for example Key accounts 2 h). The clock pauses outside Sun to Thu working hours, Cairo time.</td><td><b>D1</b> to store SLA settings and arrival times. A list of official working hours and holidays (from HR).</td><td>The app saves arrival time and computes the due time in working hours. It stops the clock when it finds the first reply in Sent Items with the same conversation.</td><td><span class="risk lo">Low</span></td></tr>
+        <tr><td>First reply detection</td><td>Clock stops when the first reply is sent.</td><td><b>M1</b> "Send As" for the team on each shared box, and the setting that saves a copy of sent mail in the shared box (MessageCopyForSentAsEnabled).</td><td>Without that setting, a reply sent from a person's own Outlook lands only in their personal Sent Items and the tool cannot see it.</td><td><span class="risk lo">Low</span></td></tr>
+        <tr><td>Reassign</td><td>A lead moves a case to another person. The case and any breach then count for the new owner. Every move is logged.</td><td><b>ID1</b> real login, so the log shows who moved it. <b>D1</b> with an audit log.</td><td>Reassign only changes the owner in the case store. Email stays in the mailbox. The log keeps who, when and why.</td><td><span class="risk lo">Low</span></td></tr>
+        <tr><td>Domain-based access</td><td>In the demo, the email domain decides which boxes a person can open (pricing staff open pricing boxes, network staff open the Network box).</td><td><b>ID2</b> Entra ID security groups, one per team (for example Pricing, Network, Internal, Leads).</td><td>In DP World everyone has the same email domain, so this becomes group membership. IT adds a person to a group, and the tool shows only the boxes of that group. Leaving the group removes access the same day.</td><td><span class="risk md">Medium</span></td></tr>
+        <tr><td>Team KPIs</td><td>Cases, breaches, due soon and emails counted per person, with filters by request type.</td><td><b>ID2</b> a "Leads" group that may see everyone's numbers. <b>D1</b>. Optional Power BI.</td><td>KPIs are counted from the case store, not from mailboxes. Each person sees their own numbers. Leads see the team.</td><td><span class="risk md">Medium</span> performance data</td></tr>
+        <tr><td>My shift (active / away)</td><td>Shows active time, away time and breaks while the tool is open. Goes "away" after no input for a while or when the tab is hidden.</td><td><b>P1</b> written approval from HR and Legal, a clear notice to staff, and a rule on who may see it. No new software on laptops.</td><td>Counts only activity inside this tool's page. It does not watch the laptop, other apps, keystrokes or the screen. Egypt's Personal Data Protection Law (No. 151 of 2020) and DP World HR policy apply, so this part stays off until approved.</td><td><span class="risk hi">High</span> employee monitoring</td></tr>
+      </tbody>
+    </table></div>
+    <div class="two">
+      <div><span class="lbl">Today in the demo</span><ul class="clean"><li>Dummy mailboxes and invented people (Nour, Omar, Mariam, Ahmed).</li><li>Emails are sample data inside the page. No real mailbox is read.</li><li>Access by email domain is simulated with a "Who are you" picker.</li></ul></div>
+      <div><span class="lbl">Ask IT</span><ul class="clean"><li>Which shared mailboxes exist today, and who has Full Access and Send As?</li><li>Can the app get read access scoped to only those boxes (RBAC for Applications in Exchange Online)?</li><li>Graph app or Power Automate for the email trigger?</li></ul></div>
+    </div>
+  </article>
+
+  <article class="task" id="t-rates" data-blocks="ID1 H1 D2 A1 S1">
+    <header><span class="tn">Task 2</span><h3>Rate Bank reading (export and import rates)</h3>
+      <p>The tool reads the team's Rate Bank Export and Import files, finds the lowest standard 40' per lane and shows validity. It only reads. It never writes to them.</p>
+      <p class="ar">الأداة بتقرا ملفات الـ Rate Bank بس، عمرها ما بتكتب فيها.</p></header>
+    <div class="chips" data-chips></div>
+    <div class="flow"><div class="st">The Rate Bank owner updates it<small>Excel on SharePoint, as today</small></div><div class="st">A scheduled job reads it<small>every hour, on a company service account (A1)</small></div><div class="st">Read-only permission on those 2 files<small>Graph Sites.Selected, read only (D2)</small></div><div class="st">Rates are cleaned<small>standard rows only; no validity = end of month</small></div><div class="st">Pricing sees fresh rates<small>with "last read" time on screen</small></div></div>
+    <div class="two"><div><span class="lbl">Today</span><p>The prototype uses a dummy Rate Bank. No real file is connected.</p></div><div><span class="lbl">Rule that must stay</span><p>View only. Sheets with passwords are never opened. Later the same job can read NPM instead of Excel.</p></div></div>
+  </article>
+
+  <article class="task" id="t-hub" data-blocks="ID1 ID2 H1 D1 S1">
+    <header><span class="tn">Task 3</span><h3>Pricing Hub and Sales pages (roles)</h3>
+      <p>Pricing sees buy rates, profit and sell. Sales see only the sell rate and quote. Today this is a switch button in the page, which is not real protection.</p>
+      <p class="ar">الـ sales لازم ما يشوفوش الـ buy rate. ده محتاج IT يعمل roles حقيقية، مش زرار.</p></header>
+    <div class="chips" data-chips></div>
+    <div class="flow"><div class="st">Person opens the tool<small>DP World login (ID1)</small></div><div class="st">Entra ID says which group<small>Pricing, Sales, Leads (ID2)</small></div><div class="st">Server sends only allowed data<small>sales never receive buy rates in the browser</small></div><div class="st">Page shows the right screens<small>Pricing Hub or Sales pages</small></div></div>
+    <div class="note"><b>Why the server part matters</b><span>If buy rates are inside the page and only hidden, a sales user can still find them. For real roles, the buy rates must stay on the server (H1 + D1) and only pricing users receive them.</span></div>
+  </article>
+
+  <article class="task" id="t-quote" data-blocks="ID1 ID2 H1 D1 M3 S1">
+    <header><span class="tn">Task 4</span><h3>Quotation email (buy + profit = sell)</h3>
+      <p>Pricing picks a rate, the tool adds profit on ocean freight only (fixed 25/50 only for China dry export ports, otherwise set from the market gap), and writes the quote email.</p>
+      <p class="ar">الأداة بتكتب الإيميل كـ draft، وإنتي اللي بتدوسي Send بنفسك.</p></header>
+    <div class="chips" data-chips></div>
+    <div class="flow"><div class="st">Choose lane and rate<small>buy rate from Rate Bank</small></div><div class="st">Tool adds profit<small>shows buy, profit and sell</small></div><div class="st">Draft is created in Outlook<small>draft only, never auto-send (M3)</small></div><div class="st">Person checks and presses Send<small>from pricing@ or own box</small></div><div class="st">Quote saved to the log<small>Reference Sheet replacement (D1)</small></div></div>
+  </article>
+
+  <article class="task" id="t-ref" data-blocks="ID1 H1 D1 A1">
+    <header><span class="tn">Task 5</span><h3>Quotes log, feedback and declines (Reference Sheet)</h3>
+      <p>Every request and quote is logged with sales PIC, pricing PIC, lane, date and result (won, lost, no feedback). Same thread and subject in the same month counts as one request.</p>
+      <p class="ar">بدل ما نكتب في الـ Reference Sheet بإيدينا، كل quote تتسجل لوحدها في قاعدة بيانات.</p></header>
+    <div class="chips" data-chips></div>
+    <div class="flow"><div class="st">Case or quote is saved<small>automatically, with the person's name</small></div><div class="st">Stored in a team list<small>SharePoint List or Dataverse with audit log (D1)</small></div><div class="st">Sales add feedback<small>won, lost, price too high</small></div><div class="st">Monthly report reads it<small>no copy-paste into Excel</small></div></div>
+    <div class="note"><span>The current Reference Sheet stays view only. The new log starts fresh, or IT imports a copy once.</span></div>
+  </article>
+
+  <article class="task" id="t-globe" data-blocks="ID1 H1 D1 W1">
+    <header><span class="tn">Task 6</span><h3>Route Globe (routes, chokepoints, transit days, trucking)</h3>
+      <p>Shows sea routes from Egypt in km and days, closed chokepoints and alternatives, and truck rates to the Gulf. Most of this runs inside the page itself.</p>
+      <p class="ar">ده أسهل جزء: محتاج بس استضافة ولوجين. الحسابات كلها جوه الصفحة.</p></header>
+    <div class="chips" data-chips></div>
+    <div class="flow"><div class="st">User picks port pair<small>inside the page</small></div><div class="st">Page computes km and days<small>sea km ÷ ~710 per day + port + truck</small></div><div class="st">Trucking offers from a list<small>kept in D1, edited by pricing</small></div><div class="st">Chokepoint status<small>updated by pricing; later from approved news sites (W1)</small></div></div>
+  </article>
+
+  <article class="task" id="t-sokhna" data-blocks="ID1 H1 D2 I1">
+    <header><span class="tn">Task 7</span><h3>Sokhna terminal rule</h3>
+      <p>Sokhna has two terminals. Every Sokhna rate must show its terminal, DP World terminal rates come first, and the tool warns before a sales quote uses another terminal's rate.</p>
+      <p class="ar">ده rule جوه الأداة، مش محتاج حاجة كبيرة من IT. المهم إن اسم الـ terminal يبقى موجود في الداتا.</p></header>
+    <div class="chips" data-chips></div>
+    <div class="flow"><div class="st">Rate row has a "Terminal" value<small>new column in Rate Bank, or a field from NPM</small></div><div class="st">Tool sorts DP World terminal first<small>rule inside the page</small></div><div class="st">Warning on other terminal<small>"Not DP World terminal, confirm"</small></div></div>
+    <div class="note"><span>No new IT block. Only a data question: can the Rate Bank owner add a Terminal column, and does NPM store the terminal on each contract?</span></div>
+  </article>
+
+  <article class="task" id="t-market" data-blocks="H1 D1 A1 W1">
+    <header><span class="tn">Task 8</span><h3>Market watch and news (GRI, market level)</h3>
+      <p>Tracks carrier GRIs and market notes so pricing can set profit from the gap to the market.</p>
+      <p class="ar">لو عايزين الأخبار تتجاب لوحدها، IT لازم يسمح للأداة تفتح مواقع معينة بس.</p></header>
+    <div class="chips" data-chips></div>
+    <div class="flow"><div class="st">Approved public sites list<small>carrier news pages, index sites (W1)</small></div><div class="st">Daily job collects headlines<small>company account (A1)</small></div><div class="st">Saved to the team store<small>D1</small></div><div class="st">Pricing reviews before use<small>nothing changes a rate by itself</small></div></div>
+  </article>
+
+  <article class="task" id="t-report" data-blocks="ID2 D1 A1 BI">
+    <header><span class="tn">Task 9</span><h3>Monthly pricing report and dashboards</h3>
+      <p>Requests, quotes, win rate, SLA results per month. Today built by hand in Excel and PowerPoint.</p>
+      <p class="ar">التقرير الشهري يتعمل لوحده من نفس الداتا، ومديرينك يشوفوه في Power BI.</p></header>
+    <div class="chips" data-chips></div>
+    <div class="flow"><div class="st">Data already in D1<small>cases, quotes, feedback</small></div><div class="st">Power BI report<small>if IT allows a workspace (BI)</small></div><div class="st">Shared with managers only<small>Leads group (ID2)</small></div></div>
+  </article>
+
+  <article class="task" id="t-npm" data-blocks="I1 I2 S1 AI1">
+    <header><span class="tn">Task 10 · later</span><h3>NPM and CARGOES link</h3>
+      <p>NPM (Network Pricing Manager) becomes the rate source instead of the Rate Bank. A won quote turns into a booking in CARGOES. Our tool stays the Egypt pricing layer in between.</p>
+      <p class="ar">ده آخر مرحلة: الأسعار من NPM، والحجز يروح CARGOES.</p></header>
+    <div class="chips" data-chips></div>
+    <div class="flow"><div class="st">NPM Rate Search API<small>read access for Egypt lanes (I1)</small></div><div class="st">Tool applies Egypt rules<small>standard only, profit, Sokhna terminal</small></div><div class="st">Quote won<small>sales feedback</small></div><div class="st">Booking created in CARGOES<small>through its API (I2)</small></div></div>
+    <div class="note"><span>The tool runs no AI today. If AI is added later (for example to read emails), it goes through IT and Legal first (AI1).</span></div>
+  </article>
+</section>
+
+<section id="path">
+  <div class="eyebrow">Part 4</div>
+  <h2>Order of work</h2>
+  <div class="path">
+    <div><b>A · Host safely</b><span>Page on SharePoint or Power Apps behind DP World login. Entra groups for roles. Team data store.</span><span class="code fam-host">ID1 ID2 H1 D1</span></div>
+    <div><b>B · Connect data</b><span>Rate Bank read-only job and pricing shared mailboxes on a service account. Shared inbox cases go live without My shift.</span><span class="code fam-host">D2 M1 M2 M3 A1</span></div>
+    <div><b>C · Company systems</b><span>NPM for rates, CARGOES for bookings, Power BI for reports.</span><span class="code fam-host">I1 I2 BI</span></div>
+    <div><b>D · Policies</b><span>HR and Legal decide on My shift. IT and Legal decide on any AI.</span><span class="code fam-host">P1 AI1 S1</span></div>
+  </div>
+</section>
+
+<section id="asks">
+  <div class="eyebrow">Part 5</div>
+  <h2>Questions to ask IT on Tuesday</h2>
+  <ol class="asks">
+    <li>Where should we host it: SharePoint page, Power Apps, or an Azure web app? Who in IT will own it?<span class="ar">نحطها فين، ومين في IT هيبقى مسؤول عنها؟</span></li>
+    <li>Can you create Entra ID groups for Pricing, Sales, Network and Leads, so the tool shows each person only what their group allows?<span class="ar">ممكن تعملوا جروبات علشان كل واحد يشوف اللي يخصه بس؟</span></li>
+    <li>Which pricing shared mailboxes exist? Can the app get read access to only those boxes, and can sent replies be copied into the shared box?<span class="ar">إيه الـ shared mailboxes الموجودة، وينفع الأداة تقرا منها هي بس؟</span></li>
+    <li>For emails sent to one person directly: do you prefer an Outlook rule that copies them to pricing@, or each person giving consent?<span class="ar">الإيميلات اللي بتيجي لحد بالاسم: نعمل rule ولا كل واحد يوافق؟</span></li>
+    <li>Can a service account read the Rate Bank files read-only (Sites.Selected), so nothing runs on a personal computer?<span class="ar">ينفع حساب للشركة يقرا الـ Rate Bank بدل أي جهاز شخصي؟</span></li>
+    <li>Where should team data live: SharePoint Lists, Dataverse, or Azure SQL? We need an audit log.<span class="ar">الداتا تتحفظ فين، ويكون فيه سجل مين غيّر إيه؟</span></li>
+    <li>Who must approve "My shift" activity tracking: HR, Legal, or both? Until then it stays off.<span class="ar">مين يوافق على متابعة الوقت؟ لحد ما يوافقوا هتفضل مقفولة.</span></li>
+    <li>Can we get read access to the NPM Rate Search API for Egypt lanes later?<span class="ar">ينفع ناخد أسعار من NPM بالـ API بعدين؟</span></li>
+  </ol>
+</section>
+
+<footer>
+  Related pages: <a href="https://claude.ai/artifact/5k5VfRvCKzeCJdgmtSMyH6">Demo with dummy data</a> · <a href="https://claude.ai/artifact/AcHuKWDAGR9TgNSBSFpe36">Demo handover for IT</a> · <a href="https://claude.ai/artifact/Wx8XzJxUuLYL1oPNfgNv9w">IT basics guide</a>.<br>
+  This page has no rates, no customer data and no passwords. Share inside DP World only. Prepared 23 Nov 2026.
+</footer>
+</div>
+
+<script>
+const FAM={ID:"id",H:"host",D:"data",M:"mail",A:"auto",P:"pol",S:"pol",AI:"pol",I:"int",W:"int",BI:"int"};
+const P=[
+ ["ID1","DP World login (SSO)","Microsoft Entra ID single sign-on","People open the tool with the same account they use for Outlook. No new passwords."],
+ ["ID2","Roles from Entra ID groups","Security groups: Pricing, Sales, Network, Leads","Decides who sees buy rates, which mailboxes, and team KPIs."],
+ ["H1","Hosting behind DP World login","SharePoint, Power Apps or Azure web app + small server part","Moves the prototype page into DP World systems."],
+ ["D1","Team data store with audit log","SharePoint Lists, Dataverse or Azure SQL","Holds cases, quotes, feedback, SLA settings, trucking offers. Logs who changed what."],
+ ["D2","Read-only access to the Rate Bank","Microsoft Graph Sites.Selected (read) on 2 files","Lets a job read the Rate Bank files with no personal login and no write rights."],
+ ["M1","Shared mailbox setup","pricing@, network@ ... Full Access + Send As by group, sent-copy on","One mailbox per queue, each with its own SLA. Replies saved in the shared box."],
+ ["M2","Mail read for the app, limited","Graph Mail.Read scoped by Exchange RBAC for Applications","The app can read only the named pricing boxes, never the whole company."],
+ ["M3","Create drafts, never auto-send","Graph Mail.ReadWrite (delegated) for drafts","Tool writes the quote or reply as a draft. A person presses Send."],
+ ["A1","Jobs on a company account","Power Automate or Azure Functions, service account","Hourly Rate Bank read, new-email trigger, daily news. Not on any person's computer."],
+ ["P1","HR and Legal approval for My shift","Policy, staff notice, who may see the data","Required before any active/away time tracking is switched on."],
+ ["S1","Security and data review","Data classification, logging, DLP check","Confirms buy rates and customer emails stay inside DP World."],
+ ["AI1","AI approval (only if added later)","IT + Legal company AI plan","The tool runs no AI today. Any future AI step needs this first."],
+ ["W1","Approved outside websites","Outbound allowlist for public news and index sites","Lets a job fetch market news from named sites only."],
+ ["I1","NPM API access","Network Pricing Manager, Rate Search","Later: rates come from NPM instead of the Excel Rate Bank."],
+ ["I2","CARGOES link","CARGOES booking API","Later: a won quote becomes a booking."],
+ ["BI","Power BI workspace","Reports for managers","Monthly pricing report and SLA dashboards without manual Excel."]
+];
+const LATER={"t-npm":["I1","I2","AI1"],"t-globe":["W1"],"t-sokhna":["I1"],"t-report":["BI"],"t-cases":["P1"]};
+const famOf=c=>FAM[c.replace(/\d+$/,"")]||"int";
+const byCode=Object.fromEntries(P.map(p=>[p[0],p]));
+const tasks=[...document.querySelectorAll("article.task")];
+
+// pieces
+const pl=document.getElementById("pieceList");
+pl.innerHTML=P.map(([c,n,t,w])=>`<button type="button" class="piece fam-${famOf(c)}" data-code="${c}" aria-pressed="false"><span class="top"><span class="code">${c}</span><span class="nm">${n}</span></span><span class="tech">${t}</span><span class="why">${w}</span></button>`).join("");
+
+// chips
+tasks.forEach(t=>{
+  const later=LATER[t.id]||[];
+  t.querySelector("[data-chips]").innerHTML='<span class="lbl" style="align-self:center">IT gives</span>'+t.dataset.blocks.split(" ").map(c=>`<button type="button" class="chip fam-${famOf(c)}${later.includes(c)?" later":""}" data-code="${c}"><b>${c}</b>${byCode[c][1]}${later.includes(c)?" (later)":""}</button>`).join("");
+});
+
+// matrix
+const mx=document.getElementById("mx");
+const short={"t-cases":"1 Shared inbox cases","t-rates":"2 Rate Bank reading","t-hub":"3 Pricing Hub and roles","t-quote":"4 Quotation email","t-ref":"5 Quotes log","t-globe":"6 Route Globe","t-sokhna":"7 Sokhna terminal","t-market":"8 Market watch","t-report":"9 Monthly report","t-npm":"10 NPM and CARGOES"};
+mx.innerHTML=`<thead><tr><th class="task" style="color:var(--muted)">Task</th>${P.map(p=>`<th class="fam-${famOf(p[0])}" title="${p[1]}" data-col="${p[0]}">${p[0]}</th>`).join("")}</tr></thead><tbody>${tasks.map(t=>{const b=t.dataset.blocks.split(" "),l=LATER[t.id]||[];return `<tr data-task="${t.id}"><th class="task"><a href="#${t.id}">${short[t.id]}</a></th>${P.map(p=>`<td class="fam-${famOf(p[0])}" data-col="${p[0]}">${b.includes(p[0])?(l.includes(p[0])?'<span class="ring" title="later or optional"></span>':'<span class="dot" title="needed"></span>'):""}</td>`).join("")}</tr>`}).join("")}</tbody>`;
+
+// filter
+let cur=null;
+function setF(code){
+  cur=(cur===code)?null:code;
+  document.querySelectorAll(".piece").forEach(b=>b.setAttribute("aria-pressed",b.dataset.code===cur));
+  tasks.forEach(t=>t.classList.toggle("dim",!!cur&&!t.dataset.blocks.split(" ").includes(cur)));
+  mx.querySelectorAll("tbody tr").forEach(r=>{const t=document.getElementById(r.dataset.task);r.classList.toggle("dim",!!cur&&!t.dataset.blocks.split(" ").includes(cur))});
+  mx.querySelectorAll("[data-col]").forEach(c=>c.classList.toggle("hl",c.dataset.col===cur));
+  const fb=document.getElementById("filterBar");fb.hidden=!cur;
+  if(cur){const n=tasks.filter(t=>t.dataset.blocks.split(" ").includes(cur)).length;document.getElementById("filterText").textContent=`${cur} ${byCode[cur][1]}: needed by ${n} of ${tasks.length} tasks.`}
+}
+document.addEventListener("click",e=>{const b=e.target.closest(".piece,.chip");if(b){setF(b.dataset.code);if(b.classList.contains("chip"))document.getElementById("map").scrollIntoView({behavior:"smooth"})}});
+document.getElementById("clearF").addEventListener("click",()=>{cur=cur;setF(cur)});
+</script>

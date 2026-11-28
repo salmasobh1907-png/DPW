@@ -1,0 +1,147 @@
+<title>Pricing Tool Data Request</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE work: a document to read, for DP World IT and BTI
+   IDEA a central-bank style bulletin: one ask, one source map, then the detail
+   PICTURE the source map: each data source → how DP World connects it → the screens it feeds
+   COLOUR white, ink #14161a, deep teal #0b5d63 leading, rule grey; night #0d1416
+   TYPE Libre Caslon Text for titles + Inter for text
+   LAYOUT title and ask across the top, source map full width beneath; sections in one 1100px column */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0d1416);--ink:light-dark(#14161a,#e7eeee);--mut:light-dark(#555c63,#9fb0b1);--rule:light-dark(#dde2e5,#26363a);--tl:light-dark(#0b5d63,#5cc3c9);--tlbg:light-dark(#e6f1f1,#12292b);--warn:light-dark(#8a4b00,#f0b46a);--wbg:light-dark(#fdf3e6,#2a1f12)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif;overflow-x:clip;margin:0}
+.band{padding-block:clamp(24px,4vw,52px);padding-left:max(5vw,16px,env(safe-area-inset-left,0px));padding-right:max(5vw,16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1100px;margin:0 auto}
+h1,h2{font-family:"Libre Caslon Text",Georgia,serif;font-weight:400;letter-spacing:-.02em;line-height:1.1;margin:0}
+h1{font-size:clamp(32px,4.6vw,48px);max-width:20ch}
+h2{font-size:clamp(23px,2.6vw,29px);margin-bottom:12px}
+p{margin:0 0 12px;max-width:72ch}
+.meta{color:var(--mut);font-size:14px;margin-top:10px}
+.ask{margin-top:22px;border-left:4px solid var(--tl);background:var(--tlbg);padding:16px 20px;border-radius:0 6px 6px 0;max-width:820px}
+.ask b{color:var(--tl)}
+.note{background:var(--wbg);color:var(--ink);border-left:4px solid var(--warn);padding:12px 16px;border-radius:0 6px 6px 0;font-size:15px;margin:14px 0}
+.map{margin-top:28px;border-top:2px solid var(--ink)}
+.mh,.mr{display:grid;grid-template-columns:minmax(0,1.15fr) 26px minmax(0,1fr) 26px minmax(0,1fr);align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--rule)}
+.mh{font-size:13px;color:var(--mut);font-weight:600}
+.src b{display:block}.src span,.how span,.use span{font-size:13px;color:var(--mut);display:block}
+.arr{color:var(--tl);font-weight:700;text-align:center}
+.how{font-size:14px}
+.how b{color:var(--tl)}
+.use{font-size:14px}
+.now{display:inline-block;font-size:12px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--tl);color:var(--bg);margin-left:6px;vertical-align:1px}
+.later{display:inline-block;font-size:12px;font-weight:600;padding:1px 7px;border-radius:10px;border:1px solid var(--mut);color:var(--mut);margin-left:6px;vertical-align:1px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:9px 10px;border-bottom:1px solid var(--rule)}
+th{font-size:13px;color:var(--mut);font-weight:600;border-bottom:2px solid var(--ink)}
+td b{font-weight:600}
+ol,ul{margin:0 0 10px;padding-left:22px;max-width:76ch}
+li{margin-bottom:6px}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;border-top:2px solid var(--ink);margin-top:8px}
+.st{padding:12px 12px 12px 0;border-right:1px solid var(--rule)}
+.st:last-child{border-right:0}
+.st i{font-style:normal;font-family:"Libre Caslon Text",serif;font-size:26px;color:var(--tl);display:block}
+.st b{display:block;font-size:15px}
+.st span{font-size:14px;color:var(--mut)}
+code{font-size:13px;background:var(--tlbg);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+hr{border:0;border-top:1px solid var(--rule);margin:0}
+@media(max-width:760px){.mh{display:none}.mr{grid-template-columns:minmax(0,1fr);gap:4px}.arr{display:none}.how,.use{padding-left:12px;border-left:2px solid var(--tl)}.cols{grid-template-columns:minmax(0,1fr)}.steps{grid-template-columns:minmax(0,1fr)}.st{border-right:0;border-bottom:1px solid var(--rule)}}
+@media(max-width:600px){table{font-size:13px}th,td{padding:6px 4px}.stack thead{display:none}.stack tr{display:grid;padding-block:8px;border-bottom:1px solid var(--rule)}.stack td{display:flex;justify-content:space-between;gap:12px;border:0;padding:3px 0}.stack td::before{content:attr(data-l);color:var(--mut);font-weight:600;flex:0 0 40%}}
+</style>
+
+<section class="band"><div class="wrap">
+  <h1>Pricing tool: data sources request for IT and BTI</h1>
+  <div class="meta">DP World Egypt · Ocean Freight Pricing · Contact: Salma Ismail (Pricing) · 27 Nov 2026 · Internal, DP World only</div>
+  <div class="ask"><b>What we ask now:</b> name an owner for each source below, give read-only test access to the first four (Rate Bank, shared mailboxes, Entra ID groups, a team database), and book one session with BTI to confirm the fields. The tool runs on plain rules and calls no AI or language model. Today it uses dummy data only.</div>
+
+  <div class="map" role="table" aria-label="Data sources, connection and screens">
+    <div class="mh" role="row"><span>Data source</span><span></span><span>How DP World connects it (read only)</span><span></span><span>Screens it feeds</span></div>
+    <div class="mr" role="row"><div class="src"><b>Rate Bank Export <span class="now">first</span></b><span>Rate Data Base, Reference Sheet, Bookings, Contacts</span></div><div class="arr">→</div><div class="how"><b>SharePoint, Sites.Selected</b><span>Scheduled job on a service account copies the named sheets into the database</span></div><div class="arr">→</div><div class="use">Rates &amp; offer, Rate Bank, Overview<span>Lowest rate, margin, checks</span></div></div>
+    <div class="mr" role="row"><div class="src"><b>Rate Bank Import <span class="now">first</span></b><span>Import Rate Dashboard</span></div><div class="arr">→</div><div class="how"><b>SharePoint, Sites.Selected</b><span>Same job, same schedule</span></div><div class="arr">→</div><div class="use">Rates &amp; offer (import)</div></div>
+    <div class="mr" role="row"><div class="src"><b>Shared mailboxes <span class="now">first</span></b><span>pricing@, network@ and the other team boxes</span></div><div class="arr">→</div><div class="how"><b>Microsoft Graph, Mail.Read</b><span>Limited to named boxes with Exchange RBAC for Applications</span></div><div class="arr">→</div><div class="use">Inbox, Shared inbox cases<span>Cases, SLA, Team KPIs</span></div></div>
+    <div class="mr" role="row"><div class="src"><b>Entra ID security groups <span class="now">first</span></b><span>Pricing, Sales, Leads, Network</span></div><div class="arr">→</div><div class="how"><b>Single sign-on</b><span>Roles come from groups, not from the email address</span></div><div class="arr">→</div><div class="use">Every screen<span>Sales never get buy rates</span></div></div>
+    <div class="mr" role="row"><div class="src"><b>Team database <span class="now">first</span></b><span>Quotes, feedback, cases, logs, edits</span></div><div class="arr">→</div><div class="how"><b>SharePoint Lists or Azure SQL</b><span>With an audit log of who changed what</span></div><div class="arr">→</div><div class="use">Offers &amp; feedback, KPIs, Help &amp; settings</div></div>
+    <div class="mr" role="row"><div class="src"><b>Trucking rates</b><span>Pickup in Egypt (EXW), cross-border trucks</span></div><div class="arr">→</div><div class="how"><b>Owner to confirm</b><span>File on SharePoint or entered in the tool</span></div><div class="arr">→</div><div class="use">Trucking rates, EXW part of the offer</div></div>
+    <div class="mr" role="row"><div class="src"><b>Carrier links and files</b><span>Tariff files, CSV or Excel links, an internal API</span></div><div class="arr">→</div><div class="how"><b>Data sources screen</b><span>Direct download links refresh on a schedule; uploads by Pricing. IT confirms which hosts the tool may read</span></div><div class="arr">→</div><div class="use">Rates &amp; offer<span>Rate Bank wins on conflicts</span></div></div>
+    <div class="mr" role="row"><div class="src"><b>WhatsApp from carriers and NVOCCs</b><span>Rate lines and announcements</span></div><div class="arr">→</div><div class="how"><b>Today: chat export (.txt) upload</b><span>Later: official WhatsApp Business Platform on a DP World number (IT, Legal, Meta approval)</span></div><div class="arr">→</div><div class="use">Rates (marked "confirm by email"), announcements</div></div>
+    <div class="mr" role="row"><div class="src"><b>NPM (Network Pricing Manager) <span class="later">later</span></b><span>Global rates</span></div><div class="arr">→</div><div class="how"><b>API, to agree with the NPM team</b><span>Replaces the Excel source; screens stay the same</span></div><div class="arr">→</div><div class="use">Rates &amp; offer</div></div>
+    <div class="mr" role="row"><div class="src"><b>CARGOES bookings, market index <span class="later">later</span></b><span>Booking volumes, market rate level</span></div><div class="arr">→</div><div class="how"><b>To agree with each owner</b></div><div class="arr">→</div><div class="use">Carrier volumes, Market alerts, margin advice</div></div>
+  </div>
+</div></section>
+
+<hr>
+<section class="band"><div class="wrap">
+  <h2>No AI or model inside the tool</h2>
+  <p>Every feature is a fixed rule written in JavaScript: keyword matching for emails, formulas for profit and transit days, date checks for validity. Nothing is sent to an AI service.</p>
+  <ul>
+    <li><b>Checked on every change.</b> An automated test (<code>tests/rules.test.js</code>) fails if the page calls an AI or language-model service, or loads code from any host that is not on the allowed list.</li>
+    <li><b>Allowed outside hosts today:</b> <code>cdnjs.cloudflare.com</code> (pdf.js 3.11.174, SheetJS 0.18.5, jsPDF 2.5.1 + autotable 3.8.2) and Google Fonts. IT can host these files inside DP World instead; the tool then calls no outside host.</li>
+    <li><b>Mail links only open a draft.</b> A person always presses Send in Outlook.</li>
+  </ul>
+  <div class="note"><b>Prototype parts IT replaces.</b> The demo saves data through its prototype host (<code>window.claude</code>: shared store, file download, test-mail connector, viewer name). These are storage and login services, not AI. In production they become: the team database, a normal browser download, the Graph mail job, and Entra ID sign-in.</div>
+</div></section>
+
+<hr>
+<section class="band"><div class="wrap">
+  <h2>What we need for each source</h2>
+  <div class="scroll"><table class="stack">
+    <thead><tr><th>Source</th><th>Fields the tool reads</th><th>How often</th><th>Owner</th><th>Sensitivity</th></tr></thead>
+    <tbody>
+      <tr><td data-l="Source"><b>Rate Data Base</b></td><td data-l="Fields">Rate ID, Month, Carrier, POL, POL Terminal, POD, Transshipment, 20/40 Rate, 20RF/40RF, Currency, 20/40 THC, Free Time, Validity, Approx TT, Contract Type, Comment</td><td data-l="How often">On change, at least daily</td><td data-l="Owner">Rate Bank owner (Pricing), to confirm</td><td data-l="Sensitivity">High: buy rates</td></tr>
+      <tr><td data-l="Source"><b>Import Rate Dashboard</b></td><td data-l="Fields">Rate ID, Month, Carrier, POL, POD, 20/40 Rate, 20RF/40RF, Currency, Free Time, Validity, Contract Type, Comment</td><td data-l="How often">On change, at least daily</td><td data-l="Owner">Rate Bank owner, to confirm</td><td data-l="Sensitivity">High: buy rates</td></tr>
+      <tr><td data-l="Source"><b>Reference Sheet</b></td><td data-l="Fields">Request number, subject, customer, Egypt port, foreign port, 20/40 count, TEU, status, received and quoted dates, sales, pricing, comment</td><td data-l="How often">Daily</td><td data-l="Owner">To confirm</td><td data-l="Sensitivity">Medium: customer names</td></tr>
+      <tr><td data-l="Source"><b>Bookings</b></td><td data-l="Fields">Month, carrier, volume, equipment, TEU, consignee, shipper, source, owner</td><td data-l="How often">Monthly</td><td data-l="Owner">To confirm</td><td data-l="Sensitivity">Medium</td></tr>
+      <tr><td data-l="Source"><b>Contacts</b></td><td data-l="Fields">Carrier, pricing email, sales email</td><td data-l="How often">On change</td><td data-l="Owner">Pricing</td><td data-l="Sensitivity">Low</td></tr>
+      <tr><td data-l="Source"><b>Shared mailboxes</b></td><td data-l="Fields">Sender, subject, body, attachments (Excel, PDF), arrival time, conversation ID, sent copy</td><td data-l="How often">Within a minute (change notification)</td><td data-l="Owner">IT messaging team</td><td data-l="Sensitivity">High: customer mail</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Never read:</b> the "Carrier Credentials" sheet, or any sheet named like credential or password. The tool already skips them; the production job must exclude them too. The Rate Bank stays read only: the tool never writes to it.</div>
+</div></section>
+
+<hr>
+<section class="band"><div class="wrap cols">
+  <div>
+    <h2>Questions for the BTI session</h2>
+    <ol>
+      <li>Which values can <b>Contract Type</b> hold? The tool counts only rows where it is empty or "Standard" as the lowest rate.</li>
+      <li>How is the <b>Rate ID / reference number</b> built, and who assigns it?</li>
+      <li>Can the Rate Bank get a <b>POL Terminal</b> column for Sokhna (DP World terminal or other)? Today the tool guesses it from the carrier name.</li>
+      <li>What date format does <b>Validity</b> use? An empty validity means the end of the rate's month.</li>
+      <li>Who updates the Rate Bank, and at what times, so the refresh job runs after them?</li>
+      <li>Does NPM offer an API, and who owns it?</li>
+      <li>Do we have a <b>Microsoft 365 Copilot</b> licence (Outlook, Teams, Excel, PowerPoint), or only Copilot Chat? It would help <i>around</i> the tool (summing up long rate threads, meeting notes, slides in the DP World template), never inside it: the tool stays plain rules.</li>
+      <li>Can we use <b>Power Automate</b> (no AI, already in Microsoft 365) for the plumbing: save rate emails and their Excel or PDF attachments from the shared mailboxes to a SharePoint folder the tool reads; run the hourly Rate Bank copy to JSON (the refresh job in the data contract); post a Teams alert when a case passes its SLA?</li>
+    </ol>
+  </div>
+  <div>
+    <h2>Decisions IT makes</h2>
+    <ol>
+      <li><b>Hosting:</b> SharePoint + Power Automate, Power Apps + Dataverse, or Azure Static Web App + Functions + SQL. With the Azure option the buy rates stay on the server and only reach the Pricing group.</li>
+      <li><b>Service account</b> for the refresh job and the mail job.</li>
+      <li><b>Security review</b> before any real data enters the tool.</li>
+      <li><b>HR and Legal</b> view on the "My shift" time tracking.</li>
+      <li><b>New shared mailboxes:</b> IT creates them in Microsoft 365 (for example a reefer box); Pricing then adds them in the tool with SLA, access and routing words.</li>
+      <li><b>WhatsApp:</b> whether DP World opens a WhatsApp Business Platform number for carriers. The tool never reads a personal WhatsApp.</li>
+      <li><b>Allowed link hosts</b> for the Data sources screen (SharePoint, carrier portals, internal APIs).</li>
+      <li><b>Apps hub, next levels:</b> Microsoft Graph Mail.Read on the shared mailboxes and Send As pricing@; Presence.Read for Teams status; Calendars.Read for meetings; Teams Phone (if DP World has it) for calls from the tool; SharePoint Sites.Selected for the team site and reports; links or APIs for NPM and CARGOES; carrier APIs (most large carriers offer developer portals; DCSA standards for schedules and tracking) under contracts. No passwords are stored in the tool.</li>
+    </ol>
+  </div>
+</div></section>
+
+<hr>
+<section class="band"><div class="wrap">
+  <h2>Proposed order of work</h2>
+  <div class="steps">
+    <div class="st"><i>1</i><b>Owners named</b><span>One owner per source in the map above</span></div>
+    <div class="st"><i>2</i><b>BTI session</b><span>Fields and reference number confirmed</span></div>
+    <div class="st"><i>3</i><b>Test access</b><span>Read only, named items, on a copy</span></div>
+    <div class="st"><i>4</i><b>Security review</b><span>Before real data</span></div>
+    <div class="st"><i>5</i><b>Pilot</b><span>Pricing team first, then Sales</span></div>
+  </div>
+  <p style="margin-top:20px">Attached in the handover pack: the prototype page, the dummy Rate Bank files, <code>README.md</code> (data model and rules), <code>TAB_MAP.csv</code> (every screen: source → effect), <code>docs/IT_Needs_Map.html</code> and the rule tests.</p>
+</div></section>

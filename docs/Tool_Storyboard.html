@@ -1,0 +1,226 @@
+<title>Pricing Tool Storyboard</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* VOICE work: a guide to show IT and management, calm and exact
+   IDEA a film storyboard: one customer request travelling frame by frame, switchable Before / After
+   PICTURE the 8-frame strip of the journey, each frame a drawn scene with its caption and time cost
+   COLOUR white ground, the tool's indigo #3e3c90 dominant, teal #00a8b5 support, coral for "before" pain
+   TYPE Space Grotesk 700 + Inter
+   LAYOUT laptop: title and switch over a 4x2 strip; 720px: 2 columns; phone: one column of frames */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0e0d24);--panel:light-dark(#f3f2fb,#1a1940);--ink:light-dark(#14123a,#eceaff);--mut:light-dark(#555377,#b2b0d6);--line:light-dark(#dcdaf0,#2e2c5c);--ind:light-dark(#3e3c90,#9d9af0);--indf:light-dark(#3e3c90,#2a2870);--teal:light-dark(#00838d,#3fd0da);--coral:light-dark(#c2412d,#ff8a76);--coralf:light-dark(#fde8e4,#3a1d1a);--tealf:light-dark(#e0f5f6,#123437)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 Inter,"Segoe UI",Arial,sans-serif;margin:0;overflow-x:clip}
+.band{padding-block:clamp(28px,4vw,56px);padding-left:max(5vw,16px,env(safe-area-inset-left,0px));padding-right:max(5vw,16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1240px;margin:0 auto}
+h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;letter-spacing:-.02em;line-height:1.08;margin:0}
+h1{font-size:clamp(32px,4.4vw,50px);max-width:20ch}
+h2{font-size:clamp(24px,2.6vw,32px);margin-bottom:14px;max-width:32ch}
+h3{font-size:18px;margin-bottom:6px}
+p{margin:0 0 10px;max-width:68ch}
+.note{font-size:13px;color:var(--mut)}
+.hero{background:var(--indf);color:#fff;margin-top:calc(-1*env(safe-area-inset-top,0px));padding-top:calc(env(safe-area-inset-top,0px) + 2.5rem)}
+.hero .note{color:#d9d8f5}
+.hrow{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+.lede{font-size:17px;max-width:58ch;color:#e9e8fb;margin-top:12px}
+.sw{display:inline-flex;background:rgba(255,255,255,.12);border-radius:999px;padding:4px;gap:4px}
+.sw button{border:0;background:none;color:#fff;font:600 15px Inter,sans-serif;padding:10px 20px;border-radius:999px;cursor:pointer;min-height:44px}
+.sw button[aria-pressed=true]{background:#fff;color:#3e3c90}
+.sw button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.fr{background:#fff;color:#14123a;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.fr .sc{height:110px;border-radius:6px;background:#f3f2fb;position:relative;overflow:hidden}
+.fr .sc svg{position:absolute;inset:0;width:100%;height:100%}
+.fr .no{font:700 13px "Space Grotesk",sans-serif;color:#3e3c90}
+.fr b{font-size:15px;line-height:1.3}
+.fr .cap{font-size:14px;line-height:1.45;color:#3b3960}
+.fr .cost{font-size:13px;font-weight:600;padding:3px 9px;border-radius:999px;align-self:flex-start}
+.before .fr .cost{background:#fde8e4;color:#a5321f}
+.after .fr .cost{background:#e0f5f6;color:#00666e}
+.tot{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:16px;font-size:15px;color:#e9e8fb}
+.tot b{font:700 24px "Space Grotesk",sans-serif;color:#fff;margin-right:6px}
+.roles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.role{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--panel)}
+.role .lvl{font-size:13px;color:var(--mut)}
+.role ul{margin:6px 0 0;padding-left:18px;font-size:14px}.role li{margin-bottom:4px}
+.role.top{border-color:var(--ind)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--mut);font-weight:600}
+td.b{color:var(--coral)}td.a{color:var(--teal);font-weight:500}
+.flow{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.2fr) auto minmax(0,1fr);gap:10px;align-items:stretch}
+.fbox{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--panel)}
+.fbox.core{border:2px solid var(--ind);background:var(--bg)}
+.fbox ul{margin:6px 0 0;padding-left:18px;font-size:14px}
+.arr{align-self:center;color:var(--ind);font:700 22px "Space Grotesk",sans-serif}
+.ex{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:15px}
+.ex span{padding:8px 12px;border-radius:8px;background:var(--panel);white-space:nowrap}
+.ex .eq{background:var(--ind);color:#fff}
+.day{display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 18px}
+.day .t{font:700 20px "Space Grotesk",sans-serif;color:var(--ind);white-space:nowrap;padding:10px 0;border-top:1px solid var(--line)}
+.day .d{padding:12px 0;border-top:1px solid var(--line)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,48px)}
+.chk{list-style:none;margin:0;padding:0}.chk li{padding:9px 0 9px 30px;border-top:1px solid var(--line);position:relative;font-size:15px}
+.chk li::before{content:"";position:absolute;left:4px;top:15px;width:12px;height:12px;border-radius:3px;background:var(--teal)}
+.chk li.it::before{background:none;border:2px solid var(--coral)}
+.st{font-size:13px;font-weight:600;margin-left:6px}.st.ok{color:var(--teal)}.st.it{color:var(--coral)}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(13em,1fr));gap:12px}
+.kpi div{border-top:3px solid var(--ind);padding-top:8px}
+.kpi b{display:block;font:700 17px "Space Grotesk",sans-serif}
+@media(max-width:1000px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.roles{grid-template-columns:repeat(2,minmax(0,1fr))}.flow{grid-template-columns:minmax(0,1fr)}.arr{transform:rotate(90deg);justify-self:center}}
+@media(max-width:600px){.strip,.roles,.two{grid-template-columns:minmax(0,1fr)}table{font-size:13px}th,td{padding:7px 5px}.stack thead{display:none}.stack tr{display:grid;padding-block:8px;border-bottom:1px solid var(--line)}.stack td{border:0;padding:3px 0;display:grid;grid-template-columns:7em minmax(0,1fr);gap:8px}.stack td::before{content:attr(data-l);font-weight:600;color:var(--mut)}}
+@media(prefers-reduced-motion:no-preference){.fr{transition:transform .2s}.strip.flip .fr{transform:translateY(-3px)}}
+</style>
+
+<section class="band hero"><div class="wrap">
+  <div class="hrow">
+    <div>
+      <div class="note">DP World Egypt, Freight Forwarding · Pricing tool prototype · guide for IT and management · dummy data only</div>
+      <h1>One customer request, from email to a checked quote</h1>
+      <p class="lede">Follow a single rate request through eight frames. Switch between how it works today and how it works with the tool. Same people, same carriers, fewer hops.</p>
+    </div>
+    <div class="sw" role="group" aria-label="Show the process"><button id="b-before" aria-pressed="false">Before</button><button id="b-after" aria-pressed="true">With the tool</button></div>
+  </div>
+  <div class="strip after" id="strip"></div>
+  <div class="tot" id="tot"></div>
+  <p class="note" style="margin-top:10px">Steps describe the process. Minutes are to be measured in the pilot, so the strip counts hand-offs and tools opened, not invented times.</p>
+</div></section>
+
+<section class="band"><div class="wrap">
+  <h2>Five roles, each sees only what their job needs</h2>
+  <div class="roles">
+    <div class="role"><div class="lvl">Level 1</div><h3>Executive</h3><ul><li>Inbox cases with SLA timer</li><li>Buy rates, lowest standard rate</li><li>Buy + profit = sell</li><li>Quote, PDF, Gmail / Outlook draft</li></ul></div>
+    <div class="role"><div class="lvl">Level 1</div><h3>Sales</h3><ul><li>Quick price on sell rates</li><li>Never sees buy rates or margin</li><li>Offers sent to them, feedback won / lost</li></ul></div>
+    <div class="role"><div class="lvl">Level 2</div><h3>Direct Manager</h3><ul><li>Own team only</li><li>Workload, SLA, cycle time</li><li>Forward / reassign with reason</li><li>Training requests</li></ul></div>
+    <div class="role"><div class="lvl">Level 3</div><h3>Senior Management</h3><ul><li>Cockpit for the department</li><li>Top 3 pains with owner and fix</li><li>Approve / reject decisions</li></ul></div>
+    <div class="role top"><div class="lvl">Level 4</div><h3>Top Management</h3><ul><li>Whole company cockpit</li><li>Margin, win rate, TEU, forecast</li><li>Morning brief</li></ul></div>
+  </div>
+  <p class="note" style="margin-top:10px">Role names, not person names or job titles. In production each role is an Entra ID group set by IT.</p>
+</div></section>
+
+<section class="band" style="padding-top:0"><div class="wrap">
+  <h2>Before and after, step by step</h2>
+  <div class="scroll"><table class="stack">
+    <thead><tr><th>Step</th><th>Today</th><th>With the tool</th></tr></thead>
+    <tbody id="cmp"></tbody>
+  </table></div>
+</div></section>
+
+<section class="band" style="padding-top:0"><div class="wrap">
+  <h2>How it works: plain rules on read-only data</h2>
+  <div class="flow">
+    <div class="fbox"><h3>Sources (read only)</h3><ul><li>Rate Bank on SharePoint</li><li>Shared mailboxes (M365 Graph)</li><li>Later: NPM, CARGOES, Finance FX</li></ul><p class="note" style="margin-top:6px">Demo today: dummy Rate Bank file, Gmail test box with one +address per mailbox.</p></div>
+    <div class="arr" aria-hidden="true">→</div>
+    <div class="fbox core"><h3>Rules (no AI)</h3><ul>
+      <li>Lowest rate = standard dry rates only; special, spot, DG, named customer never count</li>
+      <li>No validity date = valid to month end; spot = that sailing only</li>
+      <li>Sokhna: DP World terminal first, other terminal flagged</li>
+      <li>Jebel Ali: suspended carriers hidden</li>
+      <li>Profit on ocean freight only; THC and local charges at cost</li>
+      <li>Rate moves of 5% or more flagged; free time, D&amp;D, ACI and FX date checked</li></ul></div>
+    <div class="arr" aria-hidden="true">→</div>
+    <div class="fbox"><h3>Outputs</h3><ul><li>Quote email and locked PDF with check code</li><li>Gmail / Outlook draft, a person sends</li><li>Cases, SLA, dashboards, Cockpit</li></ul></div>
+  </div>
+  <div class="ex" aria-label="Worked example"><span class="note" style="background:none;padding:0">Worked example, China dry export, 40':</span><span>buy USD 1,800</span><span>+ profit USD 50</span><span class="eq">= sell USD 1,850</span><span>THC at cost</span></div>
+  <p class="note" style="margin-top:8px">Other lanes: no fixed profit. The advisor sets it from the gap to the other carriers and to the market level on the lane.</p>
+</div></section>
+
+<section class="band" style="padding-top:0"><div class="wrap two">
+  <div>
+    <h2>A day for the Executive</h2>
+    <div class="day">
+      <div class="t">08:45</div><div class="d"><b>Morning brief and Today.</b> Rates expiring this week, lanes that moved, cases waiting, one "Next up".</div>
+      <div class="t">09:00</div><div class="d"><b>Pull the mailboxes.</b> Each email becomes a case with a reference number and an SLA clock.</div>
+      <div class="t">09:10</div><div class="d"><b>Price it.</b> The request is read, lowest standard rate found, margin options shown with buy + profit = sell.</div>
+      <div class="t">09:15</div><div class="d"><b>Before you send.</b> Rate move, free time and D&amp;D, ACI on imports, currency and FX date.</div>
+      <div class="t">09:20</div><div class="d"><b>Draft and PDF.</b> Saved as a draft; the Executive checks and presses Send.</div>
+      <div class="t">16:45</div><div class="d"><b>End of day and hand-over.</b> Open items handed to the back-up with a note.</div>
+    </div>
+  </div>
+  <div>
+    <h2>A week for management</h2>
+    <div class="day">
+      <div class="t">Daily</div><div class="d"><b>Direct Manager:</b> team load, late cases, who is away, reassign with reason.</div>
+      <div class="t">Weekly</div><div class="d"><b>Senior Management:</b> Cockpit headline, top 3 pains with owner and fix, approve or reject decisions.</div>
+      <div class="t">Monthly</div><div class="d"><b>Top Management:</b> margin, win rate, TEU, forecast, customers going down.</div>
+    </div>
+    <h2 style="margin-top:26px">Built-in control</h2>
+    <ul class="chk">
+      <li>The tool never sends email; a person sends every draft</li>
+      <li>Sales never see buy rates</li>
+      <li>Every quote has a number and a check code; Verify catches edited copies</li>
+      <li>Sources are read only; the Rate Bank is never written to</li>
+      <li>No passwords stored; carrier sites are opened by the person</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="band" style="padding-top:0"><div class="wrap two">
+  <div>
+    <h2>Ready for IT?</h2>
+    <p>The prototype is ready to show and to specify from. It is not yet a production app: these items need IT.</p>
+    <ul class="chk">
+      <li>Screens, rules and data contract documented (README, TAB_MAP, DATA_CONTRACT) <span class="st ok">Done</span></li>
+      <li>67 automated rule tests passing <span class="st ok">Done</span></li>
+      <li>Data layer can swap Excel for SharePoint, then NPM <span class="st ok">Done</span></li>
+      <li class="it">Hosting inside DP World and Entra ID sign-in with role groups <span class="st it">IT</span></li>
+      <li class="it">Read-only Graph access to the shared mailboxes <span class="st it">IT</span></li>
+      <li class="it">Database for cases, quotes, check codes and decisions (now in the browser) <span class="st it">IT</span></li>
+      <li class="it">Data owners named for rates, FX and ACI <span class="st it">Business</span></li>
+    </ul>
+  </div>
+  <div>
+    <h2>What the pilot measures</h2>
+    <div class="kpi">
+      <div><b>Time to quote</b><span class="note">Email received to draft saved, working hours</span></div>
+      <div><b>Replies within SLA</b><span class="note">Share of cases answered inside the mailbox SLA</span></div>
+      <div><b>Win rate</b><span class="note">Won quotes over decided quotes</span></div>
+      <div><b>Margin per box</b><span class="note">Sell minus buy on won quotes, vs the 3 months before</span></div>
+      <div><b>Hand-offs</b><span class="note">Forwards and reassigns per case</span></div>
+      <div><b>Quote errors</b><span class="note">Quotes from a non-standard or other-terminal rate</span></div>
+    </div>
+    <p class="note" style="margin-top:12px">Baseline taken in the first two weeks before the tool is used, so the comparison is fair.</p>
+  </div>
+</div></section>
+
+<script>
+{
+const F=[
+ {t:"Request arrives",ic:"mail",b:["Email lands in a personal inbox or a shared box","No reference number; easy to miss in a busy inbox"],a:["Email lands in the shared mailbox","Becomes a case with a reference number and SLA clock"],bc:"2 inboxes checked",ac:"1 case list"},
+ {t:"Who takes it",ic:"people",b:["Picked up by whoever sees it first","Back-up unclear when someone is away"],a:["Routed by rules to the right box and person","Forward needs person, mailbox and reason"],bc:"Manual hand-off",ac:"Rule routing"},
+ {t:"Read the request",ic:"read",b:["Re-type POL, POD, equipment and customer","Target price buried in the text"],a:["Smart request reads lane, boxes, customer and target","Missing details flagged"],bc:"Re-typing",ac:"Read by rules"},
+ {t:"Find the rate",ic:"search",b:["Open the Rate Bank Excel, filter, compare carriers","Risk of quoting a special, spot or suspended rate"],a:["Lowest standard rate picked by the rules","Specials, spots and other terminal shown separately"],bc:"Excel + emails",ac:"1 screen"},
+ {t:"Set the profit",ic:"calc",b:["Margin by feel or a flat number","No view of the gap to other carriers"],a:["Margin advisor from the gap and market level","Buy + profit = sell shown for every option"],bc:"Gut feel",ac:"Shown and explained"},
+ {t:"Check before sending",ic:"shield",b:["Free time, D&D, ACI and FX date checked from memory","Rate moves noticed late"],a:["Before you send: rate move, free time and D&D, ACI, currency and FX date","Terms added to the quote"],bc:"From memory",ac:"Checklist on screen"},
+ {t:"Send the quote",ic:"doc",b:["Copy into an email, format by hand","Any copy can be edited later"],a:["Email and locked PDF with number and check code","Saved as a draft; a person presses Send"],bc:"Manual format",ac:"Draft + PDF"},
+ {t:"Follow up and learn",ic:"chart",b:["Won / lost lives in people's heads","Managers ask for status by email"],a:["Feedback logged; cases close with time","Dashboards and Cockpit per role"],bc:"No record",ac:"Logged and visible"}];
+const IC={
+ mail:'<rect x="34" y="28" width="92" height="58" rx="6" fill="#fff" stroke="#3e3c90" stroke-width="3"/><path d="M36 32 80 64 124 32" fill="none" stroke="#3e3c90" stroke-width="3"/><circle cx="130" cy="30" r="10" fill="#00a8b5"/>',
+ people:'<circle cx="60" cy="44" r="13" fill="#3e3c90"/><path d="M38 90c2-18 42-18 44 0" fill="#3e3c90"/><circle cx="104" cy="44" r="13" fill="#00a8b5"/><path d="M82 90c2-18 42-18 44 0" fill="#00a8b5"/>',
+ read:'<rect x="40" y="20" width="80" height="74" rx="4" fill="#fff" stroke="#3e3c90" stroke-width="3"/><g stroke="#3e3c90" stroke-width="3"><path d="M52 38h56M52 50h40M52 62h50"/></g><rect x="50" y="70" width="46" height="12" rx="3" fill="#00a8b5"/>',
+ search:'<rect x="30" y="24" width="70" height="64" rx="4" fill="#fff" stroke="#3e3c90" stroke-width="3"/><g stroke="#c9c7e6" stroke-width="3"><path d="M40 40h50M40 52h50M40 64h50M40 76h50"/></g><circle cx="104" cy="62" r="18" fill="#fff" stroke="#00a8b5" stroke-width="5"/><path d="M117 75l14 14" stroke="#00a8b5" stroke-width="6" stroke-linecap="round"/>',
+ calc:'<rect x="50" y="18" width="60" height="78" rx="6" fill="#3e3c90"/><rect x="58" y="26" width="44" height="16" rx="2" fill="#e0f5f6"/><g fill="#fff"><rect x="58" y="50" width="12" height="10" rx="2"/><rect x="74" y="50" width="12" height="10" rx="2"/><rect x="90" y="50" width="12" height="10" rx="2"/><rect x="58" y="66" width="12" height="10" rx="2"/><rect x="74" y="66" width="12" height="10" rx="2"/></g><rect x="90" y="66" width="12" height="24" rx="2" fill="#00a8b5"/>',
+ shield:'<path d="M80 16 116 30v26c0 22-16 36-36 42C60 92 44 78 44 56V30z" fill="#3e3c90"/><path d="M64 56l12 12 22-24" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>',
+ doc:'<rect x="46" y="16" width="68" height="82" rx="4" fill="#fff" stroke="#3e3c90" stroke-width="3"/><g stroke="#c9c7e6" stroke-width="3"><path d="M56 34h48M56 46h48M56 58h30"/></g><circle cx="98" cy="80" r="13" fill="#00a8b5"/><path d="M92 80l4 4 8-8" fill="none" stroke="#fff" stroke-width="3"/>',
+ chart:'<path d="M34 92h96" stroke="#3e3c90" stroke-width="3"/><rect x="44" y="62" width="16" height="30" fill="#c9c7e6"/><rect x="68" y="48" width="16" height="44" fill="#c9c7e6"/><rect x="92" y="34" width="16" height="58" fill="#3e3c90"/><path d="M44 54 76 40 100 24 124 18" fill="none" stroke="#00a8b5" stroke-width="4"/>'};
+const strip=document.getElementById("strip"),tot=document.getElementById("tot"),cmp=document.getElementById("cmp");
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function draw(mode){
+  const A=mode==="after";
+  strip.className="strip "+mode;
+  strip.innerHTML=F.map((f,i)=>`<article class="fr"><div class="sc"><svg viewBox="0 0 160 110" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${IC[f.ic]}</svg></div><span class="no">Frame ${i+1}</span><b>${esc(f.t)}</b><div class="cap">${(A?f.a:f.b).map(esc).join("<br>")}</div><span class="cost">${esc(A?f.ac:f.bc)}</span></article>`).join("");
+  tot.innerHTML=A?`<span><b>1</b>place to work</span><span><b>0</b>emails sent by the tool</span><span><b>8 of 8</b>steps logged</span>`:`<span><b>4+</b>places: inboxes, Excel, calculator, email</span><span><b>0</b>reference numbers</span><span><b>2 of 8</b>steps leave a record</span>`;
+  document.getElementById("b-before").setAttribute("aria-pressed",String(!A));
+  document.getElementById("b-after").setAttribute("aria-pressed",String(A));
+  try{ localStorage.setItem("sbMode",mode); }catch(e){}
+}
+cmp.innerHTML=F.map(f=>`<tr><td data-l="Step"><b>${esc(f.t)}</b></td><td class="b" data-l="Today">${f.b.map(esc).join("<br>")}</td><td class="a" data-l="With the tool">${f.a.map(esc).join("<br>")}</td></tr>`).join("");
+document.getElementById("b-before").onclick=()=>draw("before");
+document.getElementById("b-after").onclick=()=>draw("after");
+let m="after"; try{ m=localStorage.getItem("sbMode")||"after"; }catch(e){}
+draw(m==="before"?"before":"after");
+}
+</script>

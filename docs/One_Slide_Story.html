@@ -1,0 +1,134 @@
+<title>One Slide Story</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* VOICE work, a looping showcase slide for management, in the Showcase's ocean look
+   IDEA a race: the same customer request runs the old way and the tool's way side by side
+   PICTURE two route boards: a token zigzagging through 9 stops vs gliding through 5, each stop lighting a card
+   COLOUR abyss #030B17 ground, sea #3BE3D2 for the tool, alarm #FF6B5A for the old way, road #FFB23F for savings
+   TYPE Archivo (wide) + IBM Plex Sans / Mono
+   LAYOUT a fixed 16:9 stage scaled to the window: title strip, two boards side by side, savings strip */
+:root{color-scheme:dark;--abyss:#030B17;--panel:rgba(8,24,46,.78);--line:rgba(120,190,220,.2);--ink:#EAF4FA;--mute:#8FA9BE;--sea:#3BE3D2;--alarm:#FF6B5A;--road:#FFB23F;--good:#7BE38B}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(1200px 800px at 70% 40%,#0B2747 0%,#05142A 45%,var(--abyss) 80%);color:var(--ink);font:16px/1.4 "IBM Plex Sans",system-ui,sans-serif;overflow:hidden}
+#wrap{position:fixed;inset:0;display:grid;place-items:center}
+#stage{position:relative;width:1600px;height:900px;transform-origin:center center;flex:none}
+.top{position:absolute;left:56px;top:36px;right:56px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px}
+.eyebrow{font:600 14px/1 "IBM Plex Mono",monospace;color:var(--sea);margin:0 0 12px}
+h1{margin:0;font:800 48px/1.02 "Archivo",sans-serif;font-variation-settings:"wdth" 115;letter-spacing:-.01em}
+.ctrl{display:flex;gap:10px}
+.ctrl button{font:600 14px/1 "IBM Plex Mono",monospace;color:var(--ink);background:rgba(3,14,30,.7);border:1px solid var(--line);border-radius:999px;padding:12px 18px;cursor:pointer;min-height:44px}
+.ctrl button:hover{border-color:var(--sea)}
+.ctrl button:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.board{position:absolute;top:150px;width:728px;height:520px;background:var(--panel);border:1px solid var(--line);border-radius:22px;overflow:hidden}
+#bB{left:56px;border-color:rgba(255,107,90,.4)}
+#bA{left:816px;border-color:rgba(59,227,210,.5)}
+.bh{position:absolute;left:24px;top:20px;right:24px;display:flex;justify-content:space-between;align-items:baseline}
+.bh b{font:800 26px/1 "Archivo",sans-serif;font-variation-settings:"wdth" 112}
+#bB .bh b{color:var(--alarm)}#bA .bh b{color:var(--sea)}
+.meters{display:flex;gap:22px;font:500 13px/1.2 "IBM Plex Mono",monospace;color:var(--mute);text-align:right}
+.meters span{display:block;font:800 30px/1 "Archivo",sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+.board svg{position:absolute;left:0;top:0;width:728px;height:520px}
+.st{position:absolute;width:150px;text-align:center;font:600 14px/1.25 "IBM Plex Sans",sans-serif;color:var(--mute);transition:color .3s}
+.st.on{color:var(--ink)}
+.tip{position:absolute;width:168px;padding:9px 11px;border-radius:12px;font:500 13px/1.35 "IBM Plex Sans",sans-serif;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s}
+.tip.on{opacity:1;transform:none}
+#bB .tip{background:rgba(255,107,90,.13);border:1px solid rgba(255,107,90,.45);color:#FFD9D2}
+#bA .tip{background:rgba(59,227,210,.1);border:1px solid rgba(59,227,210,.45);color:#D6FBF7}
+.tip i{display:block;font:600 11px/1 "IBM Plex Mono",monospace;font-style:normal;letter-spacing:.06em;margin-bottom:5px;opacity:.85}
+.stamp{position:absolute;right:26px;bottom:22px;font:800 22px/1 "Archivo",sans-serif;padding:10px 16px;border-radius:12px;opacity:0;transform:scale(.7);transition:opacity .35s,transform .35s cubic-bezier(.3,1.6,.5,1)}
+.stamp.on{opacity:1;transform:none}
+#doneA{background:var(--sea);color:#02201d}
+#doneB{background:var(--alarm);color:#2a0803;right:auto;left:26px}
+#waitA{position:absolute;left:24px;bottom:28px;font:500 14px/1.3 "IBM Plex Mono",monospace;color:var(--mute);opacity:0;transition:opacity .4s}
+#waitA.on{opacity:1}
+.save{position:absolute;left:56px;right:56px;top:694px;height:150px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.sv{background:rgba(3,14,30,.7);border:1px solid var(--line);border-radius:18px;padding:18px 22px;opacity:.25;transition:opacity .5s,border-color .5s}
+.sv.on{opacity:1;border-color:rgba(255,178,63,.55)}
+.sv b{display:block;font:800 44px/1 "Archivo",sans-serif;font-variation-settings:"wdth" 118;color:var(--road);font-variant-numeric:tabular-nums}
+.sv span{display:block;margin-top:8px;font-size:15px;color:#C5D8E6}
+.foot{position:absolute;left:56px;right:56px;bottom:16px;font:500 12px/1.3 "IBM Plex Mono",monospace;color:var(--mute);display:flex;justify-content:space-between;gap:20px}
+.prog{position:absolute;left:56px;right:56px;top:678px;height:3px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sea),var(--road))}
+</style>
+
+<div id="wrap"><div id="stage" role="img" aria-label="Animation: the same rate request takes 9 stops the old way and 5 stops with the tool, then the savings appear">
+  <div class="top">
+    <div><p class="eyebrow">DP World Egypt · Freight Forwarding · Pricing tool</p><h1>One request, two ways: what the tool changes</h1></div>
+    <div class="ctrl"><button id="pp" type="button">Pause</button><button id="rs" type="button">Replay</button></div>
+  </div>
+
+  <section class="board" id="bB">
+    <div class="bh"><b>Before</b><div class="meters"><div><span id="mBs">1</span>stops</div><div><span id="mBt">0</span>min*</div></div></div>
+    <svg viewBox="0 0 728 520" aria-hidden="true"><path id="pathB" d="" fill="none" stroke="rgba(255,107,90,.35)" stroke-width="3" stroke-dasharray="9 9"/><g id="dotsB"></g><circle id="tokB" r="12" fill="#FF6B5A"/></svg>
+    <div id="labB"></div>
+    <div class="stamp" id="doneB">Sent after 9 stops</div>
+  </section>
+
+  <section class="board" id="bA">
+    <div class="bh"><b>With the tool</b><div class="meters"><div><span id="mAs">1</span>stops</div><div><span id="mAt">0</span>min*</div></div></div>
+    <svg viewBox="0 0 728 520" aria-hidden="true"><path id="pathA" d="" fill="none" stroke="rgba(59,227,210,.45)" stroke-width="5" stroke-linecap="round"/><g id="dotsA"></g><circle id="tokA" r="12" fill="#EAF4FA"/></svg>
+    <div id="labA"></div>
+    <p id="waitA">Next request already open…</p>
+    <div class="stamp" id="doneA">Draft ready ✓</div>
+  </section>
+
+  <div class="prog"><i id="bar"></i></div>
+  <div class="save">
+    <div class="sv" id="s1"><b>18 min</b><span>back on every quote*</span></div>
+    <div class="sv" id="s2"><b>9 → 5</b><span>stops for one request</span></div>
+    <div class="sv" id="s3"><b>4 → 1</b><span>places to work: inbox, Excel, calculator, email → one screen</span></div>
+    <div class="sv" id="s4"><b>2 → 8</b><span>of 8 steps leave a record, with a reference number</span></div>
+  </div>
+  <div class="foot"><span>* Example times (30 vs 12 minutes) to show the idea. The pilot measures the real ones.</span><span>Dummy data · plain rules, no AI · a person presses Send</span></div>
+</div></div>
+
+<script>
+{
+const LOOP=17000, SEG_B=1700, SEG_A=1300, START=600, SAVE_AT=14800;
+const B=[{x:70,y:300,t:"Customer email",tip:["IN","Rate request arrives in a personal inbox"]},{x:200,y:150,t:"Inbox",tip:["SEARCH","Which email had the carrier offer?"]},{x:330,y:420,t:"Rate Bank Excel",tip:["FILTER","167 rows, filter by hand"]},{x:465,y:150,t:"Calculator",tip:["MARGIN","Margin by feel"]},{x:580,y:420,t:"Email by hand",tip:["FORMAT","Copy, paste, format"]},{x:655,y:160,t:"Manager",tip:["ASK","“What’s the status?”"]},{x:665,y:300,t:"Customer",tip:null}];
+const ROUTE=[0,1,2,1,2,3,4,5,6];
+const A=[{x:70,t:"Shared mailbox",tip:["CASE C-2041","Number and SLA clock from the first second"],up:true},{x:215,t:"Smart request",tip:["READ","Sokhna → Jeddah · 2×40'HC · target USD 900"],up:false},{x:365,t:"Lowest rate",tip:["BUY + PROFIT = SELL","850 + 50 = USD 900"],up:true},{x:515,t:"Checks",tip:["BEFORE YOU SEND","Rate move · D&D · ACI · FX date ✓"],up:false},{x:660,t:"Draft + PDF",tip:["OF-261128-001","Locked PDF, check code"],up:true}];
+const AY=300;
+const $=id=>document.getElementById(id);
+const pB=ROUTE.map(i=>B[i]);
+$("pathB").setAttribute("d","M"+B[0].x+" "+B[0].y+" "+[1,2,3,4,5,6].map(i=>"L"+B[i].x+" "+B[i].y).join(" "));
+$("pathA").setAttribute("d","M"+A[0].x+" "+AY+" L"+A[A.length-1].x+" "+AY);
+$("dotsB").innerHTML=B.map(s=>`<circle cx="${s.x}" cy="${s.y}" r="18" fill="#0A1E38" stroke="#FF6B5A" stroke-width="3"/>`).join("");
+$("dotsA").innerHTML=A.map(s=>`<circle cx="${s.x}" cy="${AY}" r="18" fill="#0A1E38" stroke="#3BE3D2" stroke-width="3"/>`).join("");
+const clampX=(x,w)=>Math.max(8,Math.min(728-w-8,x));
+$("labB").innerHTML=B.map((s,i)=>{const below=s.y>250; return `<div class="st" id="lb${i}" style="left:${clampX(s.x-75,150)}px;top:${below?s.y+26:s.y-48}px">${s.t}</div>`+(s.tip?`<div class="tip" id="tb${i}" style="left:${clampX(s.x-84,168)}px;top:${below?s.y-98:s.y+28}px"><i>${s.tip[0]}</i>${s.tip[1]}</div>`:"");}).join("");
+$("labA").innerHTML=A.map((s,i)=>`<div class="st" id="la${i}" style="left:${clampX(s.x-75,150)}px;top:${s.up?AY+28:AY-48}px">${s.t}</div><div class="tip" id="ta${i}" style="left:${clampX(s.x-84,168)}px;top:${s.up?AY-150:AY+62}px"><i>${s.tip[0]}</i>${s.tip[1]}</div>`).join("");
+function fit(){ const s=Math.min(innerWidth/1600,innerHeight/900); $("stage").style.transform="scale("+s+")"; }
+addEventListener("resize",fit); fit();
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let t0=performance.now(), paused=false, pauseAt=0;
+const on=(id,v)=>{ const e=$(id); if(e) e.classList.toggle("on",v); };
+function frame(t){
+  // Before: equal time per hop
+  const tb=Math.max(0,t-START), hopsB=ROUTE.length-1, kB=Math.min(hopsB,tb/SEG_B), iB=Math.min(hopsB-1,Math.floor(kB)), fB=kB-iB;
+  const a=pB[iB], b=pB[Math.min(hopsB,iB+1)], ease=f=>f<.5?2*f*f:1-((-2*f+2)**2)/2, eB=kB>=hopsB?1:ease(fB);
+  $("tokB").setAttribute("cx",a.x+(b.x-a.x)*eB); $("tokB").setAttribute("cy",a.y+(b.y-a.y)*eB);
+  const reachedB=Math.floor(kB+1e-6); const seen=new Set(ROUTE.slice(0,reachedB+1));
+  B.forEach((s,i)=>{ on("lb"+i,seen.has(i)); on("tb"+i,ROUTE[reachedB]===i&&kB<hopsB); });
+  $("mBs").textContent=Math.min(9,reachedB+1); $("mBt").textContent=Math.round(30*Math.min(1,tb/(hopsB*SEG_B)));
+  on("doneB",kB>=hopsB);
+  // With the tool
+  const ta=Math.max(0,t-START), hopsA=A.length-1, kA=Math.min(hopsA,ta/SEG_A), iA=Math.min(hopsA-1,Math.floor(kA)), fA=kA-iA, eA=kA>=hopsA?1:ease(fA);
+  const ax=A[iA].x+(A[iA+1].x-A[iA].x)*eA; $("tokA").setAttribute("cx",ax); $("tokA").setAttribute("cy",AY);
+  const reachedA=Math.floor(kA+1e-6);
+  A.forEach((s,i)=>{ on("la"+i,i<=reachedA); on("ta"+i,i<=reachedA); });
+  $("mAs").textContent=reachedA+1; $("mAt").textContent=Math.round(12*Math.min(1,ta/(hopsA*SEG_A)));
+  on("doneA",kA>=hopsA); on("waitA",kA>=hopsA&&kB<hopsB);
+  ["s1","s2","s3","s4"].forEach((id,i)=>on(id,t>=SAVE_AT+i*250||(t>=START+hopsB*SEG_B+300&&false)));
+  $("bar").style.width=(100*t/LOOP)+"%";
+}
+function tick(now){ if(!paused){ frame((now-t0)%LOOP); } requestAnimationFrame(tick); }
+if(reduce){ frame(LOOP-1); $("pp").hidden=true; } else requestAnimationFrame(tick);
+$("pp").onclick=()=>{ if(!paused){ paused=true; pauseAt=performance.now(); $("pp").textContent="Play"; } else { t0+=performance.now()-pauseAt; paused=false; $("pp").textContent="Pause"; } };
+$("rs").onclick=()=>{ t0=performance.now(); if(paused){ paused=false; $("pp").textContent="Pause"; } if(reduce) frame(LOOP-1); };
+addEventListener("keydown",e=>{ if(e.code==="Space"){ e.preventDefault(); $("pp").click(); } });
+}
+</script>
