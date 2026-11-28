@@ -161,6 +161,9 @@ textarea.ta,.ta{font-size:13px;line-height:1.45;resize:vertical}
 .demoPop{position:absolute;z-index:40;top:calc(100% + 6px);min-width:260px;max-width:min(360px,86vw);display:flex;flex-direction:column;gap:8px;align-items:stretch;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:0 12px 32px rgba(0,0,0,.18)}
 .card:has(.demoMenu[open]),.csBar2:has(.demoMenu[open]){position:relative;z-index:30}
 .demoMenu.right .demoPop{right:0}.demoPop .mini{margin:0;text-align:left}.demoPop select{width:100%}
+.csHead{margin-bottom:12px}.csChase{margin:12px 0;padding:10px 16px}.csChase>summary{cursor:pointer;font-size:13px;list-style:none}.csChase>summary::-webkit-details-marker{display:none}.csChase>summary::before{content:"▸ ";color:var(--muted)}.csChase[open]>summary::before{content:"▾ "}
+.csChase .cnt{display:inline-block;min-width:20px;text-align:center;font-size:11.5px;font-weight:700;padding:1px 6px;border-radius:10px;background:var(--line);margin-left:4px}
+.csIbx{margin:4px 0 12px}.csIbx .ibxGrid{padding:12px 0 0}.csIbx .ibxAns{margin:12px 0 0}.csRow .qno{margin-right:4px}
 details.whatif{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
 details.whatif summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);list-style:none;display:flex;align-items:center;gap:6px}
 details.whatif summary::-webkit-details-marker{display:none}
@@ -2190,7 +2193,7 @@ const IBX_OFFLINE=[{"id": "off0", "subject": "DEMO | Nile Star Line - Rate offer
 (function(){ try{ const T=IBX_OFFLINE.map(e=>Date.parse(e.date)).filter(isFinite); if(!T.length) return; const shift=(Date.now()-15*60000)-Math.max(...T);
   IBX_OFFLINE.forEach(e=>{ const t=Date.parse(e.date); if(isFinite(t)) e.date=new Date(t+shift).toISOString(); }); }catch(x){} })();
 IBX.cur=""; IBX.checked=null;
-setInterval(()=>{ if(CUR_TAB==="ibx"&&IBX.src==="gmail"&&IBX.state!=="loading"&&!document.hidden) ibxLoad(true); },60000);
+setInterval(()=>{ if((CUR_TAB==="ibx"||CUR_TAB==="cases")&&IBX.src==="gmail"&&IBX.state!=="loading"&&!document.hidden) ibxLoad(true); },60000);
 function ibxKind(subj,from,body){ subj=subj||""; from=String(from||"").toLowerCase(); body=body||"";
   if(/network enquiry|network request/i.test(subj)) return "net";
   if(/rate request|quote request|rate req\b|price request|need (a )?rate/i.test(subj)) return "sales";
@@ -2495,13 +2498,13 @@ function renderSheet(){ const p=$("p-sheet"); if(!p) return; const R=sheetRows()
 
 // ---- Shared mailboxes -> cases, SLA in working hours, per-person KPIs, active time ----
 // All dummy data. Nothing is read from Outlook or the Rate Bank.
-const CS_LS="csState_v1", CS_SETK="csSet_v1", CS_MYK="csMy_v1";
+const CS_LS="csState_v2", CS_SETK="csSet_v1", CS_MYK="csMy_v1";
 // "My shift" (active / away time) stays OFF until HR and Legal approve it (README section 8).
 // While it is false the page shows no shift card, records no activity and keeps no activity data.
 const CS_SHIFT_ON=false;
 const CS_PEOPLE=[{id:"me",name:"You",mail:"you@lead.dpw-demo"},{id:"nour",name:"Nour Adel",mail:"nour.adel@pricing.dpw-demo"},{id:"omar",name:"Omar Fathy",mail:"omar.fathy@pricing.dpw-demo"},{id:"mariam",name:"Mariam Hany",mail:"mariam.hany@network.dpw-demo"},{id:"ahmed",name:"Ahmed Samir",mail:"ahmed.samir@internal.dpw-demo"}];
 // access by email domain: each person opens only the mailboxes of their domain
-const CS_DOM={"lead.dpw-demo":["rates","kam","trk","air","net","int"],"pricing.dpw-demo":["rates","kam","trk","air"],"network.dpw-demo":["net"],"internal.dpw-demo":["int"]};
+const CS_DOM={"lead.dpw-demo":["rates","kam","trk","air","net","int","car"],"pricing.dpw-demo":["rates","kam","trk","air","car"],"network.dpw-demo":["net"],"internal.dpw-demo":["int"]};
 function csAcc(pid){ const p=CS_PEOPLE.find(x=>x.id===pid); return p?(CS_DOM[p.mail.split("@")[1]]||[]):[]; }
 const CS_MBX=[
   {id:"rates",addr:"pricing.ocean@demo",name:"Ocean requests",who:"Customers and sales",sla:3},
@@ -2509,7 +2512,8 @@ const CS_MBX=[
   {id:"trk",addr:"pricing.trucking@demo",name:"Trucking requests",who:"Customers and sales",sla:3},
   {id:"air",addr:"pricing.air@demo",name:"Air requests",who:"Customers and sales",sla:2},
   {id:"net",addr:"network.pricing@demo",name:"Network requests",who:"DP World offices abroad",sla:4},
-  {id:"int",addr:"pricing.internal@demo",name:"Internal inquiries",who:"Ops, finance, management",sla:3}];
+  {id:"int",addr:"pricing.internal@demo",name:"Internal inquiries",who:"Ops, finance, management",sla:3},
+  {id:"car",addr:"pricing.carriers@demo",name:"Carrier offers",who:"Shipping lines",sla:8}];
 // one group mail: every email lands in the tool and is routed to a team box by these rules (first match wins)
 const CS_GROUP="pricing@demo", CS_KEYACC=["gulf home retail","nile valley foods"];
 const CS_RULES=[
@@ -2587,7 +2591,7 @@ const CS_ACT={nour:[.9,.1],omar:[.82,.18],mariam:[.88,.12],ahmed:[.75,.25]};
 function csSeed(){ const now=Date.now(); let n=2041; const cases=CS_SEED.map(([m,rt,from,subj,body,age,who,done,extra,direct])=>{
     const recv=age==="after"?csPrevEnd(now)+100*6e4:csBack(now,age);
     const R=csRoute(from,subj,body), mb=R.box;
-    const c={id:"C-"+(n++),mbx:mb,why:R.why,rt,from,subj,body,recv,who,direct:direct||null,status:who?"assigned":"new",msgs:[{dir:"in",by:from,at:recv,text:body}],log:[[recv,direct?"Email sent direct to "+csMail(direct)+" · pulled into the tool, routed to "+csMbx(mb).name+" and assigned to "+csName(direct):"Email arrived in "+CS_GROUP+" · routed to "+csMbx(mb).name+" ("+R.why+")"]]};
+    const c={id:"Q-"+(n++),mbx:mb,why:R.why,rt,from,subj,body,recv,who,direct:direct||null,status:who?"assigned":"new",msgs:[{dir:"in",by:from,at:recv,text:body}],log:[[recv,direct?"Email sent direct to "+csMail(direct)+" · pulled into the tool, routed to "+csMbx(mb).name+" and assigned to "+csName(direct):"Email arrived in "+CS_GROUP+" · routed to "+csMbx(mb).name+" ("+R.why+")"]]};
     const d=csDist(from+"\n"+subj+"\n"+body); if(direct) c.ab="Sent direct to "+csName(direct); else if(who&&d&&d.who===who) c.ab="Work distribution: "+d.key+" → "+csName(who); else if(who) c.ab="Auto: fewest open cases";
     if(who&&!direct) c.log.push([Math.min(now,csAdd(recv,3)),"Assigned to "+csName(who)]);
     let t=csAdd(recv,10); (extra||[]).forEach(([cat,by],i)=>{ t=Math.min(now-6e4,csAdd(recv,15+i*20)); c.msgs.push({dir:"out",cat,by,at:t,text:"(email sent, dummy)"}); });
@@ -2638,6 +2642,55 @@ function csShiftCard(){ const m=csTick(), S=csSet(), [st,cl]=csMyState(m), act=m
     <p class="note" style="margin:6px 0 0">No mouse or keyboard for ${S.idle} min, a hidden tab or a closed laptop counts as Away.</p></div>`; }
 function csWireShift(root){ const b=root.querySelector("#csBrk"); if(b) b.onclick=()=>{ const m=csTick(); m.mode=m.mode==="break"?"work":"break"; m.lastInput=Date.now(); csMySave(m); csRender(); }; }
 
+// ---------- one inbox: every mailbox email is a case too (one list, one number) ----------
+// Number ranges in the demo: Q-1001… requests read from the mailbox, Q-2041… sample cases, Q-3001… carrier offers.
+// In production one sequence gives the number when the email arrives.
+try{ IBX.read=new Set(JSON.parse(localStorage.getItem("ibxRead")||"[]")); }catch(e){ IBX.read=new Set(); }
+function ibxMarkRead(id){ IBX.read.add(id); try{ localStorage.setItem("ibxRead",JSON.stringify([...IBX.read])); }catch(e){} }
+function ibxAuto(){ if(IBX.state==="idle"&&!IBX.auto){ IBX.auto=true; setTimeout(()=>{ try{ if(!IBX.items.length) ibxUse(IBX_OFFLINE,"offline"); }catch(x){} ibxLoad(true); },50); } }
+function ibxStatusTxt(){ return IBX.state==="ok"?(IBX.src==="gmail"?`<span class="live"></span>Connected to Gmail · ${IBX.items.length} emails · checked ${IBX.checked?IBX.checked.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):""} · checks again every minute`:"Offline copy of the same emails"):IBX.state==="loading"?"Reading the mailbox…":IBX.state==="nomcp"?"Gmail is not reachable in this view. The offline copy is shown.":IBX.state==="empty"?"The pricing mailbox has no carrier offers or requests yet.":esc(IBX.msg||""); }
+function csIbxEmail(c){ return c&&c.ibx?IBX.items.find(e=>e.id===c.ibx):null; }
+function csSyncIbx(){ if(!IBX.items.length) return false; const D=csLoad(), now=Date.now(); let ch=false;
+  const ids=new Set(IBX.items.map(e=>e.id)), n0=D.cases.length; D.cases=D.cases.filter(c=>!c.ibx||ids.has(c.ibx)); if(D.cases.length!==n0) ch=true;
+  const offers=IBX.items.filter(e=>e.kind==="offer").slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))||String(a.id).localeCompare(String(b.id)));
+  IBX.items.forEach(e=>{ const off=e.kind==="offer", no=off?"Q-"+(3001+offers.indexOf(e)):ibxNo(e); let c=D.cases.find(x=>x.ibx===e.id);
+    if(!c){ let recv=Date.parse(e.date); if(!isFinite(recv)||recv>now) recv=now; const r=off?{}:ibxReq(e), w=ibxWho(e), subj=String(e.subject||"").replace(/^DEMO\s*\|\s*/i,"")||"(no subject)", body=String(e.body||"").split(/\n--\s*\n/)[0].trim();
+      const from=off?(guessCarrier(subj+"\n"+body)||w||"Shipping line")+" (carrier)":(w||"Sender")+(e.kind==="net"?" (DP World office abroad)":" (Sales)");
+      const R=off?{box:"car",why:"Sender is a shipping line"}:e.kind==="net"?{box:"net",why:"Sender is a DP World office abroad"}:csRoute(from+" "+(r.cust||""),subj,body);
+      const d=off?null:csDist(from+"\n"+subj+"\n"+body);
+      c={id:no,ibx:e.id,mbx:R.box,why:R.why,rt:off?"line":e.kind==="net"?"net":"sales",from,subj,body,recv,who:d?d.who:null,direct:null,ab:d?"Work distribution: "+d.key+" → "+csName(d.who):"",status:d?"assigned":"new",msgs:[{dir:"in",by:from,at:recv,text:body}],
+        log:[[recv,"Email arrived in "+CS_GROUP+" · routed to "+csMbx(R.box).name+" ("+R.why+")"]]};
+      if(d) c.log.push([recv,"Assigned to "+csName(d.who)+" by work distribution ("+d.key+")"]);
+      D.cases.push(c); ch=true; }
+    if(c.id!==no){ if(CSV.open===c.id) CSV.open=no; c.id=no; ch=true; }
+    if(!c.sub){ let at=null, what="";
+      if(off){ if(IBX.read.has(e.id)){ at=now; what="Offer read into Carrier offers"; } }
+      else { const a=ibxAns(e); if(a||e.replied||IBX.done.has(e.id)){ at=a&&a.created?Date.parse(a.created):NaN; if(!isFinite(at)){ const m=(e.msgs||[]).find(x=>/pricing\.team/i.test(x.from||"")); at=m?Date.parse(m.date):NaN; } if(!isFinite(at)) at=now; what=a?"Offer sent to "+(a.seller||"sales")+" · "+(a.car||"")+" · USD "+money(a.sell)+" per "+(a.eq||"container"):"Answered from the mailbox"; } }
+      if(at!=null){ at=Math.max(c.recv,Math.min(now,at)); const by=c.who||CSV.me; if(!c.who){ c.who=by; c.ab="Taken by "+csName(by); c.log.push([at,"Assigned to "+csName(by)]); }
+        c.msgs.push({dir:"out",cat:c.rt,by,at,text:what,submit:true}); c.sub=at; c.subBy=by; c.status="submitted"; c.log.push([at,what+" by "+csName(by)+" · clock stopped"]); ch=true; } } });
+  if(ch) csStore(); return ch; }
+// what the mailbox email offers on top of a plain case: request details, Price it, or read the carrier offer
+function csIbxBlock(c){ const e=csIbxEmail(c); if(!e) return "";
+  if(e.kind==="offer") return `<div class="csIbx"><div class="qact"><button class="mini${c.sub?"":" ok"}" data-ibxoff="${esc(e.id)}">Read it into Carrier offers</button><span class="note">The reader finds the lanes, rates, validity and charges. ${c.sub?"Already read.":"Reading it stops the clock."}</span></div></div>`;
+  const r=ibxReq(e), a=ibxAns(e), w=ibxWho(e);
+  return `<div class="csIbx"><div class="ibxGrid"><div><span>Requested by</span><b>${esc(w||"—")}${e.kind==="net"?" (network)":" (sales)"}</b></div><div><span>Customer</span><b>${esc(r.cust||"—")}</b></div><div><span>Lane</span><b>${esc(r.pol||"?")} → ${esc(r.pod||"?")}</b></div><div><span>Containers</span><b>${r.qty} × ${r.size}' ${esc(r.type)}</b></div><div><span>Commodity</span><b>${esc(r.cmd||"—")}</b></div><div><span>Target</span><b>${r.target?"USD "+money(r.target):"not given"}</b></div></div>
+   ${a?ibxAnsCard(e,a):`<div class="qact" style="margin-top:10px"><button class="mini ok" data-ibxq="${esc(e.id)}">Price it</button><span class="note">Opens the lane with every carrier rate and the margin rule. <b>Send offer to sales</b> there stops the clock and logs it under ${esc(c.id)}.</span></div>`}</div>`; }
+function csChaseHtml(){ const R=slaRules(), C=chaseAll().map(c=>({c,s:chaseState(c)})), due=C.filter(x=>x.s.due).length, wait=C.filter(x=>!x.s.rep).length;
+  const rows=C.map(({c,s})=>`<div class="qal ${s.rep?"fu":s.due?"exp":"warn"}"><span><i class="sev"></i><b>${esc(c.car)}</b> · ${esc(c.subj)}<br><small>asked ${esc(ibxWhen(c.at))}${c.n?` · reminded ${c.n}×, last ${esc(ibxWhen(c.last))}`:""} · ${s.rep?'<span class="ok-t">replied</span>':s.due?`<b style="color:var(--bad)">no reply for ${slaDur(s.used)}: send a reminder</b>`:`reminder due in ${slaDur(s.lim-s.used)}`}</small></span><span class="qact">${s.rep?"":`<a class="mini${s.due?" ok":""}" target="_blank" rel="noopener" data-chr="${esc(c.id)}" href="${esc(chaseMail(c))}">Send reminder</a><button class="mini" data-chg="${esc(c.id)}">Got a reply</button>`}<button class="mini" data-chx="${esc(c.id)}">Remove</button></span></div>`).join("");
+  return `<details class="card csChase" id="csChase"${CSV.chase?" open":""}><summary><b>Waiting for carriers</b> <span class="cnt">${wait}</span>${due?` <span class="pill lost">${due} reminder${due>1?"s":""} due</span>`:""}<span class="note"> · requests we sent to the lines</span></summary>
+   ${rows?`<div class="list" style="margin-top:10px">${rows}</div>`:'<p class="note" style="margin:10px 0 0">No open request to a line. Requests you send from Rate Bank › Ask carriers or “Ask again” show here.</p>'}
+   <div class="qact" style="margin-top:10px"><label class="note">Remind a carrier after <input type="text" id="csChH" inputmode="decimal" value="${esc(String(R.chase))}" style="width:56px;display:inline-block"> working hours</label><span class="note">· The reminder opens as a ready email. A line is marked replied when its offer arrives.</span></div></details>`; }
+function csWireChase(p){ const d=$("csChase"); if(!d) return; d.ontoggle=()=>{ CSV.chase=d.open; };
+  p.querySelectorAll("[data-chr]").forEach(a=>a.addEventListener("click",()=>{ const c=chaseAll().find(x=>x.id===a.dataset.chr); chaseUpd(a.dataset.chr,{n:((c&&c.n)||0)+1,last:new Date().toISOString()}); setTimeout(renderCases,400); }));
+  p.querySelectorAll("[data-chg]").forEach(b=>b.onclick=()=>{ chaseUpd(b.dataset.chg,{got:1}); renderCases(); });
+  p.querySelectorAll("[data-chx]").forEach(b=>b.onclick=()=>{ chaseUpd(b.dataset.chx,"x"); renderCases(); });
+  const h=$("csChH"); if(h) h.onchange=()=>{ const x=parseFloat(h.value); const R=slaRules(); R.chase=isFinite(x)&&x>0?x:SLA_DEF.chase; try{ localStorage.setItem("slaRules",JSON.stringify(R)); }catch(e){} renderCases(); }; }
+async function ibxDoReset(){ if(!QT.db) return 0; let n=0; for(const c of ["extraRates","quotes","feedback","declines","plog"]){ try{ const sn=await QT.db.collection(c).limit(500).get(); for(const d of sn.docs){ let dd={}; try{ dd=d.data()||{}; }catch(e){} if(dd.seed) continue; await QT.db.doc(c+"/"+d.id).delete(); n++; } }catch(e){} } return n; }
+
+(function(){ const _r=renderIbx; renderIbx=function(){ const v=_r.apply(this,arguments);
+  try{ if(typeof CUR_TAB!=="undefined"&&CUR_TAB==="cases"&&isPricing()){ const a=document.activeElement, busy=(a&&a.closest&&a.closest("#csDet textarea,#csNewF,.demoMenu[open]"))||document.querySelector("#p-cases .demoMenu[open]")||($("csNewF")&&!$("csNewF").hidden);
+    if(busy) csLive(); else renderCases(); } }catch(e){} return v; }; })();
+
 // ---------- Cases page ----------
 const CSV={box:"all",f:"open",open:null,cat:null,me:"me"};
 function csVisible(L){ const A=new Set(csAcc(CSV.me)); return L.filter(c=>A.has(c.mbx)||c.who===CSV.me); }
@@ -2646,15 +2699,16 @@ function csKpis(L){ const now=Date.now(), open=L.filter(c=>!c.sub), br=open.filt
 function csFilter(L){ return L.filter(c=>(CSV.box==="all"||c.mbx===CSV.box)&&(CSV.f==="all"||(CSV.f==="open"&&!c.sub)||(CSV.f==="mine"&&c.who===CSV.me&&!c.sub)||(CSV.f==="new"&&!c.who)||(CSV.f==="breach"&&!c.sub&&csState(c).st==="breach")||(CSV.f==="done"&&c.sub)))
   .sort((a,b)=>CSV.f==="done"?b.sub-a.sub:(csState(a).left-csState(b).left)); }
 function csListHtml(){ const D=csLoad(), L=csFilter(csVisible(D.cases));
-  return L.length?L.map(c=>`<button class="csRow${CSV.open===c.id?" on":""}" data-cs="${c.id}"><span class="csT"><b>${esc(c.subj)}</b><span class="note">${esc(c.id)} · ${esc(c.from)}</span></span>
+  return L.length?L.map(c=>`<button class="csRow${CSV.open===c.id?" on":""}" data-cs="${c.id}"><span class="csT"><b>${esc(c.subj)}</b><span class="note"><span class="qno">${esc(c.id)}</span> ${esc(c.from)}</span></span>
     <span class="csM"><span class="pill seen">${esc(csMbx(c.mbx).name)}</span>${c.direct?`<span class="pill new">Direct to ${esc(csName(c.direct))}</span>`:""}${csPill(c)}<span class="note">${esc(c.who?csName(c.who):"Not assigned")} · ${csWhen(c.recv)}</span></span></button>`).join(""):`<p class="note" style="padding:12px">No cases here.</p>`; }
 function csDetHtml(c){ if(!c) return `<div class="card"><p class="note">Pick a case on the left to open it.</p></div>`;
   const s=csState(c), S=csSet(), mine=c.who===CSV.me, cat=CSV.cat||c.rt;
   const ppl=CS_PEOPLE.map(p=>`<option value="${p.id}"${c.who===p.id?" selected":""}>${esc(p.name)}</option>`).join("");
   return `<div class="card csDet"><div class="csSh"><h3>${esc(c.subj)}</h3>${csPill(c)}</div>
-   <div class="csMeta"><span><b>Case</b> ${esc(c.id)}</span><span><b>Routed to</b> ${esc(csMbx(c.mbx).name)} <span class="note">· ${esc(c.why||"moved by hand")}</span></span>${c.direct?`<span><b>Came in</b> direct to ${esc(csMail(c.direct))} <span class="note">· pulled in and assigned to ${esc(csName(c.direct))}</span></span>`:""}<span><b>From</b> ${esc(c.from)}</span><span><b>Request type</b> ${esc(CS_CAT[c.rt])}</span>
+   <div class="csMeta"><span><b>Request no.</b> ${esc(c.id)}</span><span><b>Routed to</b> ${esc(csMbx(c.mbx).name)} <span class="note">· ${esc(c.why||"moved by hand")}</span></span>${c.direct?`<span><b>Came in</b> direct to ${esc(csMail(c.direct))} <span class="note">· pulled in and assigned to ${esc(csName(c.direct))}</span></span>`:""}<span><b>From</b> ${esc(c.from)}</span><span><b>Request type</b> ${esc(CS_CAT[c.rt])}</span>
    <span><b>Arrived</b> ${csWhen(c.recv)}${s.late?` <span class="pill open">after hours · clock starts ${String(S.start).padStart(2,"0")}:00</span>`:""}</span><span><b>SLA</b> ${csSla(c.mbx)} working h · due ${csWhen(s.due)}</span>
    ${c.ab?`<span><b>Assigned by</b> ${esc(c.ab)}</span>`:""}<span><b>Assigned to</b> <select id="csWho"><option value="">Not assigned</option>${ppl}</select>${!c.who?` <button class="mini ok" id="csTake">Take it</button>`:""}</span></div>
+   ${csIbxBlock(c)}
    <div class="csMsgs">${c.msgs.map(m=>`<div class="csMsg ${m.dir}"><div class="note">${m.dir==="in"?esc(m.by):"Sent by "+esc(csName(m.by))+" · to "+esc(CS_CAT[m.cat]||"")}${m.submit?" · <b>submitted</b>":""} · ${csWhen(m.at)}</div><div class="csTx">${esc(m.text).replace(/\n/g,"<br>")}</div></div>`).join("")}</div>
    ${c.sub?`<p class="note">Clock stopped at ${csWhen(c.sub)} when ${esc(csName(c.subBy))} sent the reply and pressed Submit. Time used: ${csDur(s.used)} of ${csSla(c.mbx)}h.</p>`:""}
    <div class="csComp"><div class="csSh"><b>Write an email</b><label class="f csTo">Send to<select id="csCat">${Object.entries(CS_CAT).map(([k,l])=>`<option value="${k}"${k===cat?" selected":""}>${l}</option>`).join("")}</select></label></div>
@@ -2666,16 +2720,18 @@ function csSendMsg(c,submit){ const txt=($("csTxt")||{}).value||"", cat=($("csCa
   const me=CSV.me; if(!c.who){ c.who=me; c.status="assigned"; c.log.push([now,"Assigned to "+csName(me)]); }
   c.msgs.push({dir:"out",cat,by:me,at:now,text:txt||"(email sent)",submit:!!submit}); c.log.push([now,"Email to "+CS_CAT[cat]+" sent by "+csName(me)+(submit?" and submitted · clock stopped":"")]);
   if(submit){ c.sub=now; c.subBy=me; c.status="submitted"; } CSV.cat=null; csStore(); csRender(); }
-function renderCases(){ const p=$("p-cases"); if(!p) return; const D=csLoad(), ALL=D.cases, L=csVisible(ALL), now=Date.now(), S=csSet(), acc=csAcc(CSV.me);
+function renderCases(){ const p=$("p-cases"); if(!p) return; ibxAuto(); csSyncIbx(); const D=csLoad(), ALL=D.cases, L=csVisible(ALL), now=Date.now(), S=csSet(), acc=csAcc(CSV.me);
   if(CSV.box!=="all"&&!acc.includes(CSV.box)) CSV.box="all"; if(CSV.open&&!L.some(c=>c.id===CSV.open)) CSV.open=null;
   const boxes=[["all",acc.length>1?"All my mailboxes":"My mailbox",L.filter(c=>!c.sub).length],...CS_MBX.filter(m=>acc.includes(m.id)).map(m=>[m.id,m.name,L.filter(c=>c.mbx===m.id&&!c.sub).length])];
   const fs=[["open","Open"],["mine","My cases"],["new","Not assigned"],["breach","Breached"],["done","Submitted"],["all","All"]];
-  p.innerHTML=`${csInHours(now)?"":`<div class="card csOff"><b>Outside working hours.</b> <span class="note">SLA clocks are paused until ${String(S.start).padStart(2,"0")}:00 (Sun to Thu, Cairo).</span></div>`}
+  p.innerHTML=`<div class="csBar2 csHead"><button class="mini ok" id="csGo">${IBX.state==="loading"?"Reading…":"Check inbox"}</button><span class="note" aria-live="polite" style="margin-right:auto">${ibxStatusTxt()}</span>
+    <button class="mini" id="csAuto">Auto-assign new cases</button><details class="demoMenu right"><summary>Demo tools · ${esc(csName(CSV.me))}</summary><div class="demoPop"><label class="f">Signed in as<select id="csMe">${CS_PEOPLE.map(x=>`<option value="${x.id}"${x.id===CSV.me?" selected":""}>${esc(x.name)} · ${esc(x.mail)}</option>`).join("")}</select></label><span class="note">Opens: ${acc.map(m=>esc(csMbx(m).addr)).join(", ")}</span><button class="mini" id="csNew">Send a test email</button><button class="mini" id="csOffl">Use offline copy</button><button class="mini" id="csReset" title="Puts the sample cases back and removes rates, quotes and feedback added during a rehearsal">Reset demo</button><span class="note">For rehearsals only. Not part of the real tool.</span></div></details></div>
+  ${csInHours(now)?"":`<div class="card csOff"><b>Outside working hours.</b> <span class="note">SLA clocks are paused until ${String(S.start).padStart(2,"0")}:00 (Sun to Thu, Cairo).</span></div>`}
   <div id="csK">${csKpis(L)}</div>
+  ${csChaseHtml()}
   ${CS_SHIFT_ON&&CSV.me==="me"?`<div class="csTop">${csShiftCard()}</div>`:""}
   <div class="csChips">${boxes.map(([k,l,n])=>`<button class="csChip" data-box="${k}" aria-pressed="${CSV.box===k}">${esc(l)} <span class="cnt">${n}</span></button>`).join("")}</div>
-  <div class="csBar2"><div class="csF">${fs.map(([k,l])=>`<button class="mini${CSV.f===k?" ok":""}" data-f="${k}">${l}</button>`).join("")}</div>
-    <button class="mini" id="csAuto">Auto-assign new cases</button><details class="demoMenu right"><summary>Demo tools · ${esc(csName(CSV.me))}</summary><div class="demoPop"><label class="f">Signed in as<select id="csMe">${CS_PEOPLE.map(x=>`<option value="${x.id}"${x.id===CSV.me?" selected":""}>${esc(x.name)} · ${esc(x.mail)}</option>`).join("")}</select></label><span class="note">Opens: ${acc.map(m=>esc(csMbx(m).addr)).join(", ")}</span><button class="mini" id="csNew">Send a test email</button><button class="mini" id="csReset">Reset demo cases</button><span class="note">For rehearsals only. Not part of the real tool.</span></div></details></div>
+  <div class="csBar2"><div class="csF">${fs.map(([k,l])=>`<button class="mini${CSV.f===k?" ok":""}" data-f="${k}">${l}</button>`).join("")}</div></div>
   <div class="card csNewF" id="csNewF" hidden><h3>Test email to ${CS_GROUP}</h3><div class="trkform">
    <label class="f">To<select id="cnTo"><option value="">${CS_GROUP} (group mail)</option>${CS_PEOPLE.map(x=>`<option value="${x.id}">${esc(x.mail)} (${esc(x.name)} direct)</option>`).join("")}</select></label>
    <label class="f">From<select id="cnF">${["Cairo Home Appliances","Delta Textile Co.","Gulf Home Retail (import dept.)","Hala Mostafa (Sales)","DP World Mumbai office","Ops desk (Sokhna)"].map(x=>`<option>${esc(x)}</option>`).join("")}</select></label>
@@ -2696,23 +2752,27 @@ function renderCases(){ const p=$("p-cases"); if(!p) return; const D=csLoad(), A
   $("cnGo").onclick=()=>{ const to=$("cnTo").value, from=$("cnF").value, subj=$("cnS").value.trim()||"(no subject)", body=$("cnB").value.trim(), now=Date.now(), R=csRoute(from,subj,body);
     const rt=R.box==="net"?"net":R.box==="int"?"ops":/\(sales\)/i.test(from)?"sales":"cnee";
     const D0=to?null:csDist(from+"\n"+subj+"\n"+body), owner=to||(D0&&D0.who)||null;
-    const c={id:"C-"+(2100+ALL.length+Math.floor(Math.random()*800)),mbx:R.box,why:R.why,rt,from,subj,body,recv:now,who:owner,direct:to||null,ab:to?"Sent direct to "+csName(to):D0?"Work distribution: "+D0.key+" → "+csName(D0.who):"",status:owner?"assigned":"new",msgs:[{dir:"in",by:from,at:now,text:body}],
+    const c={id:"Q-"+(2100+ALL.length+Math.floor(Math.random()*800)),mbx:R.box,why:R.why,rt,from,subj,body,recv:now,who:owner,direct:to||null,ab:to?"Sent direct to "+csName(to):D0?"Work distribution: "+D0.key+" → "+csName(D0.who):"",status:owner?"assigned":"new",msgs:[{dir:"in",by:from,at:now,text:body}],
       log:to?[[now,"Email sent direct to "+csMail(to)+" · pulled into the tool, routed to "+csMbx(R.box).name+" ("+R.why+") and assigned to "+csName(to)]]:[[now,"Email arrived in "+CS_GROUP+" · routed to "+csMbx(R.box).name+" ("+R.why+")"]]};
     if(D0) c.log.push([now,"Assigned to "+csName(D0.who)+" by work distribution ("+D0.key+")"]);
     ALL.unshift(c); CSV.f="open"; const can=acc.includes(R.box)||c.who===CSV.me; CSV.open=can?c.id:null;
     CSV.msg=`<b>${to?"Pulled in from "+esc(csName(to))+"'s own inbox":"Routed"} to ${esc(csMbx(R.box).name)}${to?", assigned to "+esc(csName(to)):D0?", assigned to "+esc(csName(D0.who))+" (work distribution: "+esc(D0.key)+")":", not assigned yet"}</b> <span class="note">· ${esc(R.why)}${can?"":` · ${esc(csName(CSV.me))} cannot open this box, so it is not in this list`}</span>`; csStore(); const m=CSV.msg; renderCases(); CSV.msg=m; };
-  $("csReset").onclick=()=>{ CS=csSeed(); CSV.open=null; csStore(); renderCases(); };
+  $("csReset").onclick=async()=>{ try{ ["chase","chaseSeed","ibxRead","ibxDone"].forEach(k=>localStorage.removeItem(k)); }catch(e){} IBX.read=new Set(); IBX.done=new Set();
+    let n=0; if(QT.isOwner||!QT.shared) n=await ibxDoReset(); CS=csSeed(); CSV.open=null; csStore(); renderCases(); CSV.msg=`<b>Demo reset.</b> <span class="note">Sample cases are back${n?" and "+n+" rehearsal items were removed":""}.</span>`; const m=CSV.msg; renderCases(); CSV.msg=m; };
+  $("csGo").onclick=()=>ibxLoad(); $("csOffl").onclick=()=>ibxUse(IBX_OFFLINE,"offline"); csWireChase(p);
   csWireDet(); }
 function csWireList(root){ root.querySelectorAll("[data-cs]").forEach(b=>b.onclick=()=>{ CSV.open=b.dataset.cs; CSV.cat=null; renderCases(); }); }
 function csWireDet(){ const c=csLoad().cases.find(x=>x.id===CSV.open); if(!c) return;
   const w=$("csWho"); if(w) w.onchange=()=>{ const was=c.who; c.who=w.value||null; c.ab=c.who?"By hand ("+csName(CSV.me)+")":""; c.status=c.sub?"submitted":(c.who?"assigned":"new"); c.log.push([Date.now(),(c.who?(was?"Reassigned from "+csName(was)+" to ":"Assigned to ")+csName(c.who):"Unassigned")+" by "+csName(CSV.me)+(c.who?" · now counts in "+csName(c.who)+"'s KPIs":"")]); csStore(); renderCases(); };
   if($("csTake")) $("csTake").onclick=()=>{ c.who=CSV.me; c.ab="Taken by "+csName(CSV.me); c.status="assigned"; c.log.push([Date.now(),"Taken by "+csName(CSV.me)]); csStore(); renderCases(); };
   if($("csCat")) $("csCat").onchange=()=>{ CSV.cat=$("csCat").value; };
+  const det=$("csDet"); if(det){ det.querySelectorAll("[data-ibxoff]").forEach(b=>b.onclick=()=>{ ibxMarkRead(b.dataset.ibxoff); ibxToOffer(IBX.items.find(x=>x.id===b.dataset.ibxoff)); });
+    det.querySelectorAll("[data-ibxq]").forEach(b=>b.onclick=()=>ibxToQuote(IBX.items.find(x=>x.id===b.dataset.ibxq))); }
   if($("csSend")) $("csSend").onclick=()=>csSendMsg(c,false);
   if($("csSub")) $("csSub").onclick=()=>csSendMsg(c,true); }
 // light refresh every 15 s: list, KPIs and my status, never the email box being typed in
 function csLive(){ try{ if(typeof CUR_TAB==="undefined") return;
-  if(CUR_TAB==="cases"){ const l=$("csList"); if(l){ const sc=l.scrollTop; l.innerHTML=csListHtml(); l.scrollTop=sc; csWireList(l); } const k=$("csK"); if(k) k.innerHTML=csKpis(csVisible(csLoad().cases));
+  if(CUR_TAB==="cases"){ csSyncIbx(); const l=$("csList"); if(l){ const sc=l.scrollTop; l.innerHTML=csListHtml(); l.scrollTop=sc; csWireList(l); } const k=$("csK"); if(k) k.innerHTML=csKpis(csVisible(csLoad().cases));
     const st=$("csMySt"); if(st){ const [t,cl]=csMyState(csMy()); st.textContent=t; st.className="pill "+cl; } }
   if(CUR_TAB==="ckpi"&&!document.activeElement?.closest?.("#p-ckpi")) renderCkpi(); }catch(e){} }
 
@@ -2769,7 +2829,7 @@ try{ csStartTimer(); }catch(e){}
 
 const ICON=n=>`<svg class="ic sm" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 const NAV={
-  pricing:[["Daily work",[["ibx","Inbox","inbox"],["cases","Shared inbox cases","clock"],["lane","Rates & offer","map"],["q","Offers & feedback","file"]],"pricing + sales"],
+  pricing:[["Daily work",[["cases","Inbox","inbox"],["lane","Rates & offer","map"],["q","Offers & feedback","file"]],"pricing + sales"],
            ["Rate Bank",[["sheet","Rate Bank","db"],["trk","Trucking rates","truck"]],"pricing"],
            ["Reports",[["home","Overview","home"]],"managers"],
            ["Reference",[["svc","Alliance loops","ship"],["info","Help & settings","help"]],"everyone"]],
@@ -2777,18 +2837,18 @@ const NAV={
          ["Reference",[["trk","Trucking rates","truck"],["svc","Alliance loops","ship"],["info","Help","help"]],"everyone"]]
 };
 // merged tabs: one nav item, a small switch on top of the page
-const SUBS={cases:[["cases","Cases"],["ckpi","Team KPIs"],["cmbx","Mailboxes & SLA"]],q:[["q","Offers & quotes"],["fb","Sales feedback"]],sheet:[["sheet","Rate Data Base"],["off","Carrier offers"],["req","Ask carriers"],["plog","Pricing log"],["hl","Rate check"]],home:[["home","Overview"],["dem","Customer requests"],["gw","Market alerts"],["vol","Carrier volumes"]],info:[["info","Help"],["src","Settings & sources"]]};
+const SUBS={cases:[["cases","Inbox"],["ckpi","Team KPIs"],["cmbx","Mailboxes & SLA"]],q:[["q","Offers & quotes"],["fb","Sales feedback"]],sheet:[["sheet","Rate Data Base"],["off","Carrier offers"],["req","Ask carriers"],["plog","Pricing log"],["hl","Rate check"]],home:[["home","Overview"],["dem","Customer requests"],["gw","Market alerts"],["vol","Carrier volumes"]],info:[["info","Help"],["src","Settings & sources"]]};
 const SUBS_SALES={q:"My offers & quotes",fb:"Feedback to pricing"};
 const PAR={}; Object.keys(SUBS).forEach(k=>SUBS[k].forEach(([c])=>PAR[c]=k));
 function navKey(t){ return PAR[t]||t; }
 function renderSub(t){ let bar=$("subsw"); const pk=navKey(t), L=SUBS[pk]; if(!bar){ bar=document.createElement("div"); bar.id="subsw"; bar.className="subsw"; bar.setAttribute("role","group"); bar.setAttribute("aria-label","Part of this page"); const w=$("work"); w.insertBefore(bar,w.firstChild); }
   const ok=L&&(isPricing()||pk!=="info"); bar.hidden=!ok; if(!ok) return; bar.innerHTML=L.map(([k,l])=>`<button type="button" data-sk="${k}" aria-pressed="${k===t}">${esc((!isPricing()&&SUBS_SALES[k])||l)}</button>`).join(""); bar.querySelectorAll("[data-sk]").forEach(x=>x.onclick=()=>openTab(x.dataset.sk)); }
 const NAVOPEN=new Set();
-const PAGE={cases:["Shared inbox cases","Every email in a shared mailbox is a case, with an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
+const PAGE={cases:["Inbox","Every email is one request: one number, an owner and an SLA clock · demo with dummy data"],ckpi:["Team KPIs","Cases, breaches and emails per person · demo with dummy data"],cmbx:["Mailboxes & SLA","Each shared mailbox, its SLA and who can open it"],sheet:["Rate Bank","Rate Data Base, with rates added from email at the bottom · demo with dummy data"],ibx:["Inbox","Carrier offers and customer requests from email · demo with dummy data"],plog:["Pricing log","What pricing asked for, from whom, when, and every reminder"],src:["Settings & sources","Where the data comes from, change the file, fix rates and requests in the tool"],home:["Overview","Today at a glance"],lane:["Rates & offer","Every carrier rate on the lane, the profit, and the offer email to sales"],dem:["Customer requests","Every request in the Reference Sheet, grouped by lane"],
   q:["Offers & quotes","Offers pricing sent to sales, and quotes sales sent to customers"],fb:["Sales feedback","What sales hear from customers, with pricing's replies"],off:["Carrier offers","A carrier email or Excel turned into Rate Bank rows"],
   req:["Ask carriers","Monthly “Rate Idea” emails to the lines"],svc:["Alliance loops","Reference list of liner rotations that call Egypt, 19 Oct 2026"],vol:["Carrier volumes","What we booked with each line, for contract and volume talks"],trk:["Trucking rates","Pickup in Egypt for EXW requests, and cross-border trucks"],hl:["Rate Bank check","Rows in the Rate Bank that are wrong or easy to misread"],gw:["Market alerts","Disruptions, rate-increase notices and the weekly market index"],info:["Help","How the platform works and where the numbers come from"]};
 const PAGE_SALES={ibx:["Inbox","Your customer requests from email · demo with dummy data"],lane:["Find a rate","Route, carrier rates, customer offer and quotation"],q:["My offers & quotes","Pricing's offers to you, your quotes to customers, follow-ups and hit ratio"],fb:["Feedback to pricing","Tell pricing what the customer said and read their answer"]};
-const SHORT={cases:"Cases",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
+const SHORT={cases:"Inbox",ckpi:"KPIs",cmbx:"Boxes",sheet:"Sheet",ibx:"Inbox",plog:"Log",src:"Sources",home:"Overview",lane:"Rates",dem:"Requests",q:"Offers",fb:"Feedback",off:"Offers",req:"Ask",svc:"Loops",vol:"Volumes",trk:"Trucks",hl:"Check",gw:"Market"};
 let ROLE=lsGet("rg-role","pricing"), CUR_TAB="lane";
 QT.isOwner=false;
 function canPricing(){ return !QT.shared || QT.isOwner || ((QT.settings&&QT.settings.pricing)||[]).includes(QT.meId); }
@@ -2808,12 +2868,14 @@ function renderNav(){
   $("footRole").textContent=isPricing()?"Pricing view":"Sales view";
   updateBadges(); try{ plBadge(); }catch(e){}
 }
-function setRole(r){ IBX.open=null; try{ $("q-me").value=r==="sales"?DEMO_SP:(QT.meName||"Pricing team"); }catch(e){} ROLE=r; lsSet("rg-role",r); MRG_MANUAL=false; renderNav(); if(!allowed(CUR_TAB)) openTab("lane"); else openTab(CUR_TAB,true); if(CUR_TAB!=="lane"){ updateLane(false); } renderOffer(); renderQ(); renderFbLane(); renderFbAll(); renderFbSend(); if(CUR_TAB==="ibx") renderIbx(); }
+function setRole(r){ IBX.open=null; try{ $("q-me").value=r==="sales"?DEMO_SP:(QT.meName||"Pricing team"); }catch(e){} ROLE=r; lsSet("rg-role",r); MRG_MANUAL=false; renderNav(); if(!allowed(CUR_TAB)) openTab(CUR_TAB==="ibx"||navKey(CUR_TAB)==="cases"?"ibx":"lane"); else openTab(CUR_TAB,true); if(CUR_TAB!=="lane"){ updateLane(false); } renderOffer(); renderQ(); renderFbLane(); renderFbAll(); renderFbSend(); if(CUR_TAB==="ibx") renderIbx(); }
 let _roleWas=null;
-function applyRole(){ renderNav(); if(!allowed(CUR_TAB)) openTab("lane"); else setTitle(CUR_TAB); const now=isPricing(); if(_roleWas!==null&&_roleWas!==now){ rerenderOptions(); buildQuote(); renderOffer(); if(DIR==="exp"&&quote.dest) renderTruck(quote.dest,quote.sea||quote.dest); renderFbSend(); if(CUR_TAB==="trk") renderTrk(); } _roleWas=now; }
+function applyRole(){ renderNav(); if(!allowed(CUR_TAB)) openTab(CUR_TAB==="ibx"||navKey(CUR_TAB)==="cases"?"ibx":"lane"); else setTitle(CUR_TAB); const now=isPricing(); if(_roleWas!==null&&_roleWas!==now){ rerenderOptions(); buildQuote(); renderOffer(); if(DIR==="exp"&&quote.dest) renderTruck(quote.dest,quote.sea||quote.dest); renderFbSend(); if(CUR_TAB==="trk") renderTrk(); } _roleWas=now; }
 function setTitle(t){ const P=(!isPricing()&&PAGE_SALES[t])||PAGE[t]||["",""]; $("pgTitle").textContent=P[0]; $("pgSub").textContent=P[1]+(t==="home"?` · Rate Bank ${DATA.asof}`:""); document.title="DP World Platform Demo"; }
 document.addEventListener("click",e=>{ const c=e.target.closest&&e.target.closest(".cmt"); if(!c) return; e.stopPropagation(); c.classList.toggle("open"); c.title=c.classList.contains("open")?"Click to shorten":"Click to read the full note"; },true);
 function openTab(t,quiet){
+  // one Inbox: pricing works in the merged list (cases), sales keep "my requests" (ibx)
+  if(t==="ibx"&&isPricing()) t="cases"; else if((t==="cases"||t==="ckpi"||t==="cmbx")&&!isPricing()) t="ibx";
   if(!allowed(t)) t="lane";
   const panes=["cases","ckpi","cmbx","sheet","ibx","home","lane","dem","q","fb","hl","gw","vol","trk","off","req","svc","src","plog","info"]; const prevTab=CUR_TAB; CUR_TAB=t;
   panes.forEach(k=>{ const p=$("p-"+k); if(p) p.hidden=k!==t; });

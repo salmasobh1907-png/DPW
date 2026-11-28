@@ -58,8 +58,7 @@ Full table, one row per sub-screen: `TAB_MAP.csv`. Summary:
 
 | Screen | Takes data from | Shows / does | Feeds |
 | --- | --- | --- | --- |
-| Inbox | Test mailbox (or sample emails inside the page) | Carrier offers and customer requests; "Price it"; "Send offer to sales" | Rates & offer, Offers & quotes, Carrier offers |
-| Shared inbox cases (Cases, Team KPIs, Mailboxes & SLA) | Sample emails + routing rules + mailbox list in the page | Case per email, owner, SLA clock in working hours (Sun–Thu, Cairo), reassign with log, work distribution (customer → owner), KPIs by consignee / sales / network request | Overview, manager KPIs |
+| Inbox (Inbox, Team KPIs, Mailboxes & SLA) | Test mailbox (or sample emails inside the page) + sample cases + routing rules + mailbox list in the page | One list for every email: carrier offers and customer / sales / network requests. Each has one request number (Q-…), an owner and an SLA clock in working hours (Sun–Thu, Cairo). "Price it", "Read it into Carrier offers", reassign with log, work distribution (customer → owner), waiting-for-carriers list, KPIs by consignee / sales / network request. Sales see only their own requests and pricing's answers | Rates & offer, Offers & quotes, Carrier offers, Overview, manager KPIs |
 | Rates & offer | Rate data + offers added from email + route map data | Map, all carrier rates on the lane, lowest standard 40', buy + profit = sell, checks, offer email and PDF | Offers & quotes, decline log |
 | Offers & feedback | Shared store: quotes, feedback | Offers, quotes, won / lost, hit ratio, sales feedback and replies | Overview, Carrier volumes |
 | Rate Bank (Rate Data Base, Carrier offers, Ask carriers, Pricing log, Rate check) | Dummy Rate Bank + files dropped on the page (Excel, PDF, .msg, .eml) | Rate sheet, offer → rows, monthly rate request emails, log of pricing asks, row checks | Rates & offer |
@@ -101,7 +100,7 @@ Full table, one row per sub-screen: `TAB_MAP.csv`. Summary:
 
 ### 5.3 Browser-only storage (per user)
 
-Shared inbox cases and their settings (`csState_v1`, `csSet_v1`, `csMy_v1`), theme, last screen, view (pricing / sales).
+Inbox cases and their settings (`csState_v2`, `csSet_v1`; `csMy_v1` only if "My shift" is ever switched on), which mailbox emails were answered or read (`ibxDone`, `ibxRead`), theme, last screen, view (pricing / sales).
 In production the cases must move to the database (see section 9).
 
 ## 6. Business rules built in
@@ -114,7 +113,8 @@ In production the cases must move to the database (see section 9).
 6. Checks before sending: stop on expired rate, suspended line, zero profit, offer valid after the carrier's validity. Warn when a rate ends within 3 days or a cheaper line exists.
 7. Suspended carriers can be set per lane, with an end date, in Help & settings.
 8. Sokhna: each Sokhna rate shows its terminal; DP World terminal rates show first; a warning appears when the picked rate loads at another terminal. In production the terminal should come from a Rate Bank column.
-9. SLA per mailbox in working hours (Sun–Thu, Cairo). The clock stops at the first reply. Values are placeholders to agree with management.
+9. SLA per mailbox in working hours (Sun–Thu, Cairo). The clock stops at the first reply: "Send and submit" in the Inbox, "Send offer to sales" in Rates & offer, or "Read it into Carrier offers" for a carrier offer. Values are placeholders to agree with management.
+12. One request number. Every email gets one number (Q-…) when it arrives, and the same number is used in the Inbox, the offer and the quotes log. Demo ranges: Q-1001… requests read from the mailbox, Q-2041… sample cases, Q-3001… carrier offers. In production one sequence gives the number when the mail connector saves the email.
 10. Spot rates only when the carrier says spot; valid for that sailing only.
 11. Sales never see buy rates, profit or the market band.
 
@@ -144,7 +144,7 @@ If these services are missing, the page still opens, shows the sample emails and
 - In production: buy rates must stay on the server and reach Pricing users only; role switch in the page is not protection.
 - "My shift" (active / away time inside the tool) must stay OFF until HR and Legal approve (Egypt Personal Data Protection Law 151 of 2020).
   In the page it is switched off by `const CS_SHIFT_ON=false`: no shift card, no Active / Away columns, no activity recorded or stored. Set it to `true` only after written approval.
-- Rehearsal controls (offline copy, reset, test email, "Signed in as") sit in one **Demo tools** menu on Inbox and Shared inbox cases. They are not part of the real tool.
+- Rehearsal controls (offline copy, reset, test email, "Signed in as") sit in one **Demo tools** menu on the Inbox. They are not part of the real tool.
 
 ## 9. What we ask from IT (details in the IT Needs Map)
 
@@ -169,14 +169,14 @@ If these services are missing, the page still opens, shows the sample emails and
 ## 11. How to test (about 10 minutes)
 
 1. Open `app/DP_World_Platform_DEMO.html` in Chrome or Edge (or the online link).
-2. Inbox → **Demo tools** → "Use offline copy" → open a request → **Price it**.
+2. Inbox → open request Q-1002 → **Price it** → **Send offer to sales**. Back in the Inbox the request is under **Submitted** with the clock stopped. (The offline copy of the emails loads by itself; it is also under **Demo tools**.)
 3. Rates & offer: check the route, the rate cards, buy / profit / sell, the checks, then the offer email.
 4. Switch to **Sales** at the top: buy rates and profit disappear.
-5. Shared inbox cases: reassign a case, open Team KPIs, change an SLA in Mailboxes & SLA.
+5. Inbox: reassign a request, open Team KPIs, change an SLA in Mailboxes & SLA.
 6. Rate Bank → Carrier offers: drop an Excel or PDF offer, see the rows it finds.
 7. Run the scripts in section 12 and reload the page.
 
-Tested on 24 Nov 2026: all 9 menu screens open with no errors; the scripts give back the same 164 rates, 3 reefer
+Tested on 24 Nov 2026: all menu screens open with no errors; the scripts give back the same 164 rates, 3 reefer
 rates, 24 import rates, 125 requests and 36 bookings.
 
 ## 12. Scripts (Python 3 + openpyxl, no network)
@@ -195,6 +195,6 @@ python3 make_dummy_ratebank.py ../data/demo_data.json ../data
 ## 13. Known limits of the prototype
 
 - One HTML page; roles are a switch, not real security.
-- Shared inbox cases live in each browser, not shared.
+- Inbox cases (owner, SLA clock, history) live in each browser, not shared.
 - Sample emails and dummy data only; no connection to DP World systems.
 - Map distances and transit days are estimates for planning, not carrier schedules.
